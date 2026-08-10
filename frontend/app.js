@@ -28,22 +28,28 @@ function handleRoute() {
     // Update active nav
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
-        if (link.getAttribute('href') === (routeKey === '#/skill/' ? '#/skills' : hash)) {
+        const href = link.getAttribute('href');
+        if (href === (routeKey === '#/skill/' ? '#/skills' : hash)) {
             link.classList.add('active');
         }
     });
 
     // Update Title
-    document.getElementById('page-title').textContent = route.title;
+    const titleEl = document.getElementById('page-title');
+    if (titleEl) titleEl.textContent = route.title;
 
     // Load Template
     const template = document.getElementById(route.template);
     const appDiv = document.getElementById('app');
+    if (!template || !appDiv) return;
+
     appDiv.innerHTML = '';
     appDiv.appendChild(template.content.cloneNode(true));
     
     // Re-initialize icons
-    lucide.createIcons();
+    if (window.lucide) {
+        lucide.createIcons();
+    }
 
     // Init page logic
     if (route.init) {
@@ -56,16 +62,17 @@ window.addEventListener('hashchange', handleRoute);
 // --- Utilities ---
 function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
+    if (!container) return;
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     
     let icon = 'info';
-    if(type === 'success') icon = 'check-circle';
-    if(type === 'error') icon = 'alert-circle';
+    if (type === 'success') icon = 'check-circle';
+    if (type === 'error') icon = 'alert-circle';
     
     toast.innerHTML = `<i data-lucide="${icon}"></i> <span>${message}</span>`;
     container.appendChild(toast);
-    lucide.createIcons();
+    if (window.lucide) lucide.createIcons();
     
     setTimeout(() => {
         toast.style.animation = 'fadeOut 0.3s forwards';
@@ -86,10 +93,11 @@ async function apiFetch(endpoint, options = {}) {
         const data = isJson ? await res.json() : await res.text();
         
         if (!res.ok) {
-            throw new Error(data.detail || data.message || `HTTP error ${res.status}`);
+            throw new Error((typeof data === 'object' && (data.detail || data.message)) || `HTTP error ${res.status}`);
         }
         return data;
     } catch (error) {
+        console.error(`API Fetch Error [${endpoint}]:`, error);
         showToast(error.message, 'error');
         throw error;
     }
@@ -99,100 +107,222 @@ async function apiFetch(endpoint, options = {}) {
 async function initApp() {
     handleRoute();
     
-    // Check if we need to seed
+    // Check if seed button should be shown
     try {
         const stats = await apiFetch('/skills/');
-        if (stats.total === 0) {
-            document.getElementById('btn-seed').style.display = 'flex';
+        const seedBtn = document.getElementById('btn-seed');
+        if (seedBtn) {
+            if (stats.total === 0) {
+                seedBtn.style.display = 'flex';
+            } else {
+                seedBtn.style.display = 'none';
+            }
+
+            seedBtn.onclick = async () => {
+                try {
+                    seedBtn.disabled = true;
+                    await apiFetch('/ingestion/seed', { method: 'POST' });
+                    showToast('Database seeded with 10 skills successfully!', 'success');
+                    seedBtn.style.display = 'none';
+                    handleRoute(); // refresh current view
+                } catch (e) {
+                    seedBtn.disabled = false;
+                }
+            };
         }
     } catch (e) {
-        console.error("API might not be ready", e);
+        console.warn("Could not check initial seed state", e);
     }
-
-    document.getElementById('btn-seed').addEventListener('click', async () => {
-        try {
-            document.getElementById('btn-seed').disabled = true;
-            await apiFetch('/ingestion/seed', { method: 'POST' });
-            showToast('Database seeded successfully!', 'success');
-            document.getElementById('btn-seed').style.display = 'none';
-            handleRoute(); // refresh current view
-        } catch (e) {
-            document.getElementById('btn-seed').disabled = false;
-        }
-    });
 }
 
 // --- Dashboard ---
 async function initDashboard() {
     try {
         const [skillsData, auditStats] = await Promise.all([
-            apiFetch('/skills/'),
+            apiFetch('/skills/').catch(() => ({ total: 0, skills: [], categories: [] })),
             apiFetch('/audit/stats').catch(() => ({ total_versions: 0, total_proposals: 0, pending_proposals: 0, quarantined_proposals: 0 }))
         ]);
         
-        document.getElementById('stat-skills').textContent = skillsData.total;
-        document.getElementById('stat-versions').textContent = auditStats.total_versions || skillsData.total;
-        document.getElementById('stat-proposals').textContent = auditStats.total_proposals || 0;
-        document.getElementById('stat-quarantined').textContent = auditStats.quarantined_proposals || 0;
+        const elSkills = document.getElementById('stat-skills');
+        const elVersions = document.getElementById('stat-versions');
+        const elProposals = document.getElementById('stat-proposals');
+        const elQuarantined = document.getElementById('stat-quarantined');
+
+        if (elSkills) elSkills.textContent = skillsData.total;
+        if (elVersions) elVersions.textContent = auditStats.total_versions || skillsData.total;
+        if (elProposals) elProposals.textContent = auditStats.total_proposals || 0;
+        if (elQuarantined) elQuarantined.textContent = auditStats.quarantined_proposals || 0;
 
         // Render Chart
         const chartContainer = document.getElementById('category-chart');
-        chartContainer.innerHTML = '';
-        if (skillsData.categories && skillsData.categories.length > 0) {
-            const max = Math.max(...skillsData.categories.map(c => c.count));
-            skillsData.categories.forEach(cat => {
-                const height = Math.max(15, (cat.count / max) * 100);
-                chartContainer.innerHTML += `
-                    <div class="bar-wrap" onclick="window.location.hash='#/skills'" style="cursor:pointer;">
-                        <div class="bar" style="height: ${height}%;" title="${cat.category}: ${cat.count}"></div>
-                        <div class="bar-label" title="${cat.category}">${cat.category} (${cat.count})</div>
+        if (chartContainer) {
+            chartContainer.innerHTML = '';
+            if (skillsData.categories && skillsData.categories.length > 0) {
+                const max = Math.max(...skillsData.categories.map(c => c.count));
+                skillsData.categories.forEach(cat => {
+                    const height = Math.max(18, (cat.count / max) * 100);
+                    chartContainer.innerHTML += `
+                        <div class="bar-wrap" onclick="window.location.hash='#/skills'" style="cursor:pointer;">
+                            <div class="bar" style="height: ${height}%;" title="${cat.category}: ${cat.count}"></div>
+                            <div class="bar-label" title="${cat.category}">${cat.category} (${cat.count})</div>
+                        </div>
+                    `;
+                });
+            } else {
+                chartContainer.innerHTML = `
+                    <div style="text-align:center; padding: 24px 12px; width:100%;">
+                        <p class="text-muted mb-4">No skills loaded yet in the local registry.</p>
+                        <button class="btn btn-primary" id="btn-seed-inline">
+                            <i data-lucide="database"></i> Seed Curated Skills Ecosystem
+                        </button>
                     </div>
                 `;
-            });
-        } else {
-            chartContainer.innerHTML = `
-                <div style="text-align:center; padding: 24px 12px; width:100%;">
-                    <p class="text-muted mb-4">No skills loaded yet in the local registry.</p>
-                    <button class="btn btn-primary" id="btn-seed-inline">
-                        <i data-lucide="database"></i> Seed Curated Skills Ecosystem
-                    </button>
-                </div>
-            `;
-            setTimeout(() => {
-                const inlineSeed = document.getElementById('btn-seed-inline');
-                if (inlineSeed) {
-                    inlineSeed.onclick = () => document.getElementById('btn-seed').click();
-                }
-                lucide.createIcons();
-            }, 50);
+                setTimeout(() => {
+                    const inlineSeed = document.getElementById('btn-seed-inline');
+                    if (inlineSeed) {
+                        inlineSeed.onclick = async () => {
+                            try {
+                                inlineSeed.disabled = true;
+                                await apiFetch('/ingestion/seed', { method: 'POST' });
+                                showToast('Seeded successfully!', 'success');
+                                initDashboard();
+                            } catch (err) {
+                                inlineSeed.disabled = false;
+                            }
+                        };
+                    }
+                    if (window.lucide) lucide.createIcons();
+                }, 50);
+            }
         }
 
-        // Mock Activity Feed
+        // Render Activity Feed
         const feed = document.getElementById('activity-feed');
-        if (skillsData.total > 0) {
-            feed.innerHTML = `
-                <div class="activity-item">
-                    <div class="activity-icon"><i data-lucide="git-merge"></i></div>
-                    <div class="activity-content">
-                        <div class="activity-text">Merged batch for <b>Data Processing</b></div>
-                        <div class="activity-time">2 mins ago</div>
+        if (feed) {
+            if (skillsData.total > 0) {
+                feed.innerHTML = `
+                    <div class="activity-item">
+                        <div class="activity-icon"><i data-lucide="git-merge"></i></div>
+                        <div class="activity-content">
+                            <div class="activity-text">Autonomous pipeline ready for <b>${skillsData.skills[0]?.name || 'FastAPI Auto-CRUD'}</b></div>
+                            <div class="activity-time">Live</div>
+                        </div>
                     </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-icon"><i data-lucide="file-plus"></i></div>
-                    <div class="activity-content">
-                        <div class="activity-text">New proposal submitted by Veteran Dev</div>
-                        <div class="activity-time">1 hour ago</div>
+                    <div class="activity-item">
+                        <div class="activity-icon"><i data-lucide="shield-check"></i></div>
+                        <div class="activity-content">
+                            <div class="activity-text">Security Sentinel active & watching proposals</div>
+                            <div class="activity-time">Protected</div>
+                        </div>
                     </div>
-                </div>
-            `;
-            lucide.createIcons();
+                    <div class="activity-item">
+                        <div class="activity-icon"><i data-lucide="network"></i></div>
+                        <div class="activity-content">
+                            <div class="activity-text">Neural node graph topology mapped for <b>${skillsData.total} skills</b></div>
+                            <div class="activity-time">Synced</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                feed.innerHTML = '<p class="text-muted">No recent activity. Seed the database to get started.</p>';
+            }
+        }
+
         // Start Mini Dashboard Neural Preview
         initMiniNeuralPreview();
+
+        if (window.lucide) lucide.createIcons();
 
     } catch (e) {
         console.error("Dashboard error", e);
     }
+}
+
+// --- Mini Dashboard Neural Canvas Preview ---
+let miniAnimId = null;
+function initMiniNeuralPreview() {
+    const canvas = document.getElementById('dashboard-neural-preview');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    if (miniAnimId) cancelAnimationFrame(miniAnimId);
+
+    const nodes = [
+        { x: 35, y: 75, color: '#00d4ff', r: 8, label: 'A' },
+        { x: 95, y: 40, color: '#818cf8', r: 7, label: 'B' },
+        { x: 95, y: 110, color: '#a855f7', r: 7, label: 'C' },
+        { x: 165, y: 75, color: '#f43f5e', r: 9, label: 'D' },
+        { x: 235, y: 75, color: '#10b981', r: 10, label: 'LIVE' },
+    ];
+    const links = [
+        [0, 1], [0, 2], [1, 3], [2, 3], [3, 4]
+    ];
+    let particles = [
+        { linkIdx: 0, progress: 0.1, speed: 0.015, color: '#00d4ff' },
+        { linkIdx: 1, progress: 0.6, speed: 0.012, color: '#a855f7' },
+        { linkIdx: 2, progress: 0.3, speed: 0.018, color: '#818cf8' },
+        { linkIdx: 3, progress: 0.8, speed: 0.014, color: '#f43f5e' },
+        { linkIdx: 4, progress: 0.5, speed: 0.02, color: '#10b981' }
+    ];
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw links
+        ctx.lineWidth = 1.5;
+        links.forEach(([i, j]) => {
+            const n1 = nodes[i];
+            const n2 = nodes[j];
+            const grad = ctx.createLinearGradient(n1.x, n1.y, n2.x, n2.y);
+            grad.addColorStop(0, n1.color + '66');
+            grad.addColorStop(1, n2.color + '66');
+            ctx.strokeStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(n1.x, n1.y);
+            ctx.lineTo(n2.x, n2.y);
+            ctx.stroke();
+        });
+
+        // Update & draw particles
+        particles.forEach(p => {
+            p.progress += p.speed;
+            if (p.progress > 1) p.progress = 0;
+            const [i, j] = links[p.linkIdx];
+            const n1 = nodes[i];
+            const n2 = nodes[j];
+            const px = n1.x + (n2.x - n1.x) * p.progress;
+            const py = n1.y + (n2.y - n1.y) * p.progress;
+
+            ctx.fillStyle = p.color;
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.arc(px, py, 3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        });
+
+        // Draw nodes
+        nodes.forEach(n => {
+            ctx.shadowColor = n.color;
+            ctx.shadowBlur = 10;
+            ctx.fillStyle = n.color;
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 8px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(n.label, n.x, n.y);
+        });
+
+        miniAnimId = requestAnimationFrame(draw);
+    }
+    draw();
 }
 
 // --- Skills Browser ---
@@ -201,6 +331,8 @@ async function initSkills() {
         const data = await apiFetch('/skills/');
         const grid = document.getElementById('skills-grid');
         const pills = document.getElementById('category-pills');
+        if (!grid || !pills) return;
+
         let allSkills = data.skills || [];
         let activeCategory = 'all';
 
@@ -226,7 +358,7 @@ async function initSkills() {
                     </div>
                 `;
             });
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
         }
 
         // Render Category Pills with click handlers
@@ -303,12 +435,13 @@ async function initSkillDetail(id) {
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                 
                 e.target.classList.add('active');
-                document.getElementById(`tab-${e.target.dataset.tab}`).classList.add('active');
+                const targetTab = document.getElementById(`tab-${e.target.dataset.tab}`);
+                if (targetTab) targetTab.classList.add('active');
             });
         });
 
         // Use Skill
-        document.getElementById('btn-use-skill').addEventListener('click', async () => {
+        document.getElementById('btn-use-skill')?.addEventListener('click', async () => {
             try {
                 await apiFetch(`/skills/${id}/use`, {
                     method: 'POST',
@@ -316,17 +449,17 @@ async function initSkillDetail(id) {
                 });
                 showToast('Skill executed successfully', 'success');
                 let uc = document.getElementById('detail-ucount');
-                uc.textContent = parseInt(uc.textContent) + 1;
+                if (uc) uc.textContent = parseInt(uc.textContent || '0') + 1;
             } catch (e) {}
         });
 
         // Submit Proposal
-        document.getElementById('btn-submit-proposal').addEventListener('click', async () => {
-            const isModify = document.querySelector('.tab-btn[data-tab="modify"]').classList.contains('active');
+        document.getElementById('btn-submit-proposal')?.addEventListener('click', async () => {
+            const isModify = document.querySelector('.tab-btn[data-tab="modify"]')?.classList.contains('active');
             const type = isModify ? 'modification' : 'issue_report';
-            const content = isModify ? document.getElementById('proposal-content').value : null;
-            const issue = isModify ? null : document.getElementById('proposal-issue').value;
-            const proposer = document.getElementById('proposal-proposer').value;
+            const content = isModify ? document.getElementById('proposal-content')?.value : null;
+            const issue = isModify ? null : document.getElementById('proposal-issue')?.value;
+            const proposer = document.getElementById('proposal-proposer')?.value;
 
             try {
                 await apiFetch(`/proposals/skills/${id}/proposals`, {
@@ -345,60 +478,69 @@ async function initSkillDetail(id) {
 
         // Render Timeline
         const timeline = document.getElementById('version-timeline');
-        timeline.innerHTML = '';
-        if(versions && versions.length > 0) {
-            versions.slice(0, 5).forEach(v => {
-                timeline.innerHTML += `
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                            <h4>v${v.id.substring(0,8)}</h4>
-                            <p>${new Date(v.created_at).toLocaleString()}</p>
+        if (timeline) {
+            timeline.innerHTML = '';
+            if (versions && versions.length > 0) {
+                versions.slice(0, 5).forEach(v => {
+                    timeline.innerHTML += `
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <h4>v${v.id.substring(0,8)}</h4>
+                                <p>${new Date(v.created_at).toLocaleString()}</p>
+                            </div>
                         </div>
-                    </div>
-                `;
-            });
-        } else {
-             timeline.innerHTML = '<p class="text-muted">No versions yet.</p>';
+                    `;
+                });
+            } else {
+                 timeline.innerHTML = '<p class="text-muted">No versions yet.</p>';
+            }
         }
 
         // Render Proposals
         const activeProps = document.getElementById('active-proposals');
-        activeProps.innerHTML = '';
-        if(proposals && proposals.length > 0) {
-            proposals.forEach(p => {
-                let badgeClass = p.status === 'pending' ? 'yellow' : (p.status === 'rejected' ? 'red' : 'green');
-                activeProps.innerHTML += `
-                    <div class="p-3 border-b border-gray-700 last:border-0" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 12px 0;">
-                        <div style="display:flex; justify-content:space-between;">
-                            <span style="font-size:0.875rem; font-weight:600;">${p.proposal_type}</span>
-                            <span style="font-size:0.75rem; color:var(--color-${badgeClass})">${p.status}</span>
+        if (activeProps) {
+            activeProps.innerHTML = '';
+            if (proposals && proposals.length > 0) {
+                proposals.forEach(p => {
+                    let badgeClass = p.status === 'pending' ? 'yellow' : (p.status === 'rejected' ? 'red' : 'green');
+                    activeProps.innerHTML += `
+                        <div class="p-3 border-b border-gray-700 last:border-0" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 12px 0;">
+                            <div style="display:flex; justify-content:space-between;">
+                                <span style="font-size:0.875rem; font-weight:600;">${p.proposal_type}</span>
+                                <span style="font-size:0.75rem; color:var(--color-${badgeClass})">${p.status}</span>
+                            </div>
+                            <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">by ${p.proposer_id}</p>
                         </div>
-                        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">by ${p.proposer_id}</p>
-                    </div>
-                `;
-            });
-        } else {
-            activeProps.innerHTML = '<p class="text-muted">No active proposals.</p>';
+                    `;
+                });
+            } else {
+                activeProps.innerHTML = '<p class="text-muted">No active proposals.</p>';
+            }
         }
 
+        if (window.lucide) lucide.createIcons();
+
     } catch (e) {
-        console.error(e);
+        console.error("Skill detail error", e);
     }
 }
 
-// --- Pipeline ---
+// --- Pipeline Control ---
 function logPipeline(msg, type='info') {
-    const console = document.getElementById('pipeline-console');
-    console.innerHTML += `<div class="log-entry ${type}">> ${msg}</div>`;
-    console.scrollTop = console.scrollHeight;
+    const consoleEl = document.getElementById('pipeline-console');
+    if (!consoleEl) return;
+    consoleEl.innerHTML += `<div class="log-entry ${type}">> ${msg}</div>`;
+    consoleEl.scrollTop = consoleEl.scrollHeight;
 }
 
 async function initPipeline() {
     try {
         const data = await apiFetch('/skills/');
         const select = document.getElementById('pipeline-skill-select');
+        if (!select) return;
         
+        select.innerHTML = '<option value="">Select a skill...</option>';
         data.skills.forEach(s => {
             const opt = document.createElement('option');
             opt.value = s.id;
@@ -414,17 +556,17 @@ async function initPipeline() {
             const btnFull = document.getElementById('btn-run-full');
             
             if (skillId) {
-                btnProcess.disabled = false;
-                btnFull.disabled = false;
+                if (btnProcess) btnProcess.disabled = false;
+                if (btnFull) btnFull.disabled = false;
                 logPipeline(`Selected skill: ${skillId}`);
-                document.getElementById('stage-batch').classList.add('active');
+                document.getElementById('stage-batch')?.classList.add('active');
             } else {
-                btnProcess.disabled = true;
-                btnFull.disabled = true;
+                if (btnProcess) btnProcess.disabled = true;
+                if (btnFull) btnFull.disabled = true;
             }
         });
 
-        document.getElementById('btn-process-batch').addEventListener('click', async () => {
+        document.getElementById('btn-process-batch')?.addEventListener('click', async () => {
             const skillId = select.value;
             try {
                 logPipeline(`Processing batch for ${skillId}...`, 'system');
@@ -439,14 +581,15 @@ async function initPipeline() {
                 }
                 logPipeline(res.message || '', 'info');
                 
-                document.getElementById('stage-audit').classList.add('active');
-                document.getElementById('btn-run-audit').disabled = false;
+                document.getElementById('stage-audit')?.classList.add('active');
+                const btnAudit = document.getElementById('btn-run-audit');
+                if (btnAudit) btnAudit.disabled = false;
             } catch (e) {
                 logPipeline(`Batch processing failed: ${e.message}`, 'error');
             }
         });
 
-        document.getElementById('btn-run-audit').addEventListener('click', async () => {
+        document.getElementById('btn-run-audit')?.addEventListener('click', async () => {
             if (!currentBatchId) return;
             try {
                 logPipeline(`Running audit on batch ${currentBatchId}...`, 'system');
@@ -459,8 +602,9 @@ async function initPipeline() {
                 }
                 
                 if (res.clean_count > 0) {
-                    document.getElementById('stage-release').classList.add('active');
-                    document.getElementById('btn-release').disabled = false;
+                    document.getElementById('stage-release')?.classList.add('active');
+                    const btnRel = document.getElementById('btn-release');
+                    if (btnRel) btnRel.disabled = false;
                 } else {
                     logPipeline('All proposals quarantined. Release blocked.', 'error');
                 }
@@ -469,7 +613,7 @@ async function initPipeline() {
             }
         });
 
-        document.getElementById('btn-release').addEventListener('click', async () => {
+        document.getElementById('btn-release')?.addEventListener('click', async () => {
             if (!currentBatchId) return;
             try {
                 logPipeline(`Releasing batch ${currentBatchId}...`, 'system');
@@ -480,7 +624,7 @@ async function initPipeline() {
             }
         });
 
-        document.getElementById('btn-run-full').addEventListener('click', async () => {
+        document.getElementById('btn-run-full')?.addEventListener('click', async () => {
             const skillId = select.value;
             try {
                 logPipeline(`Starting full pipeline for ${skillId}...`, 'system');
@@ -503,8 +647,10 @@ async function initPipeline() {
             }
         });
 
+        if (window.lucide) lucide.createIcons();
+
     } catch(e) {
-        console.error(e);
+        console.error("Pipeline init error", e);
     }
 }
 
@@ -515,15 +661,16 @@ async function initAudit() {
         const tbody = document.getElementById('audit-table-body');
         const emptyState = document.getElementById('audit-empty');
         const table = document.querySelector('.data-table');
+        if (!tbody) return;
 
         if (!quarantined || quarantined.length === 0) {
-            table.style.display = 'none';
-            emptyState.style.display = 'block';
+            if (table) table.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'block';
             return;
         }
 
-        table.style.display = 'table';
-        emptyState.style.display = 'none';
+        if (table) table.style.display = 'table';
+        if (emptyState) emptyState.style.display = 'none';
         tbody.innerHTML = '';
 
         quarantined.forEach(q => {
@@ -543,7 +690,7 @@ async function initAudit() {
             `;
         });
         
-        lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
 
         document.querySelectorAll('.btn-approve').forEach(btn => {
             btn.addEventListener('click', () => handleAuditAction(btn.dataset.id, 'approve'));
@@ -553,95 +700,20 @@ async function initAudit() {
         });
 
     } catch (e) {
-        console.error(e);
+        console.error("Audit init error", e);
     }
 }
 
-// --- Mini Dashboard Neural Canvas Preview ---
-let miniAnimId = null;
-function initMiniNeuralPreview() {
-    const canvas = document.getElementById('dashboard-neural-preview');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    if (miniAnimId) cancelAnimationFrame(miniAnimId);
-
-    const nodes = [
-        { x: 40, y: 75, color: '#00d4ff', r: 8, label: 'A' },
-        { x: 100, y: 40, color: '#818cf8', r: 7, label: 'B' },
-        { x: 100, y: 110, color: '#a855f7', r: 7, label: 'C' },
-        { x: 170, y: 75, color: '#f43f5e', r: 9, label: 'D' },
-        { x: 240, y: 75, color: '#10b981', r: 10, label: 'LIVE' },
-    ];
-    const links = [
-        [0, 1], [0, 2], [1, 3], [2, 3], [3, 4]
-    ];
-    let particles = [
-        { linkIdx: 0, progress: 0.1, speed: 0.015, color: '#00d4ff' },
-        { linkIdx: 1, progress: 0.6, speed: 0.012, color: '#a855f7' },
-        { linkIdx: 2, progress: 0.3, speed: 0.018, color: '#818cf8' },
-        { linkIdx: 3, progress: 0.8, speed: 0.014, color: '#f43f5e' },
-        { linkIdx: 4, progress: 0.5, speed: 0.02, color: '#10b981' }
-    ];
-
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Draw links
-        ctx.lineWidth = 1.5;
-        links.forEach(([i, j]) => {
-            const n1 = nodes[i];
-            const n2 = nodes[j];
-            const grad = ctx.createLinearGradient(n1.x, n1.y, n2.x, n2.y);
-            grad.addColorStop(0, n1.color + '66');
-            grad.addColorStop(1, n2.color + '66');
-            ctx.strokeStyle = grad;
-            ctx.beginPath();
-            ctx.moveTo(n1.x, n1.y);
-            ctx.lineTo(n2.x, n2.y);
-            ctx.stroke();
+async function handleAuditAction(id, action) {
+    if (!id) return;
+    try {
+        await apiFetch(`/audit/proposal/${id}/review`, {
+            method: 'POST',
+            body: JSON.stringify({ action, reviewer_notes: `Manually ${action}d via UI` })
         });
-
-        // Update & draw particles
-        particles.forEach(p => {
-            p.progress += p.speed;
-            if (p.progress > 1) p.progress = 0;
-            const [i, j] = links[p.linkIdx];
-            const n1 = nodes[i];
-            const n2 = nodes[j];
-            const px = n1.x + (n2.x - n1.x) * p.progress;
-            const py = n1.y + (n2.y - n1.y) * p.progress;
-
-            ctx.fillStyle = p.color;
-            ctx.shadowColor = p.color;
-            ctx.shadowBlur = 8;
-            ctx.beginPath();
-            ctx.arc(px, py, 3, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-        });
-
-        // Draw nodes
-        nodes.forEach(n => {
-            ctx.shadowColor = n.color;
-            ctx.shadowBlur = 10;
-            ctx.fillStyle = n.color;
-            ctx.beginPath();
-            ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 8px Inter, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(n.label, n.x, n.y);
-        });
-
-        miniAnimId = requestAnimationFrame(draw);
-    }
-    draw();
+        showToast(`Proposal ${action}d`, 'success');
+        initAudit(); // Refresh list
+    } catch(e) {}
 }
 
 // --- Interactive Neural Graph View ---
@@ -654,7 +726,6 @@ async function initGraph() {
 
     if (graphAnimId) cancelAnimationFrame(graphAnimId);
 
-    // Viewport state
     let width = 0;
     let height = 0;
     let scale = 1.0;
@@ -667,10 +738,9 @@ async function initGraph() {
     let startY = 0;
     let hoverNode = null;
     let selectedNode = null;
-    let currentMode = 'ecosystem'; // 'ecosystem' | 'cortex' | 'lineage'
+    let currentMode = 'ecosystem';
     let physicsRunning = true;
 
-    // Graph Data
     let nodes = [];
     let links = [];
     let particles = [];
@@ -691,7 +761,6 @@ async function initGraph() {
     resize();
     window.addEventListener('resize', resize);
 
-    // Initialize background dust particles
     bgDust = Array.from({ length: 60 }, () => ({
         x: Math.random() * 2000 - 1000,
         y: Math.random() * 2000 - 1000,
@@ -700,13 +769,11 @@ async function initGraph() {
         speed: Math.random() * 0.002 + 0.001
     }));
 
-    // Fetch live graph data
     try {
         const graphData = await apiFetch('/graph/neural-data');
         const rawNodes = graphData.nodes || [];
         const rawLinks = graphData.links || [];
 
-        // Update HUD
         const elNodes = document.getElementById('hud-node-count');
         const elLinks = document.getElementById('hud-link-count');
         const elQuarantine = document.getElementById('hud-quarantine-count');
@@ -715,13 +782,11 @@ async function initGraph() {
         const qCount = rawNodes.filter(n => n.type === 'quarantined').length;
         if (elQuarantine) elQuarantine.textContent = qCount;
 
-        // Position nodes initially
         const nodeMap = new Map();
-        nodes = rawNodes.map((n, i) => {
+        nodes = rawNodes.map((n) => {
             let x = (Math.random() - 0.5) * (width * 0.8);
             let y = (Math.random() - 0.5) * (height * 0.8);
 
-            // Give cortex stages nice horizontal spread
             if (n.x_hint !== undefined) {
                 x = n.x_hint;
                 y = n.y_hint;
@@ -747,8 +812,7 @@ async function initGraph() {
             targetNode: nodeMap.get(l.target),
         })).filter(l => l.sourceNode && l.targetNode);
 
-        // Create initial traveling particles along links
-        links.forEach((link, idx) => {
+        links.forEach((link) => {
             if (link.animated || Math.random() > 0.4) {
                 particles.push({
                     link: link,
@@ -765,11 +829,9 @@ async function initGraph() {
         showToast('Failed to load neural graph data', 'error');
     }
 
-    // Set initial view offset to center
     offsetX = width / 2;
     offsetY = height / 2;
 
-    // --- Physics Engine ---
     function updatePhysics() {
         if (!physicsRunning) return;
 
@@ -779,7 +841,6 @@ async function initGraph() {
         const centerGravity = 0.015;
         const friction = 0.88;
 
-        // Node-node repulsion
         for (let i = 0; i < nodes.length; i++) {
             for (let j = i + 1; j < nodes.length; j++) {
                 const n1 = nodes[i];
@@ -799,7 +860,6 @@ async function initGraph() {
             }
         }
 
-        // Link spring attraction
         links.forEach(l => {
             const n1 = l.sourceNode;
             const n2 = l.targetNode;
@@ -815,24 +875,19 @@ async function initGraph() {
             if (n2 !== dragNode) { n2.vx += fx; n2.vy += fy; }
         });
 
-        // Center gravity or mode alignment
         nodes.forEach(n => {
             if (n === dragNode) return;
 
             if (currentMode === 'cortex' && n.x_hint !== undefined) {
-                // Pull cortex stages to structured horizontal line
                 n.vx += (n.x_hint - n.x) * 0.05;
                 n.vy += (n.y_hint - n.y) * 0.05;
             } else if (currentMode === 'lineage' && n.type === 'version') {
-                // Pull versions below skills
                 n.vy += (120 - n.y) * 0.03;
             } else {
-                // Normal gentle center pull
                 n.vx -= n.x * centerGravity;
                 n.vy -= n.y * centerGravity;
             }
 
-            // Apply friction & update position
             n.vx *= friction;
             n.vy *= friction;
             n.x += n.vx;
@@ -840,25 +895,22 @@ async function initGraph() {
             n.pulseVal += 0.04;
         });
 
-        // Update traveling particles
         particles.forEach(p => {
             p.progress += p.speed;
             if (p.progress >= 1) p.progress = 0;
         });
     }
 
-    // --- Render Loop ---
     function render() {
         updatePhysics();
 
         ctx.save();
         ctx.clearRect(0, 0, width, height);
 
-        // Apply viewport transform (pan + zoom)
         ctx.translate(offsetX, offsetY);
         ctx.scale(scale, scale);
 
-        // 1. Draw Starry Neural Dust
+        // 1. Starry Neural Dust
         bgDust.forEach(d => {
             d.alpha += Math.sin(d.x + d.y + Date.now() * d.speed) * 0.005;
             ctx.fillStyle = `rgba(148, 163, 184, ${Math.max(0.05, Math.min(0.4, d.alpha))})`;
@@ -867,7 +919,7 @@ async function initGraph() {
             ctx.fill();
         });
 
-        // 2. Draw Synapses (Links)
+        // 2. Synapses
         links.forEach(l => {
             const n1 = l.sourceNode;
             const n2 = l.targetNode;
@@ -885,7 +937,7 @@ async function initGraph() {
             ctx.stroke();
         });
 
-        // 3. Draw Synaptic Signal Particles
+        // 3. Synaptic Signal Particles
         particles.forEach(p => {
             const n1 = p.link.sourceNode;
             const n2 = p.link.targetNode;
@@ -901,18 +953,16 @@ async function initGraph() {
             ctx.shadowBlur = 0;
         });
 
-        // 4. Draw Nodes
+        // 4. Nodes
         nodes.forEach(n => {
             const isHovered = (n === hoverNode);
             const isSelected = (n === selectedNode);
             const r = n.r + (isHovered ? 4 : (isSelected ? 3 : 0));
             const pulse = Math.sin(n.pulseVal) * 2;
 
-            // Outer Pulsing Glow Aura
             ctx.shadowColor = n.color;
             ctx.shadowBlur = isHovered ? 25 : (isSelected ? 20 : 12);
 
-            // Node Outer Shell / Gradient
             const radial = ctx.createRadialGradient(n.x, n.y, 2, n.x, n.y, r + pulse);
             radial.addColorStop(0, n.color);
             radial.addColorStop(0.7, n.color + 'dd');
@@ -924,7 +974,6 @@ async function initGraph() {
             ctx.fill();
             ctx.shadowBlur = 0;
 
-            // Orbital Ring for special nodes (Cortex, Proposer, Live Version)
             if (n.type === 'cortex' || n.type === 'proposer' || n.is_live) {
                 ctx.strokeStyle = n.color + '88';
                 ctx.lineWidth = 1.5;
@@ -935,19 +984,16 @@ async function initGraph() {
                 ctx.setLineDash([]);
             }
 
-            // Inner Core
             ctx.fillStyle = '#0a0e1a';
             ctx.beginPath();
             ctx.arc(n.x, n.y, r * 0.45, 0, Math.PI * 2);
             ctx.fill();
 
-            // Core dot
             ctx.fillStyle = n.color;
             ctx.beginPath();
             ctx.arc(n.x, n.y, r * 0.25, 0, Math.PI * 2);
             ctx.fill();
 
-            // Node Label
             ctx.font = `${n.type === 'cortex' ? 'bold 11px' : '10px'} Inter, sans-serif`;
             ctx.fillStyle = isHovered ? '#fff' : '#cbd5e1';
             ctx.textAlign = 'center';
@@ -959,12 +1005,10 @@ async function initGraph() {
         });
 
         ctx.restore();
-
         graphAnimId = requestAnimationFrame(render);
     }
     render();
 
-    // --- Mouse & Touch Coordinates Conversion ---
     function getCanvasCoords(e) {
         const rect = canvas.getBoundingClientRect();
         const clientX = e.clientX || (e.touches && e.touches[0].clientX);
@@ -988,7 +1032,6 @@ async function initGraph() {
         return null;
     }
 
-    // --- Event Listeners ---
     const tooltip = document.getElementById('neural-tooltip');
 
     canvas.addEventListener('mousemove', (e) => {
@@ -1010,7 +1053,6 @@ async function initGraph() {
             return;
         }
 
-        // Hover detection
         const target = findNodeAt(worldX, worldY);
         hoverNode = target;
 
@@ -1043,7 +1085,7 @@ async function initGraph() {
         }
     });
 
-    window.addEventListener('mouseup', (e) => {
+    window.addEventListener('mouseup', () => {
         if (isDragging && dragNode) {
             dragNode = null;
         }
@@ -1073,7 +1115,6 @@ async function initGraph() {
         scale = newScale;
     }, { passive: false });
 
-    // --- HUD Controls ---
     document.getElementById('btn-zoom-in')?.addEventListener('click', () => {
         scale = Math.min(3.5, scale * 1.25);
     });
@@ -1085,12 +1126,11 @@ async function initGraph() {
         offsetX = width / 2;
         offsetY = height / 2;
     });
-    document.getElementById('btn-toggle-physics')?.addEventListener('click', (e) => {
+    document.getElementById('btn-toggle-physics')?.addEventListener('click', () => {
         physicsRunning = !physicsRunning;
         showToast(`Simulation ${physicsRunning ? 'Resumed' : 'Paused'}`, 'info');
     });
 
-    // Mode toggles
     document.querySelectorAll('.btn-mode').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
@@ -1100,7 +1140,6 @@ async function initGraph() {
         });
     });
 
-    // Pulse Generator Button
     document.getElementById('btn-fire-pulse')?.addEventListener('click', () => {
         showToast('Firing proposal signals through neural synapses! ⚡', 'success');
         for (let i = 0; i < 15; i++) {
@@ -1117,29 +1156,32 @@ async function initGraph() {
         }
     });
 
-    // Close Inspector
     document.getElementById('btn-close-inspector')?.addEventListener('click', () => {
         const inspector = document.getElementById('neural-inspector');
         if (inspector) inspector.style.display = 'none';
         selectedNode = null;
     });
 
-    // Open Inspector Drawer
     function openNodeInspector(node) {
         selectedNode = node;
         const inspector = document.getElementById('neural-inspector');
         if (!inspector) return;
         inspector.style.display = 'flex';
 
-        document.getElementById('inspector-name').textContent = node.name;
+        const nameEl = document.getElementById('inspector-name');
+        if (nameEl) nameEl.textContent = node.name;
+        
         const badge = document.getElementById('inspector-badge');
-        badge.textContent = node.type.toUpperCase();
-        badge.style.backgroundColor = node.color + '33';
-        badge.style.color = node.color;
-        badge.style.border = `1px solid ${node.color}`;
+        if (badge) {
+            badge.textContent = node.type.toUpperCase();
+            badge.style.backgroundColor = node.color + '33';
+            badge.style.color = node.color;
+            badge.style.border = `1px solid ${node.color}`;
+        }
 
         const body = document.getElementById('inspector-body');
         const footer = document.getElementById('inspector-footer');
+        if (!body || !footer) return;
 
         let html = `
             <div class="inspector-section">
@@ -1207,7 +1249,7 @@ async function initGraph() {
         }
 
         body.innerHTML = html;
-        lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
     }
 }
 
