@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Agentic Skill Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div id="toast-container"></div>
+    <div class="app-layout">
+        <nav class="sidebar glass-panel">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon"><i data-lucide="layers"></i></div>
+                    <span>SkillManager</span>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#/dashboard" class="nav-link active" data-route="dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+                <li><a href="#/graph" class="nav-link" data-route="graph"><i data-lucide="network"></i> Neural Network</a></li>
+                <li><a href="#/skills" class="nav-link" data-route="skills"><i data-lucide="library"></i> Skill Browser</a></li>
+                <li><a href="#/pipeline" class="nav-link" data-route="pipeline"><i data-lucide="git-merge"></i> Pipeline Control</a></li>
+                <li><a href="#/audit" class="nav-link" data-route="audit"><i data-lucide="shield-alert"></i> Audit Queue</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="pulse"></span> API Online
+                </div>
+            </div>
+        </nav>
+        <main class="main-content">
+            <header class="topbar">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="topbar-actions">
+                    <div class="search-bar">
+                        <i data-lucide="search"></i>
+                        <input type="text" placeholder="Search skills...">
+                    </div>
+                    <button class="btn btn-primary" id="btn-seed" style="display: none;">
+                        <i data-lucide="database"></i> Seed DB
+                    </button>
+                    <div class="user-profile">
+                        <div class="avatar">
+                            <i data-lucide="user"></i>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <div id="app" class="view-container">
+                <!-- Content injected via JS -->
+            </div>
+        </main>
+    </div>
+    
+    <!-- Templates -->
+    <template id="tpl-dashboard">
+        <div class="dashboard-view animate-fade-in">
+            <div class="stats-grid">
+                <div class="stat-card glass-panel">
+                    <div class="stat-icon cyan"><i data-lucide="box"></i></div>
+                    <div class="stat-details">
+                        <span class="stat-label">Total Skills</span>
+                        <span class="stat-value" id="stat-skills">-</span>
+                    </div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <div class="stat-icon purple"><i data-lucide="git-commit"></i></div>
+                    <div class="stat-details">
+                        <span class="stat-label">Total Versions</span>
+                        <span class="stat-value" id="stat-versions">-</span>
+                    </div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <div class="stat-icon yellow"><i data-lucide="file-edit"></i></div>
+                    <div class="stat-details">
+                        <span class="stat-label">Pending Proposals</span>
+                        <span class="stat-value" id="stat-proposals">-</span>
+                    </div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <div class="stat-icon red"><i data-lucide="shield-off"></i></div>
+                    <div class="stat-details">
+                        <span class="stat-label">Quarantined</span>
+                        <span class="stat-value" id="stat-quarantined">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Neural Graph Hero Card -->
+            <div class="neural-hero-card glass-panel mb-6" onclick="window.location.hash='#/graph'">
+                <div class="neural-hero-content">
+                    <div class="neural-badge"><span class="pulse"></span> LIVE NEURAL ECOSYSTEM</div>
+                    <h2>Living Skill Neural Graph & Cortex Visualizer</h2>
+                    <p>Explore dynamic skill hubs, nonlinear attention weighting synapses, unforgeable trust agent orbits, and quarantine isolation pods in real-time.</p>
+                    <div class="neural-hero-action">
+                        <button class="btn btn-gradient"><i data-lucide="network"></i> Open Interactive Neural Node Graph</button>
+                        <span class="text-muted"><i data-lucide="zap"></i> Physics Simulation & Live Synaptic Pulses Active</span>
+                    </div>
+                </div>
+                <div class="neural-hero-preview">
+                    <canvas id="dashboard-neural-preview" width="280" height="150"></canvas>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-panel glass-panel">
+                    <h2>Category Breakdown</h2>
+                    <div class="chart-container" id="category-chart">
+                        <!-- CSS Bar chart -->
+                    </div>
+                </div>
+                <div class="dashboard-panel glass-panel">
+                    <h2>Recent Activity</h2>
+                    <div class="activity-feed" id="activity-feed">
+                        <!-- Activity items -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="tpl-skills">
+        <div class="skills-view animate-fade-in">
+            <div class="filter-bar glass-panel">
+                <div class="category-pills" id="category-pills">
+                    <button class="pill active" data-category="all">All</button>
+                </div>
+                <div class="sort-dropdown">
+                    <select id="sort-skills">
+                        <option value="popular">Most Used</option>
+                        <option value="newest">Newest</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="skills-grid" id="skills-grid">
+                <!-- Skill cards -->
+            </div>
+        </div>
+    </template>
+
+    <template id="tpl-skill-detail">
+        <div class="skill-detail-view animate-fade-in">
+            <button class="btn btn-ghost mb-4" onclick="window.location.hash='#/skills'"><i data-lucide="arrow-left"></i> Back to Skills</button>
+            
+            <div class="skill-header glass-panel mb-6">
+                <div class="header-main">
+                    <div class="title-row">
+                        <h1 id="detail-name">-</h1>
+                        <span class="badge badge-primary" id="detail-category">-</span>
+                    </div>
+                    <p class="text-muted" id="detail-desc">-</p>
+                </div>
+                <div class="header-actions">
+                    <div class="stats-row mb-3">
+                        <span class="stat-badge"><i data-lucide="git-branch"></i> <span id="detail-vcount">0</span> versions</span>
+                        <span class="stat-badge"><i data-lucide="play-circle"></i> <span id="detail-ucount">0</span> uses</span>
+                    </div>
+                    <button class="btn btn-primary w-full" id="btn-use-skill"><i data-lucide="zap"></i> Use This Skill</button>
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <div class="main-column">
+                    <div class="glass-panel mb-6 code-panel">
+                        <div class="panel-header">
+                            <h3>Current Version Content</h3>
+                            <button class="btn btn-icon btn-copy"><i data-lucide="copy"></i></button>
+                        </div>
+                        <pre><code id="detail-content">-</code></pre>
+                    </div>
+
+                    <div class="glass-panel submit-proposal-panel">
+                        <h3>Submit Proposal</h3>
+                        <div class="proposal-tabs">
+                            <button class="tab-btn active" data-tab="modify">Modify Content</button>
+                            <button class="tab-btn" data-tab="issue">Report Issue</button>
+                        </div>
+                        
+                        <div class="tab-content active" id="tab-modify">
+                            <textarea id="proposal-content" class="code-textarea" rows="10"></textarea>
+                        </div>
+                        <div class="tab-content" id="tab-issue">
+                            <textarea id="proposal-issue" class="form-textarea" rows="4" placeholder="Describe the issue..."></textarea>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <label>Proposer Profile (Demo)</label>
+                            <select id="proposal-proposer" class="form-select">
+                                <option value="veteran_dev">Veteran Developer (Trust: ~0.95)</option>
+                                <option value="moderate_dev">Regular Contributor (Trust: ~0.50)</option>
+                                <option value="newcomer_dev">New User (Trust: ~0.05)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mt-4 flex-end">
+                            <button class="btn btn-gradient" id="btn-submit-proposal">Submit Proposal</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="side-column">
+                    <div class="glass-panel timeline-panel mb-6">
+                        <h3>Version History</h3>
+                        <div class="timeline" id="version-timeline">
+                            <!-- Timeline items -->
+                        </div>
+                    </div>
+                    
+                    <div class="glass-panel proposals-panel">
+                        <h3>Active Proposals</h3>
+                        <div class="proposals-list" id="active-proposals">
+                            <!-- Proposals -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="tpl-pipeline">
+        <div class="pipeline-view animate-fade-in">
+            <div class="glass-panel mb-6">
+                <div class="pipeline-header">
+                    <h2>Pipeline Control</h2>
+                    <div class="form-group row-group">
+                        <label>Target Skill:</label>
+                        <select id="pipeline-skill-select" class="form-select w-64">
+                            <option value="">Select a skill...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pipeline-stages" id="pipeline-stages">
+                <div class="stage-card glass-panel" id="stage-batch">
+                    <div class="stage-icon"><i data-lucide="layers"></i></div>
+                    <h3>1. Process Batch</h3>
+                    <p>Aggregate proposals and generate merge candidate.</p>
+                    <button class="btn btn-outline w-full mt-4" id="btn-process-batch" disabled>Process Batch</button>
+                </div>
+                
+                <div class="stage-connector"><i data-lucide="arrow-right"></i></div>
+                
+                <div class="stage-card glass-panel" id="stage-audit">
+                    <div class="stage-icon"><i data-lucide="shield-check"></i></div>
+                    <h3>2. Run Audit</h3>
+                    <p>Evaluate risk, detect sybil attacks, enforce constraints.</p>
+                    <button class="btn btn-outline w-full mt-4" id="btn-run-audit" disabled>Run Audit</button>
+                </div>
+
+                <div class="stage-connector"><i data-lucide="arrow-right"></i></div>
+
+                <div class="stage-card glass-panel" id="stage-release">
+                    <div class="stage-icon"><i data-lucide="rocket"></i></div>
+                    <h3>3. Release</h3>
+                    <p>Promote candidate to official version.</p>
+                    <button class="btn btn-outline w-full mt-4" id="btn-release" disabled>Release Version</button>
+                </div>
+            </div>
+
+            <div class="text-center my-6">
+                <span class="text-muted mx-4">OR</span>
+                <button class="btn btn-gradient btn-lg" id="btn-run-full" disabled><i data-lucide="zap"></i> Run Full Pipeline</button>
+            </div>
+
+            <div class="glass-panel log-panel">
+                <h3>Pipeline Console</h3>
+                <div class="console-output" id="pipeline-console">
+                    <div class="log-entry system">Ready. Select a skill to begin.</div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="tpl-audit">
+        <div class="audit-view animate-fade-in">
+            <div class="glass-panel">
+                <div class="panel-header mb-4">
+                    <h2>Audit Queue (Quarantined)</h2>
+                    <button class="btn btn-icon"><i data-lucide="refresh-cw"></i></button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Skill ID</th>
+                                <th>Proposer</th>
+                                <th>Type</th>
+                                <th>Proposer Trust</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-table-body">
+                            <!-- Rows -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="audit-empty" class="empty-state">
+                    <i data-lucide="check-circle" class="text-green text-4xl mb-3"></i>
+                    <p>Queue is clear. No quarantined proposals.</p>
+                </div>
+            </div>
+            
+            <div class="glass-panel mt-6" id="audit-detail" style="display: none;">
+                <!-- Audit Detail View -->
+            </div>
+        </div>
+    <template id="tpl-graph">
+        <div class="neural-graph-view animate-fade-in">
+            <!-- Top Synaptic HUD bar -->
+            <div class="graph-hud-bar glass-panel mb-4">
+                <div class="hud-metrics">
+                    <div class="hud-item">
+                        <span class="hud-label"><i data-lucide="cpu"></i> Active Nodes</span>
+                        <span class="hud-value cyan" id="hud-node-count">0</span>
+                    </div>
+                    <div class="hud-item">
+                        <span class="hud-label"><i data-lucide="git-commit"></i> Synapses</span>
+                        <span class="hud-value purple" id="hud-link-count">0</span>
+                    </div>
+                    <div class="hud-item">
+                        <span class="hud-label"><i data-lucide="shield-alert"></i> Quarantined Pods</span>
+                        <span class="hud-value red" id="hud-quarantine-count">0</span>
+                    </div>
+                    <div class="hud-item">
+                        <span class="hud-label"><i data-lucide="activity"></i> Synaptic Energy</span>
+                        <span class="hud-value green" id="hud-energy-flux">Optimal</span>
+                    </div>
+                </div>
+
+                <div class="hud-actions">
+                    <div class="mode-toggle-group">
+                        <button class="btn btn-xs btn-mode active" data-mode="ecosystem"><i data-lucide="globe"></i> Ecosystem Map</button>
+                        <button class="btn btn-xs btn-mode" data-mode="cortex"><i data-lucide="git-pull-request"></i> 7-Stage Cortex</button>
+                        <button class="btn btn-xs btn-mode" data-mode="lineage"><i data-lucide="git-branch"></i> Version Trees</button>
+                    </div>
+                    <button class="btn btn-gradient btn-sm" id="btn-fire-pulse"><i data-lucide="zap"></i> Fire Proposal Pulse</button>
+                </div>
+            </div>
+
+            <!-- Canvas Container + Inspector Overlay -->
+            <div class="graph-viewport-wrapper glass-panel">
+                <!-- Interactive Canvas -->
+                <canvas id="neural-canvas"></canvas>
+
+                <!-- Floating Toolbar Overlay -->
+                <div class="graph-controls-overlay">
+                    <div class="control-pill-group">
+                        <button class="btn btn-icon btn-sm" id="btn-zoom-in" title="Zoom In"><i data-lucide="zoom-in"></i></button>
+                        <button class="btn btn-icon btn-sm" id="btn-zoom-out" title="Zoom Out"><i data-lucide="zoom-out"></i></button>
+                        <button class="btn btn-icon btn-sm" id="btn-reset-view" title="Reset View"><i data-lucide="maximize-2"></i></button>
+                        <button class="btn btn-icon btn-sm" id="btn-toggle-physics" title="Toggle Simulation"><i data-lucide="play"></i></button>
+                    </div>
+                    <div class="legend-pills">
+                        <span class="legend-pill" style="--pill-color: #00d4ff;"><span class="dot"></span> Cortex Stage</span>
+                        <span class="legend-pill" style="--pill-color: #3b82f6;"><span class="dot"></span> Skill Hub</span>
+                        <span class="legend-pill" style="--pill-color: #10b981;"><span class="dot"></span> Live Version</span>
+                        <span class="legend-pill" style="--pill-color: #a855f7;"><span class="dot"></span> Trust Agent</span>
+                        <span class="legend-pill" style="--pill-color: #ef4444;"><span class="dot"></span> Quarantined</span>
+                    </div>
+                </div>
+
+                <!-- Hover Tooltip -->
+                <div id="neural-tooltip" class="neural-tooltip" style="display: none;"></div>
+
+                <!-- Interactive Side Inspector Panel -->
+                <div class="neural-inspector glass-panel" id="neural-inspector" style="display: none;">
+                    <div class="inspector-header">
+                        <div class="inspector-title">
+                            <span class="badge" id="inspector-badge">NODE</span>
+                            <h3 id="inspector-name">Node Inspector</h3>
+                        </div>
+                        <button class="btn btn-icon btn-sm" id="btn-close-inspector"><i data-lucide="x"></i></button>
+                    </div>
+                    <div class="inspector-body" id="inspector-body">
+                        <!-- Dynamic details populated by JS -->
+                    </div>
+                    <div class="inspector-footer" id="inspector-footer">
+                        <!-- Dynamic action buttons -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="app.js"></script>
+</body>
+</html>
