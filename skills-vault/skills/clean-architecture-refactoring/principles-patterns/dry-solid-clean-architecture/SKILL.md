@@ -41,14 +41,14 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 
-# 1. Domain Entity
+# 1. Domain Entity (Pure Enterprise Logic)
 @dataclass(frozen=True)
 class User:
     id: str
     email: str
     is_active: bool
 
-# 2. Port (Interface)
+# 2. Port (Interface Contract)
 class UserRepositoryPort(ABC):
     @abstractmethod
     async def get_by_email(self, email: str) -> Optional[User]:
@@ -58,7 +58,7 @@ class UserRepositoryPort(ABC):
     async def save(self, user: User) -> None:
         pass
 
-# 3. Use Case
+# 3. Use Case (Application Orchestrator)
 class RegisterUserUseCase:
     def __init__(self, user_repo: UserRepositoryPort):
         self.user_repo = user_repo
@@ -76,3 +76,9 @@ class RegisterUserUseCase:
 ## Anti-Patterns
 - ❌ Leaking database ORM models or HTTP request objects directly into domain entities.
 - ❌ Premature DRY: Coupling two distinct domain contexts just because they currently share similar data fields.
+- ❌ God Classes / Fat Services: Violating the Single Responsibility Principle by bundling auth, billing, and email in one class.
+
+## Quality & Verification Checklist
+- [ ] Domain models contain 0 imports from third-party ORMs or web frameworks.
+- [ ] Ports use Python `abc.ABC` or TypeScript `interface` types.
+- [ ] Use cases are 100% unit-testable using in-memory mock adapters without spinning up databases.

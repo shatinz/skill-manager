@@ -63,3 +63,8 @@ async def place_order_with_outbox(session: AsyncSession, order_data: dict):
 
 ## Anti-Patterns
 - ❌ Committing to the database and publishing to Kafka/RabbitMQ in separate uncoordinated blocks (causes lost events on crash).
+- ❌ Non-idempotent event consumers that fail or duplicate actions upon retried messages.
+
+## Quality & Verification Checklist
+- [ ] Write operations and outbox records execute in a single ACID transaction.
+- [ ] Consumer handlers track processed message IDs in a deduplication table or Redis TTL key.

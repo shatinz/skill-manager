@@ -1,0 +1,32 @@
+{
+  "id": "web-frameworks.react-fullstack.nextjs-15-app-router",
+  "name": "nextjs-15-app-router",
+  "title": "Next.js 15 App Router Architecture & Server Actions",
+  "category": "web-frameworks",
+  "subcategory": "react-fullstack",
+  "version": "1.5.0",
+  "tags": [
+    "nextjs",
+    "react-19",
+    "server-actions",
+    "app-router",
+    "typescript",
+    "rsc",
+    "turbopack"
+  ],
+  "trust_rating": 0.99,
+  "estimated_tokens": 1750,
+  "description": "Architect, implement, and optimize Next.js 15 fullstack applications using React Server Components, Server Actions, async request APIs (cookies, headers, params), granular cache revalidation, and streaming suspense boundaries.",
+  "trigger_patterns": [
+    "build nextjs 15 app",
+    "nextjs 15 server actions",
+    "react server components rsc nextjs",
+    "nextjs 15 cache revalidateTag",
+    "nextjs app router nested layouts",
+    "nextjs async cookies headers"
+  ],
+  "relative_path": "skills/web-frameworks/react-fullstack/nextjs-15-app-router/SKILL.md",
+  "content": "# Next.js 15 App Router Architecture & Server Actions\n\n## Objective\nBuild high-performance, SEO-optimized, secure web applications leveraging Next.js 15 (React 19), React Server Components (RSC), asynchronous request APIs, typed Server Actions, and granular tag-based cache revalidation.\n\n## Architectural Principles\n1. **Server-First by Default**: Keep all components as React Server Components (RSC) unless interactivity, browser APIs, or React client hooks (`useState`, `useEffect`, `useActionState`) are strictly required.\n2. **Async Request Lifecycle**: In Next.js 15, `cookies()`, `headers()`, `params`, and `searchParams` are asynchronous promises. Always await them: `const params = await props.params;`.\n3. **Safe Server Actions**: Validate all action inputs with Zod schemas. Enforce user authorization inside the action before mutations. Use `useActionState` and `useFormStatus` on the client for optimistic feedback.\n4. **Granular Revalidation**: Prefer `revalidateTag(tag)` over blunt `revalidatePath()`. Wrap non-critical data fetches in `<Suspense fallback={<Skeleton />}>` for instant TTFB.\n\n## Production Blueprint\n\n### 1. Type-Safe Server Action with Zod (`actions/items.ts`)\n```typescript\n'use server';\n\nimport { z } from 'zod';\nimport { revalidateTag } from 'next/cache';\nimport { auth } from '@/lib/auth';\nimport { db } from '@/lib/db';\n\nconst CreateItemSchema = z.object({\n  title: z.string().min(3).max(120),\n  description: z.string().max(500).optional(),\n  price: z.coerce.number().positive(),\n});\n\nexport type ActionState = {\n  success?: boolean;\n  message?: string;\n  errors?: Record<string, string[]>;\n};\n\nexport async function createItemAction(\n  prevState: ActionState,\n  formData: FormData\n): Promise<ActionState> {\n  const session = await auth();\n  if (!session?.user?.id) {\n    return { success: false, message: 'Unauthorized. Please sign in.' };\n  }\n\n  const rawData = Object.fromEntries(formData.entries());\n  const validated = CreateItemSchema.safeParse(rawData);\n\n  if (!validated.success) {\n    return {\n      success: false,\n      errors: validated.error.flatten().fieldErrors,\n      message: 'Validation failed. Please correct input errors.',\n    };\n  }\n\n  try {\n    await db.item.create({\n      data: {\n        ...validated.data,\n        userId: session.user.id,\n      },\n    });\n\n    revalidateTag('items-feed');\n    return { success: true, message: 'Item created successfully.' };\n  } catch (error) {\n    console.error('Failed to create item:', error);\n    return { success: false, message: 'Internal database error.' };\n  }\n}\n```\n\n### 2. Async Page Component with Suspense (`app/items/[id]/page.tsx`)\n```tsx\nimport { Suspense } from 'react';\nimport { notFound } from 'next/navigation';\nimport { getItemById } from '@/lib/data/items';\nimport { ItemDetailView } from '@/components/item-detail-view';\nimport { SkeletonCard } from '@/components/ui/skeleton-card';\n\ntype PageProps = {\n  params: Promise<{ id: string }>;\n  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;\n};\n\nexport default async function ItemPage(props: PageProps) {\n  const { id } = await props.params;\n\n  return (\n    <main className=\"container mx-auto px-4 py-8\">\n      <Suspense fallback={<SkeletonCard />}>\n        <ItemContent id={id} />\n      </Suspense>\n    </main>\n  );\n}\n\nasync function ItemContent({ id }: { id: string }) {\n  const item = await getItemById(id);\n  if (!item) notFound();\n\n  return <ItemDetailView item={item} />;\n}\n```\n\n## Anti-Patterns to Avoid\n- \u274c **Client Component Creep**: Adding `'use client'` at the page or layout level. Instead, push `'use client'` down to the leaves (buttons, interactive forms).\n- \u274c **Unawaited Request APIs**: Treating `params` or `cookies()` as synchronous objects in Next.js 15.\n- \u274c **Waterfall Fetching**: Cascading `await fetchA()` then `await fetchB()`. Use `Promise.all([fetchA(), fetchB()])` or separate `<Suspense>` streams.\n- \u274c **Missing CSRF & Auth**: Exposing server actions without validating caller session and input schemas.\n\n## Verification Checklist\n- [ ] Run `npx next lint` and ensure no synchronous params/cookies deprecation warnings.\n- [ ] Verify Server Action validation returns structured field errors without throwing unhandled exceptions.\n- [ ] Check Network tab to confirm HTML streaming TTFB is under 150ms with `<Suspense>` boundaries.",
+  "raw_frontmatter": {},
+  "source_url": "file:///mnt/c/Users/PC/prj/skill-manager/skills-vault/skills/web-frameworks/react-fullstack/nextjs-15-app-router/SKILL.md"
+}

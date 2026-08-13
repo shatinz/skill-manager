@@ -1,0 +1,32 @@
+{
+  "id": "web-frameworks.python-api.fastapi-production-craft",
+  "name": "fastapi-production-craft",
+  "title": "FastAPI Production Architecture & Async Engineering",
+  "category": "web-frameworks",
+  "subcategory": "python-api",
+  "version": "1.5.0",
+  "tags": [
+    "fastapi",
+    "python",
+    "pydantic-v2",
+    "asyncio",
+    "sqlalchemy-async",
+    "openapi",
+    "rfc7807"
+  ],
+  "trust_rating": 0.98,
+  "estimated_tokens": 1650,
+  "description": "Architect, implement, and harden production-grade FastAPI REST and async services with Pydantic v2 schemas, SQLAlchemy 2.0 async sessions, dependency injection, and standardized RFC 7807 error envelopes.",
+  "trigger_patterns": [
+    "create fastapi backend",
+    "fastapi production setup",
+    "fastapi async sqlalchemy 2",
+    "pydantic v2 fastapi schemas",
+    "fastapi dependency injection lifespan",
+    "fastapi rfc7807 error handling"
+  ],
+  "relative_path": "skills/web-frameworks/python-api/fastapi-production-craft/SKILL.md",
+  "content": "# FastAPI Production Architecture & Async Engineering\n\n## Objective\nDesign high-throughput, maintainable, and type-safe async REST APIs using FastAPI, Pydantic v2, and SQLAlchemy 2.0 with clean layered architecture (Routers -> Services -> Repositories -> Models).\n\n## Architectural Guidelines\n1. **Layered Structure**: Routers handle HTTP parsing, status codes, and dependency injection. Services handle business logic and orchestration. Repositories handle database I/O.\n2. **Lifespan Context**: Use `@asynccontextmanager` lifespan handlers for startup/shutdown (connection pools, Redis, Kafka clients) instead of deprecated `on_event`.\n3. **Pydantic v2 Strictness**: Use `model_validate`, `model_dump`, and `ConfigDict(from_attributes=True)` for serialization.\n4. **RFC 7807 Problem Details**: Structure all error responses with `type`, `title`, `status`, `detail`, and `instance`.\n\n## Production Blueprint\n\n### Service Layer & Router (`routers/orders.py`)\n```python\nfrom contextlib import asynccontextmanager\nfrom typing import Annotated, AsyncGenerator\nfrom fastapi import APIRouter, Depends, FastAPI, HTTPException, status, Query\nfrom pydantic import BaseModel, Field, ConfigDict\nfrom sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker\nimport uuid\n\n# Lifespan and Engine\nDATABASE_URL = \"postgresql+asyncpg://postgres:secret@localhost:5432/appdb\"\nengine = create_async_engine(DATABASE_URL, pool_size=20, max_overflow=10)\nasync_session_factory = async_sessionmaker(engine, expire_on_commit=False)\n\nasync def get_db_session() -> AsyncGenerator[AsyncSession, None]:\n    async with async_session_factory() as session:\n        try:\n            yield session\n            await session.commit()\n        except Exception:\n            await session.rollback()\n            raise\n\nDbSession = Annotated[AsyncSession, Depends(get_db_session)]\n\n# Schemas\nclass OrderCreate(BaseModel):\n    customer_email: str = Field(..., max_length=255)\n    sku: str = Field(..., min_length=3, max_length=50)\n    quantity: int = Field(1, ge=1, le=100)\n\nclass OrderResponse(BaseModel):\n    id: uuid.UUID\n    customer_email: str\n    sku: str\n    quantity: int\n    status: str\n    model_config = ConfigDict(from_attributes=True)\n\n# Router\nrouter = APIRouter(prefix=\"/v1/orders\", tags=[\"Orders\"])\n\n@router.post(\"/\", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)\nasync def create_order(payload: OrderCreate, db: DbSession):\n    order = await order_service.place_order(db=db, payload=payload)\n    return order\n\n@router.get(\"/{order_id}\", response_model=OrderResponse)\nasync def get_order(order_id: uuid.UUID, db: DbSession):\n    order = await order_service.get_order(db=db, order_id=order_id)\n    if not order:\n        raise HTTPException(\n            status_code=status.HTTP_404_NOT_FOUND,\n            detail=f\"Order {order_id} not found.\"\n        )\n    return order\n```\n\n## Anti-Patterns & Traps\n- \u274c **Blocking Calls in Async Def**: Running `requests.get()` or `time.sleep()` in `async def` endpoints locks the event loop. Use `httpx.AsyncClient` or `asyncio.sleep`.\n- \u274c **Direct ORM Exposure**: Returning SQLAlchemy models without Pydantic conversion causes memory leaks, circular serialization, and secret exposure.\n- \u274c **Missing Async Commit/Rollback**: Failing to use session context managers leaves uncommitted transactions dangling in connection pools.\n\n## Verification\n- [ ] Execute `pytest-asyncio` test suite with `httpx.AsyncClient(transport=ASGITransport(app=app))` fixture.\n- [ ] Profile concurrent throughput with `wrk` or `locust` to verify no event-loop blocking.",
+  "raw_frontmatter": {},
+  "source_url": "file:///mnt/c/Users/PC/prj/skill-manager/skills-vault/skills/web-frameworks/python-api/fastapi-production-craft/SKILL.md"
+}

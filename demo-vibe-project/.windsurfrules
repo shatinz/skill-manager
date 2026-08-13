@@ -1,0 +1,285 @@
+
+
+# --- Skill: Next.js 15 App Router Architecture & Server Actions (web-frameworks.react-fullstack.nextjs-15-app-router) ---
+# Next.js 15 App Router Architecture & Server Actions
+
+## Objective
+Build high-performance, SEO-optimized, secure web applications leveraging Next.js 15 (React 19), React Server Components (RSC), asynchronous request APIs, typed Server Actions, and granular tag-based cache revalidation.
+
+## Architectural Principles
+1. **Server-First by Default**: Keep all components as React Server Components (RSC) unless interactivity, browser APIs, or React client hooks (`useState`, `useEffect`, `useActionState`) are strictly required.
+2. **Async Request Lifecycle**: In Next.js 15, `cookies()`, `headers()`, `params`, and `searchParams` are asynchronous promises. Always await them: `const params = await props.params;`.
+3. **Safe Server Actions**: Validate all action inputs with Zod schemas. Enforce user authorization inside the action before mutations. Use `useActionState` and `useFormStatus` on the client for optimistic feedback.
+4. **Granular Revalidation**: Prefer `revalidateTag(tag)` over blunt `revalidatePath()`. Wrap non-critical data fetches in `<Suspense fallback={<Skeleton />}>` for instant TTFB.
+
+## Production Blueprint
+
+### 1. Type-Safe Server Action with Zod (`actions/items.ts`)
+```typescript
+'use server';
+
+import { z } from 'zod';
+import { revalidateTag } from 'next/cache';
+import { auth } from '@/lib/auth';
+import { db } from '@/lib/db';
+
+const CreateItemSchema = z.object({
+  title: z.string().min(3).max(120),
+  description: z.string().max(500).optional(),
+  price: z.coerce.number().positive(),
+});
+
+export type ActionState = {
+  success?: boolean;
+  message?: string;
+  errors?: Record<string, string[]>;
+};
+
+export async function createItemAction(
+  prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, message: 'Unauthorized. Please sign in.' };
+  }
+
+  const rawData = Object.fromEntries(formData.entries());
+  const validated = CreateItemSchema.safeParse(rawData);
+
+  if (!validated.success) {
+    return {
+      success: false,
+      errors: validated.error.flatten().fieldErrors,
+      message: 'Validation failed. Please correct input errors.',
+    };
+  }
+
+  try {
+    await db.item.create({
+      data: {
+        ...validated.data,
+        userId: session.user.id,
+      },
+    });
+
+    revalidateTag('items-feed');
+    return { success: true, message: 'Item created successfully.' };
+  } catch (error) {
+    console.error('Failed to create item:', error);
+    return { success: false, message: 'Internal database error.' };
+  }
+}
+```
+
+### 2. Async Page Component with Suspense (`app/items/[id]/page.tsx`)
+```tsx
+import { Suspense } from 'react';
+import { notFound } from 'next/navigation';
+import { getItemById } from '@/lib/data/items';
+import { ItemDetailView } from '@/components/item-detail-view';
+import { SkeletonCard } from '@/components/ui/skeleton-card';
+
+type PageProps = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function ItemPage(props: PageProps) {
+  const { id } = await props.params;
+
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <Suspense fallback={<SkeletonCard />}>
+        <ItemContent id={id} />
+      </Suspense>
+    </main>
+  );
+}
+
+async function ItemContent({ id }: { id: string }) {
+  const item = await getItemById(id);
+  if (!item) notFound();
+
+  return <ItemDetailView item={item} />;
+}
+```
+
+## Anti-Patterns to Avoid
+- ❌ **Client Component Creep**: Adding `'use client'` at the page or layout level. Instead, push `'use client'` down to the leaves (buttons, interactive forms).
+- ❌ **Unawaited Request APIs**: Treating `params` or `cookies()` as synchronous objects in Next.js 15.
+- ❌ **Waterfall Fetching**: Cascading `await fetchA()` then `await fetchB()`. Use `Promise.all([fetchA(), fetchB()])` or separate `<Suspense>` streams.
+- ❌ **Missing CSRF & Auth**: Exposing server actions without validating caller session and input schemas.
+
+## Verification Checklist
+- [ ] Run `npx next lint` and ensure no synchronous params/cookies deprecation warnings.
+- [ ] Verify Server Action validation returns structured field errors without throwing unhandled exceptions.
+- [ ] Check Network tab to confirm HTML streaming TTFB is under 150ms with `<Suspense>` boundaries.
+
+
+# --- Skill: FastAPI Production Architecture & Async Engineering (web-frameworks.python-api.fastapi-production-craft) ---
+# FastAPI Production Architecture & Async Engineering
+
+## Objective
+Design high-throughput, maintainable, and type-safe async REST APIs using FastAPI, Pydantic v2, and SQLAlchemy 2.0 with clean layered architecture (Routers -> Services -> Repositories -> Models).
+
+## Architectural Guidelines
+1. **Layered Structure**: Routers handle HTTP parsing, status codes, and dependency injection. Services handle business logic and orchestration. Repositories handle database I/O.
+2. **Lifespan Context**: Use `@asynccontextmanager` lifespan handlers for startup/shutdown (connection pools, Redis, Kafka clients) instead of deprecated `on_event`.
+3. **Pydantic v2 Strictness**: Use `model_validate`, `model_dump`, and `ConfigDict(from_attributes=True)` for serialization.
+4. **RFC 7807 Problem Details**: Structure all error responses with `type`, `title`, `status`, `detail`, and `instance`.
+
+## Production Blueprint
+
+### Service Layer & Router (`routers/orders.py`)
+```python
+from contextlib import asynccontextmanager
+from typing import Annotated, AsyncGenerator
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, status, Query
+from pydantic import BaseModel, Field, ConfigDict
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+import uuid
+
+# Lifespan and Engine
+DATABASE_URL = "postgresql+asyncpg://postgres:secret@localhost:5432/appdb"
+engine = create_async_engine(DATABASE_URL, pool_size=20, max_overflow=10)
+async_session_factory = async_sessionmaker(engine, expire_on_commit=False)
+
+async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_factory() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+
+DbSession = Annotated[AsyncSession, Depends(get_db_session)]
+
+# Schemas
+class OrderCreate(BaseModel):
+    customer_email: str = Field(..., max_length=255)
+    sku: str = Field(..., min_length=3, max_length=50)
+    quantity: int = Field(1, ge=1, le=100)
+
+class OrderResponse(BaseModel):
+    id: uuid.UUID
+    customer_email: str
+    sku: str
+    quantity: int
+    status: str
+    model_config = ConfigDict(from_attributes=True)
+
+# Router
+router = APIRouter(prefix="/v1/orders", tags=["Orders"])
+
+@router.post("/", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
+async def create_order(payload: OrderCreate, db: DbSession):
+    order = await order_service.place_order(db=db, payload=payload)
+    return order
+
+@router.get("/{order_id}", response_model=OrderResponse)
+async def get_order(order_id: uuid.UUID, db: DbSession):
+    order = await order_service.get_order(db=db, order_id=order_id)
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Order {order_id} not found."
+        )
+    return order
+```
+
+## Anti-Patterns & Traps
+- ❌ **Blocking Calls in Async Def**: Running `requests.get()` or `time.sleep()` in `async def` endpoints locks the event loop. Use `httpx.AsyncClient` or `asyncio.sleep`.
+- ❌ **Direct ORM Exposure**: Returning SQLAlchemy models without Pydantic conversion causes memory leaks, circular serialization, and secret exposure.
+- ❌ **Missing Async Commit/Rollback**: Failing to use session context managers leaves uncommitted transactions dangling in connection pools.
+
+## Verification
+- [ ] Execute `pytest-asyncio` test suite with `httpx.AsyncClient(transport=ASGITransport(app=app))` fixture.
+- [ ] Profile concurrent throughput with `wrk` or `locust` to verify no event-loop blocking.
+
+
+# --- Skill: Supabase Postgres Row-Level Security (RLS) & Realtime Channels (databases-storage.backend-as-a-service.supabase-realtime-auth-rls) ---
+# Supabase Postgres Row-Level Security (RLS) & Realtime Channels
+
+## Objective
+Enforce database-level multi-tenant security using PostgreSQL RLS policies with `auth.uid()`, coupled with real-time broadcast and presence subscriptions via the Supabase client.
+
+## Bulletproof Multi-Tenant RLS Blueprint
+```sql
+-- Enable RLS on core tables
+ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE org_memberships ENABLE ROW LEVEL SECURITY;
+ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
+
+-- 1. Helper function to check organization membership without recursive policy queries
+CREATE OR REPLACE FUNCTION is_org_member(_org_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM org_memberships
+    WHERE org_id = _org_id
+      AND user_id = auth.uid()
+  );
+$$;
+
+-- 2. Documents Policy: Read access for organization members
+CREATE POLICY "Users can read documents belonging to their organizations"
+ON documents
+FOR SELECT
+TO authenticated
+USING (
+  is_org_member(org_id)
+);
+
+-- 3. Documents Policy: Insert access with ownership assignment
+CREATE POLICY "Users can create documents in their organizations"
+ON documents
+FOR INSERT
+TO authenticated
+WITH CHECK (
+  is_org_member(org_id) AND
+  created_by = auth.uid()
+);
+```
+
+## TypeScript Realtime Channel Integration
+```typescript
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
+
+export function subscribeToDocumentChanges(orgId: string, onUpdate: (payload: any) => void) {
+  const channel = supabase
+    .channel(`org-docs:${orgId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'documents',
+        filter: `org_id=eq.${orgId}`,
+      },
+      (payload) => {
+        onUpdate(payload);
+      }
+    )
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        console.log('Realtime document channel active');
+      }
+    });
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}
+```
+
+## Anti-Patterns
+- ❌ Relying on client-side WHERE clauses for security instead of declarative RLS policies.
+- ❌ Calling un-indexed subqueries inside RLS `USING` expressions (kills query throughput at scale).

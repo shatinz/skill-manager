@@ -53,3 +53,8 @@ We will rewrite the core ingestion service in Python 3.12 using FastAPI, Pydanti
 
 ## Anti-Patterns
 - ❌ Authoring ADRs post-hoc without documenting rejected alternatives and negative consequences.
+- ❌ Treating ADRs as immutable dogma rather than superseding them with new ADRs when requirements evolve.
+
+## Quality & Verification Checklist
+- [ ] Every ADR file follows numbered naming: `docs/adr/NNNN-title.md`.
+- [ ] Status is clearly labeled: Proposed, Accepted, Deprecated, or Superseded by NNNN.

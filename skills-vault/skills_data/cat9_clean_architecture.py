@@ -37,14 +37,14 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 
-# 1. Domain Entity
+# 1. Domain Entity (Pure Enterprise Logic)
 @dataclass(frozen=True)
 class User:
     id: str
     email: str
     is_active: bool
 
-# 2. Port (Interface)
+# 2. Port (Interface Contract)
 class UserRepositoryPort(ABC):
     @abstractmethod
     async def get_by_email(self, email: str) -> Optional[User]:
@@ -54,7 +54,7 @@ class UserRepositoryPort(ABC):
     async def save(self, user: User) -> None:
         pass
 
-# 3. Use Case
+# 3. Use Case (Application Orchestrator)
 class RegisterUserUseCase:
     def __init__(self, user_repo: UserRepositoryPort):
         self.user_repo = user_repo
@@ -72,6 +72,12 @@ class RegisterUserUseCase:
 ## Anti-Patterns
 - ❌ Leaking database ORM models or HTTP request objects directly into domain entities.
 - ❌ Premature DRY: Coupling two distinct domain contexts just because they currently share similar data fields.
+- ❌ God Classes / Fat Services: Violating the Single Responsibility Principle by bundling auth, billing, and email in one class.
+
+## Quality & Verification Checklist
+- [ ] Domain models contain 0 imports from third-party ORMs or web frameworks.
+- [ ] Ports use Python `abc.ABC` or TypeScript `interface` types.
+- [ ] Use cases are 100% unit-testable using in-memory mock adapters without spinning up databases.
 """
     },
 
@@ -102,9 +108,47 @@ Incrementally decommission legacy codebases without risky big-bang rewrites usin
 2. **Identify Seams**: Isolate entry and exit points in the legacy subsystem.
 3. **Strangler Proxy**: Route a small percentage of production traffic to the modernized service, comparing results in shadow mode before full cutover.
 
+## Strangler Fig Proxy Pattern Blueprint
+```python
+from typing import Callable, Any
+import logging
+
+logger = logging.getLogger("modernizer")
+
+class StranglerProxy:
+    def __init__(self, legacy_fn: Callable, modern_fn: Callable, rollout_percentage: float = 0.0):
+        self.legacy_fn = legacy_fn
+        self.modern_fn = modern_fn
+        self.rollout_percentage = rollout_percentage
+
+    async def execute(self, *args, **kwargs) -> Any:
+        import random
+        # Shadow mode: Execute both and compare in background
+        if self.rollout_percentage <= 0:
+            legacy_res = await self.legacy_fn(*args, **kwargs)
+            try:
+                modern_res = await self.modern_fn(*args, **kwargs)
+                if legacy_res != modern_res:
+                    logger.warning(f"Shadow mismatch! Legacy: {legacy_res} != Modern: {modern_res}")
+            except Exception as e:
+                logger.error(f"Modern shadow execution failed: {e}")
+            return legacy_res
+        
+        # Progressive rollout
+        if random.random() < self.rollout_percentage:
+            return await self.modern_fn(*args, **kwargs)
+        return await self.legacy_fn(*args, **kwargs)
+```
+
 ## Anti-Patterns
 - ❌ Attempting full 'Big-Bang' rewrites that halt business delivery for months and fail in production cutovers.
 - ❌ Refactoring complex legacy logic without golden master characterization tests.
+- ❌ Changing observable external behavior while refactoring internal code structure.
+
+## Quality & Verification Checklist
+- [ ] Golden master test suite passes against legacy code before refactoring begins.
+- [ ] Strangler proxy routes live traffic with zero dropped requests or data inconsistency.
+- [ ] Rollout percentage is configurable via environment variables or feature flags.
 """
     },
 
@@ -164,6 +208,11 @@ async def place_order_with_outbox(session: AsyncSession, order_data: dict):
 
 ## Anti-Patterns
 - ❌ Committing to the database and publishing to Kafka/RabbitMQ in separate uncoordinated blocks (causes lost events on crash).
+- ❌ Non-idempotent event consumers that fail or duplicate actions upon retried messages.
+
+## Quality & Verification Checklist
+- [ ] Write operations and outbox records execute in a single ACID transaction.
+- [ ] Consumer handlers track processed message IDs in a deduplication table or Redis TTL key.
 """
     },
 
@@ -213,6 +262,11 @@ We will rewrite the core ingestion service in Python 3.12 using FastAPI, Pydanti
 
 ## Anti-Patterns
 - ❌ Authoring ADRs post-hoc without documenting rejected alternatives and negative consequences.
+- ❌ Treating ADRs as immutable dogma rather than superseding them with new ADRs when requirements evolve.
+
+## Quality & Verification Checklist
+- [ ] Every ADR file follows numbered naming: `docs/adr/NNNN-title.md`.
+- [ ] Status is clearly labeled: Proposed, Accepted, Deprecated, or Superseded by NNNN.
 """
     }
 ]
