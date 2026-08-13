@@ -1,5 +1,16 @@
 const API_BASE = '/api';
 
+// --- Safe icon initialization ---
+function safeCreateIcons() {
+    try {
+        if (typeof lucide !== 'undefined' && lucide && typeof lucide.createIcons === 'function') {
+            lucide.createIcons();
+        }
+    } catch (e) {
+        console.warn('Lucide notice:', e);
+    }
+}
+
 // --- Router ---
 const routes = {
     '#/dashboard': { title: 'Dashboard', template: 'tpl-dashboard', init: initDashboard },
@@ -17,7 +28,6 @@ function handleRoute() {
     let routeKey = hash;
     let param = null;
     
-    // Handle dynamic routes like #/skill/123
     if (hash.startsWith('#/skill/')) {
         routeKey = '#/skill/';
         param = hash.split('#/skill/')[1];
@@ -46,12 +56,8 @@ function handleRoute() {
     appDiv.innerHTML = '';
     appDiv.appendChild(template.content.cloneNode(true));
     
-    // Re-initialize icons
-    if (window.lucide) {
-        lucide.createIcons();
-    }
+    safeCreateIcons();
 
-    // Init page logic
     if (route.init) {
         route.init(param);
     }
@@ -72,7 +78,7 @@ function showToast(message, type = 'info') {
     
     toast.innerHTML = `<i data-lucide="${icon}"></i> <span>${message}</span>`;
     container.appendChild(toast);
-    if (window.lucide) lucide.createIcons();
+    safeCreateIcons();
     
     setTimeout(() => {
         toast.style.animation = 'fadeOut 0.3s forwards';
@@ -107,7 +113,6 @@ async function apiFetch(endpoint, options = {}) {
 async function initApp() {
     handleRoute();
     
-    // Check if seed button should be shown
     try {
         const stats = await apiFetch('/skills/');
         const seedBtn = document.getElementById('btn-seed');
@@ -122,16 +127,16 @@ async function initApp() {
                 try {
                     seedBtn.disabled = true;
                     await apiFetch('/ingestion/seed', { method: 'POST' });
-                    showToast('Database seeded with 10 skills successfully!', 'success');
+                    showToast('Database seeded successfully!', 'success');
                     seedBtn.style.display = 'none';
-                    handleRoute(); // refresh current view
+                    handleRoute();
                 } catch (e) {
                     seedBtn.disabled = false;
                 }
             };
         }
     } catch (e) {
-        console.warn("Could not check initial seed state", e);
+        console.warn('Could not check initial seed state', e);
     }
 }
 
@@ -191,7 +196,7 @@ async function initDashboard() {
                             }
                         };
                     }
-                    if (window.lucide) lucide.createIcons();
+                    safeCreateIcons();
                 }, 50);
             }
         }
@@ -230,11 +235,10 @@ async function initDashboard() {
 
         // Start Mini Dashboard Neural Preview
         initMiniNeuralPreview();
-
-        if (window.lucide) lucide.createIcons();
+        safeCreateIcons();
 
     } catch (e) {
-        console.error("Dashboard error", e);
+        console.error('Dashboard error', e);
     }
 }
 
@@ -269,7 +273,6 @@ function initMiniNeuralPreview() {
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Draw links
         ctx.lineWidth = 1.5;
         links.forEach(([i, j]) => {
             const n1 = nodes[i];
@@ -284,7 +287,6 @@ function initMiniNeuralPreview() {
             ctx.stroke();
         });
 
-        // Update & draw particles
         particles.forEach(p => {
             p.progress += p.speed;
             if (p.progress > 1) p.progress = 0;
@@ -303,7 +305,6 @@ function initMiniNeuralPreview() {
             ctx.shadowBlur = 0;
         });
 
-        // Draw nodes
         nodes.forEach(n => {
             ctx.shadowColor = n.color;
             ctx.shadowBlur = 10;
@@ -358,10 +359,9 @@ async function initSkills() {
                     </div>
                 `;
             });
-            if (window.lucide) lucide.createIcons();
+            safeCreateIcons();
         }
 
-        // Render Category Pills with click handlers
         if (data.categories) {
             pills.innerHTML = '<button class="pill active" data-category="all">All</button>';
             data.categories.forEach(c => {
@@ -383,7 +383,6 @@ async function initSkills() {
 
         renderSkillCards(allSkills);
 
-        // Topbar search filter connection
         const searchInput = document.querySelector('.search-bar input');
         if (searchInput) {
             searchInput.oninput = (e) => {
@@ -401,7 +400,7 @@ async function initSkills() {
         }
 
     } catch (e) {
-        console.error("Skills error", e);
+        console.error('Skills error', e);
     }
 }
 
@@ -417,18 +416,24 @@ async function initSkillDetail(id) {
             apiFetch(`/proposals/skills/${id}/proposals`).catch(() => [])
         ]);
 
-        document.getElementById('detail-name').textContent = skill.name;
-        document.getElementById('detail-category').textContent = skill.category;
-        document.getElementById('detail-desc').textContent = skill.description;
-        document.getElementById('detail-vcount').textContent = versions.length || 0;
+        const elName = document.getElementById('detail-name');
+        const elCat = document.getElementById('detail-category');
+        const elDesc = document.getElementById('detail-desc');
+        const elVCount = document.getElementById('detail-vcount');
+        const elContent = document.getElementById('detail-content');
+        const elPropContent = document.getElementById('proposal-content');
+
+        if (elName) elName.textContent = skill.name;
+        if (elCat) elCat.textContent = skill.category;
+        if (elDesc) elDesc.textContent = skill.description;
+        if (elVCount) elVCount.textContent = versions.length || 0;
         
         if (skill.current_version && skill.current_version.content) {
             currentSkillContent = skill.current_version.content;
-            document.getElementById('detail-content').textContent = currentSkillContent;
-            document.getElementById('proposal-content').value = currentSkillContent;
+            if (elContent) elContent.textContent = currentSkillContent;
+            if (elPropContent) elPropContent.value = currentSkillContent;
         }
 
-        // Tabs logic
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -440,7 +445,6 @@ async function initSkillDetail(id) {
             });
         });
 
-        // Use Skill
         document.getElementById('btn-use-skill')?.addEventListener('click', async () => {
             try {
                 await apiFetch(`/skills/${id}/use`, {
@@ -453,7 +457,6 @@ async function initSkillDetail(id) {
             } catch (e) {}
         });
 
-        // Submit Proposal
         document.getElementById('btn-submit-proposal')?.addEventListener('click', async () => {
             const isModify = document.querySelector('.tab-btn[data-tab="modify"]')?.classList.contains('active');
             const type = isModify ? 'modification' : 'issue_report';
@@ -472,11 +475,10 @@ async function initSkillDetail(id) {
                     })
                 });
                 showToast('Proposal submitted successfully', 'success');
-                initSkillDetail(id); // Reload to show new proposal
+                initSkillDetail(id);
             } catch (e) {}
         });
 
-        // Render Timeline
         const timeline = document.getElementById('version-timeline');
         if (timeline) {
             timeline.innerHTML = '';
@@ -497,7 +499,6 @@ async function initSkillDetail(id) {
             }
         }
 
-        // Render Proposals
         const activeProps = document.getElementById('active-proposals');
         if (activeProps) {
             activeProps.innerHTML = '';
@@ -519,10 +520,10 @@ async function initSkillDetail(id) {
             }
         }
 
-        if (window.lucide) lucide.createIcons();
+        safeCreateIcons();
 
     } catch (e) {
-        console.error("Skill detail error", e);
+        console.error('Skill detail error', e);
     }
 }
 
@@ -618,7 +619,7 @@ async function initPipeline() {
             try {
                 logPipeline(`Releasing batch ${currentBatchId}...`, 'system');
                 const res = await apiFetch(`/audit/batch/${currentBatchId}/release`, { method: 'POST' });
-                logPipeline(`Release successful! New version created.`, 'success');
+                logPipeline('Release successful! New version created.', 'success');
             } catch (e) {
                 logPipeline(`Release failed: ${e.message}`, 'error');
             }
@@ -647,10 +648,10 @@ async function initPipeline() {
             }
         });
 
-        if (window.lucide) lucide.createIcons();
+        safeCreateIcons();
 
     } catch(e) {
-        console.error("Pipeline init error", e);
+        console.error('Pipeline init error', e);
     }
 }
 
@@ -690,7 +691,7 @@ async function initAudit() {
             `;
         });
         
-        if (window.lucide) lucide.createIcons();
+        safeCreateIcons();
 
         document.querySelectorAll('.btn-approve').forEach(btn => {
             btn.addEventListener('click', () => handleAuditAction(btn.dataset.id, 'approve'));
@@ -700,7 +701,7 @@ async function initAudit() {
         });
 
     } catch (e) {
-        console.error("Audit init error", e);
+        console.error('Audit init error', e);
     }
 }
 
@@ -712,7 +713,7 @@ async function handleAuditAction(id, action) {
             body: JSON.stringify({ action, reviewer_notes: `Manually ${action}d via UI` })
         });
         showToast(`Proposal ${action}d`, 'success');
-        initAudit(); // Refresh list
+        initAudit();
     } catch(e) {}
 }
 
@@ -825,7 +826,7 @@ async function initGraph() {
         });
 
     } catch (e) {
-        console.error("Failed to load neural data", e);
+        console.error('Failed to load neural data', e);
         showToast('Failed to load neural graph data', 'error');
     }
 
@@ -910,7 +911,6 @@ async function initGraph() {
         ctx.translate(offsetX, offsetY);
         ctx.scale(scale, scale);
 
-        // 1. Starry Neural Dust
         bgDust.forEach(d => {
             d.alpha += Math.sin(d.x + d.y + Date.now() * d.speed) * 0.005;
             ctx.fillStyle = `rgba(148, 163, 184, ${Math.max(0.05, Math.min(0.4, d.alpha))})`;
@@ -919,7 +919,6 @@ async function initGraph() {
             ctx.fill();
         });
 
-        // 2. Synapses
         links.forEach(l => {
             const n1 = l.sourceNode;
             const n2 = l.targetNode;
@@ -937,7 +936,6 @@ async function initGraph() {
             ctx.stroke();
         });
 
-        // 3. Synaptic Signal Particles
         particles.forEach(p => {
             const n1 = p.link.sourceNode;
             const n2 = p.link.targetNode;
@@ -953,7 +951,6 @@ async function initGraph() {
             ctx.shadowBlur = 0;
         });
 
-        // 4. Nodes
         nodes.forEach(n => {
             const isHovered = (n === hoverNode);
             const isSelected = (n === selectedNode);
@@ -1249,7 +1246,7 @@ async function initGraph() {
         }
 
         body.innerHTML = html;
-        if (window.lucide) lucide.createIcons();
+        safeCreateIcons();
     }
 }
 
