@@ -1,0 +1,29 @@
+{
+  "id": "databases-storage.backend-as-a-service.supabase-realtime-auth-rls",
+  "name": "supabase-realtime-auth-rls",
+  "title": "Supabase Postgres Row-Level Security (RLS) & Realtime Channels",
+  "category": "databases-storage",
+  "subcategory": "backend-as-a-service",
+  "version": "1.3.0",
+  "tags": [
+    "supabase",
+    "rls",
+    "postgres",
+    "realtime",
+    "auth",
+    "row-level-security"
+  ],
+  "trust_rating": 0.98,
+  "estimated_tokens": 1600,
+  "description": "Architect impenetrable PostgreSQL Row-Level Security (RLS) policies, manage JWT role claims, and handle multi-client real-time state synchronization using Supabase Realtime channels.",
+  "trigger_patterns": [
+    "supabase rls policy setup",
+    "postgres row level security auth.uid",
+    "supabase realtime broadcast presence",
+    "supabase multi tenant rls"
+  ],
+  "relative_path": "skills/databases-storage/backend-as-a-service/supabase-realtime-auth-rls/SKILL.md",
+  "content": "# Supabase Postgres Row-Level Security (RLS) & Realtime Channels\n\n## Objective\nEnforce database-level multi-tenant security using PostgreSQL RLS policies with `auth.uid()`, coupled with real-time broadcast and presence subscriptions via the Supabase client.\n\n## Bulletproof Multi-Tenant RLS Blueprint\n```sql\n-- Enable RLS on core tables\nALTER TABLE organizations ENABLE ROW LEVEL SECURITY;\nALTER TABLE org_memberships ENABLE ROW LEVEL SECURITY;\nALTER TABLE documents ENABLE ROW LEVEL SECURITY;\n\n-- 1. Helper function to check organization membership without recursive policy queries\nCREATE OR REPLACE FUNCTION is_org_member(_org_id UUID)\nRETURNS BOOLEAN\nLANGUAGE sql\nSTABLE\nSECURITY DEFINER\nSET search_path = public\nAS $$\n  SELECT EXISTS (\n    SELECT 1 FROM org_memberships\n    WHERE org_id = _org_id\n      AND user_id = auth.uid()\n  );\n$$;\n\n-- 2. Documents Policy: Read access for organization members\nCREATE POLICY \"Users can read documents belonging to their organizations\"\nON documents\nFOR SELECT\nTO authenticated\nUSING (\n  is_org_member(org_id)\n);\n\n-- 3. Documents Policy: Insert access with ownership assignment\nCREATE POLICY \"Users can create documents in their organizations\"\nON documents\nFOR INSERT\nTO authenticated\nWITH CHECK (\n  is_org_member(org_id) AND\n  created_by = auth.uid()\n);\n```\n\n## TypeScript Realtime Channel Integration\n```typescript\nimport { createClient } from '@supabase/supabase-js';\n\nconst supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);\n\nexport function subscribeToDocumentChanges(orgId: string, onUpdate: (payload: any) => void) {\n  const channel = supabase\n    .channel(`org-docs:${orgId}`)\n    .on(\n      'postgres_changes',\n      {\n        event: '*',\n        schema: 'public',\n        table: 'documents',\n        filter: `org_id=eq.${orgId}`,\n      },\n      (payload) => {\n        onUpdate(payload);\n      }\n    )\n    .subscribe((status) => {\n      if (status === 'SUBSCRIBED') {\n        console.log('Realtime document channel active');\n      }\n    });\n\n  return () => {\n    supabase.removeChannel(channel);\n  };\n}\n```\n\n## Anti-Patterns\n- \u274c Relying on client-side WHERE clauses for security instead of declarative RLS policies.\n- \u274c Calling un-indexed subqueries inside RLS `USING` expressions (kills query throughput at scale).",
+  "raw_frontmatter": {},
+  "source_url": "file:///mnt/c/Users/PC/prj/skill-manager/skills-vault/skills/databases-storage/backend-as-a-service/supabase-realtime-auth-rls/SKILL.md"
+}

@@ -1,7 +1,46 @@
 """
-askill — Lightweight Agentic Skill Vault CLI & Smart Search Engine
-Connecting autonomous AI agents to living, community-driven skill capabilities.
+askill — Backwards compatibility wrapper for eshkill.
 """
 
-__version__ = "1.0.0"
-__author__ = "Unified Agentic Skill Manager Team"
+from eshkill import (
+    Eshkill,
+    VaultConnector,
+    SmartSkillSearch,
+    AgentFormatter,
+    MCPServer,
+    AutoRouter,
+    SkillInstaller,
+    ProposalManager,
+    run_server,
+    SkillSummary,
+    SkillDetail,
+    SearchResult,
+    VaultIndex,
+    RoutingDecision,
+    InstallResult,
+    ProposalPayload,
+    ProposalResult,
+    __version__,
+    __author__
+)
+
+__all__ = [
+    "Eshkill",
+    "VaultConnector",
+    "SmartSkillSearch",
+    "AgentFormatter",
+    "MCPServer",
+    "AutoRouter",
+    "SkillInstaller",
+    "ProposalManager",
+    "run_server",
+    "SkillSummary",
+    "SkillDetail",
+    "SearchResult",
+    "VaultIndex",
+    "RoutingDecision",
+    "InstallResult",
+    "ProposalPayload",
+    "ProposalResult",
+    "__version__"
+]

@@ -1,6 +1,7 @@
 import unittest
-from askill.vault import VaultConnector
-from askill.search import SmartSkillSearch
+from eshkill.vault import VaultConnector
+from eshkill.search import SmartSkillSearch, tokenize, compute_fuzzy_token_similarity
+
 
 class TestSmartSkillSearch(unittest.TestCase):
     @classmethod
@@ -12,7 +13,7 @@ class TestSmartSkillSearch(unittest.TestCase):
     def test_search_fastapi_rest(self):
         results = self.engine.search("build fastapi rest api", top_k=3)
         self.assertGreater(len(results), 0)
-        self.assertEqual(results[0].skill.name, "fastapi-rest-craft")
+        self.assertEqual(results[0].skill.name, "fastapi-production-craft")
         self.assertGreater(results[0].score, 0.5)
 
     def test_search_postgres_query(self):
@@ -26,10 +27,10 @@ class TestSmartSkillSearch(unittest.TestCase):
         self.assertEqual(results[0].skill.name, "rag-chunking-hybrid-search")
 
     def test_search_category_filter(self):
-        results = self.engine.search("", category="security-compliance", top_k=10)
+        results = self.engine.search("", category="security-sast-hardening", top_k=10)
         self.assertGreater(len(results), 0)
         for r in results:
-            self.assertEqual(r.skill.category, "security-compliance")
+            self.assertEqual(r.skill.category, "security-sast-hardening")
 
     def test_find_best_match(self):
         match = self.engine.find_best_match("I need to write unit tests with pytest fixtures and mocks")
@@ -39,7 +40,20 @@ class TestSmartSkillSearch(unittest.TestCase):
     def test_search_docker_distroless(self):
         match = self.engine.find_best_match("docker multi stage build distroless image")
         self.assertIsNotNone(match)
-        self.assertEqual(match.skill.name, "docker-multi-stage-build")
+        self.assertEqual(match.skill.name, "docker-multi-stage-distroless")
+
+    def test_query_expansion_supabase(self):
+        results = self.engine.search("supabase real-time database", top_k=3)
+        self.assertGreater(len(results), 0)
+        names = [r.skill.name for r in results]
+        self.assertTrue("supabase-realtime-auth-rls" in names or "postgres-query-tuning" in names)
+
+    def test_fuzzy_typo_matching(self):
+        results = self.engine.search("playwreight automated browser testing", top_k=3)
+        self.assertGreater(len(results), 0)
+        names = [r.skill.name for r in results]
+        self.assertIn("playwright-e2e-automation", names)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,30 @@
+{
+  "id": "business-ecommerce-growth.payments-billing.stripe-subscription-webhooks",
+  "name": "stripe-subscription-webhooks",
+  "title": "Stripe Subscription Lifecycle, Webhook Verification & Checkout",
+  "category": "business-ecommerce-growth",
+  "subcategory": "payments-billing",
+  "version": "1.4.0",
+  "tags": [
+    "stripe",
+    "payments",
+    "subscriptions",
+    "webhooks",
+    "checkout",
+    "billing",
+    "saas"
+  ],
+  "trust_rating": 0.99,
+  "estimated_tokens": 1650,
+  "description": "Implement end-to-end SaaS recurring billing with Stripe Checkout Sessions, cryptographic webhook signature verification, and subscription state machines.",
+  "trigger_patterns": [
+    "stripe subscription checkout session",
+    "stripe webhook signature verification",
+    "handle stripe customer.subscription.updated",
+    "stripe customer portal integration"
+  ],
+  "relative_path": "skills/business-ecommerce-growth/payments-billing/stripe-subscription-webhooks/SKILL.md",
+  "content": "# Stripe Subscription Lifecycle & Webhook Verification\n\n## Objective\nImplement resilient recurring SaaS monetization workflows with Stripe Checkout, customer billing portals, and idempotent raw-body webhook signature verification.\n\n## Production Webhook Handler (`api/webhooks/stripe.py`)\n```python\nimport stripe\nfrom fastapi import APIRouter, Request, Header, HTTPException, status\nfrom app.services.billing import update_subscription_status\n\nrouter = APIRouter(prefix=\"/webhooks/stripe\")\nSTRIPE_WEBHOOK_SECRET = \"whsec_xxxxxxxx\"\n\n@router.post(\"/\")\nasync def stripe_webhook(request: Request, stripe_signature: str = Header(None)):\n    if not stripe_signature:\n        raise HTTPException(status_code=400, detail=\"Missing Stripe-Signature header\")\n\n    payload = await request.body()\n\n    try:\n        event = stripe.Webhook.construct_event(\n            payload=payload,\n            sig_header=stripe_signature,\n            secret=STRIPE_WEBHOOK_SECRET\n        )\n    except ValueError:\n        raise HTTPException(status_code=400, detail=\"Invalid payload\")\n    except stripe.error.SignatureVerificationError:\n        raise HTTPException(status_code=400, detail=\"Invalid signature\")\n\n    event_type = event[\"type\"]\n    data_object = event[\"data\"][\"object\"]\n\n    if event_type in (\"customer.subscription.created\", \"customer.subscription.updated\"):\n        await update_subscription_status(\n            stripe_customer_id=data_object[\"customer\"],\n            status=data_object[\"status\"],\n            plan_id=data_object[\"items\"][\"data\"][0][\"plan\"][\"id\"]\n        )\n    elif event_type == \"customer.subscription.deleted\":\n        await update_subscription_status(\n            stripe_customer_id=data_object[\"customer\"],\n            status=\"canceled\"\n        )\n\n    return {\"status\": \"success\"}\n```\n\n## Anti-Patterns\n- \u274c Parsing JSON body before validating the raw payload bytes against the Stripe signature.",
+  "raw_frontmatter": {},
+  "source_url": "file:///mnt/c/Users/PC/prj/skill-manager/skills-vault/skills/business-ecommerce-growth/payments-billing/stripe-subscription-webhooks/SKILL.md"
+}

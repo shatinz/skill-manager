@@ -1,701 +1,1556 @@
 {
-  "version": "1.0.0",
-  "vault_name": "Public Agentic Skill Vault",
-  "total_skills": 24,
+  "version": "2.0.0",
+  "total_skills": 52,
   "categories": {
-    "coding": {
-      "api-design": [
-        "fastapi-rest-craft",
-        "graphql-schema-design",
-        "grpc-protobuf-specs"
+    "web-frameworks": {
+      "react-fullstack": [
+        "nextjs-15-app-router",
+        "remix-fullstack-patterns"
       ],
-      "database-architecture": [
-        "postgres-query-tuning",
-        "prisma-orm-patterns"
+      "python-api": [
+        "fastapi-production-craft",
+        "django-ninja-crud"
       ],
-      "refactoring-clean-code": [
-        "legacy-code-modernizer",
-        "dry-solid-refactor"
+      "svelte": [
+        "sveltekit-5-runes"
       ],
-      "frontend-engineering": [
-        "react-performance-audit",
-        "tailwind-design-system"
+      "edge-runtime": [
+        "hono-edge-api"
+      ],
+      "content-ssg": [
+        "astro-content-collections"
       ]
     },
-    "testing-quality": {
-      "unit-integration": [
-        "pytest-mocking-mastery",
-        "playwright-e2e-automation"
+    "ui-design-antislop": {
+      "styling-tokens": [
+        "tailwind-v4-tokens"
       ],
-      "security-sast": [
-        "owasp-top10-scanner",
-        "secret-leak-detector"
+      "component-systems": [
+        "shadcn-ui-mastery"
+      ],
+      "animations": [
+        "framer-motion-orchestrator"
+      ],
+      "3d-graphics": [
+        "threejs-procedural-canvas"
+      ],
+      "visual-design": [
+        "glassmorphic-dark-ui"
+      ],
+      "responsive-layout": [
+        "responsive-mobile-first-layout"
       ]
     },
-    "devops-cloud": {
+    "databases-storage": {
+      "relational-sql": [
+        "postgres-query-tuning"
+      ],
+      "backend-as-a-service": [
+        "supabase-realtime-auth-rls"
+      ],
+      "orm-data-access": [
+        "prisma-orm-mastery",
+        "drizzle-orm-type-safe"
+      ],
+      "olap-embedded": [
+        "duckdb-polars-analytics"
+      ],
+      "key-value-cache": [
+        "redis-caching-rate-limiting"
+      ]
+    },
+    "ai-llm-agents": {
+      "rag-retrieval": [
+        "rag-chunking-hybrid-search",
+        "llamaindex-hierarchical-rag"
+      ],
+      "agent-workflows": [
+        "langgraph-multi-agent-flow"
+      ],
+      "prompt-craft": [
+        "prompt-engineering-distiller"
+      ],
+      "structured-outputs": [
+        "instructor-structured-outputs"
+      ],
+      "function-calling": [
+        "openai-anthropic-tool-use"
+      ],
+      "mcp-protocol": [
+        "mcp-server-protocol-craft"
+      ],
+      "multi-agent-teams": [
+        "autogen-crewai-orchestration"
+      ]
+    },
+    "devops-cloud-serverless": {
+      "containerization": [
+        "docker-multi-stage-distroless"
+      ],
       "ci-cd": [
-        "github-actions-matrix-ci",
-        "docker-multi-stage-build"
+        "github-actions-matrix-ci"
       ],
-      "infrastructure-as-code": [
+      "iac-cloud": [
         "terraform-aws-modules"
+      ],
+      "edge-serverless": [
+        "cloudflare-workers-kv-d1"
+      ],
+      "deployment-gitops": [
+        "vercel-zero-downtime-deploy"
+      ],
+      "orchestration": [
+        "kubernetes-helm-microservice"
       ],
       "observability": [
         "prometheus-grafana-telemetry"
       ]
     },
-    "data-ai-engineering": {
-      "llm-rag": [
-        "rag-chunking-hybrid-search",
-        "prompt-engineering-distiller"
+    "security-sast-hardening": {
+      "application-security": [
+        "owasp-top10-scanner"
       ],
-      "data-pipelines": [
-        "duckdb-fast-analytics"
+      "auth-security": [
+        "jwt-oauth2-secureshop"
+      ],
+      "secrets-management": [
+        "secret-leak-precommit-guard"
+      ],
+      "web-defense": [
+        "input-sanitization-xss-defense"
+      ],
+      "supply-chain": [
+        "dependency-cve-vulnerability-audit"
       ]
     },
-    "security-compliance": {
-      "code-hardening": [
-        "jwt-oauth2-secureshop",
-        "input-sanitization-guard"
+    "testing-qa-automation": {
+      "unit-integration-python": [
+        "pytest-mocking-mastery"
+      ],
+      "e2e-testing": [
+        "playwright-e2e-automation"
+      ],
+      "frontend-unit": [
+        "vitest-react-testing-library"
+      ],
+      "load-testing": [
+        "locust-performance-load-testing"
       ]
     },
-    "documentation-communication": {
-      "api-docs": [
-        "openapi-swagger-generator"
+    "business-ecommerce-growth": {
+      "payments-billing": [
+        "stripe-subscription-webhooks"
       ],
-      "architecture-decision-records": [
-        "adr-writer-reviewer"
+      "seo-growth": [
+        "open-seo-audit-engine"
+      ],
+      "marketplace-apis": [
+        "torob-marketplace-integration",
+        "divar-marketplace-automation"
+      ],
+      "chat-automation": [
+        "telegram-bot-agent-controller"
+      ]
+    },
+    "clean-architecture-refactoring": {
+      "principles-patterns": [
+        "dry-solid-clean-architecture"
+      ],
+      "code-modernization": [
+        "legacy-code-modernizer"
+      ],
+      "architecture-patterns": [
+        "event-driven-cqrs-messaging"
+      ],
+      "architectural-docs": [
+        "adr-architecture-decision-records"
       ]
     }
   },
   "skills": [
     {
-      "id": "coding.api-design.fastapi-rest-craft",
-      "name": "fastapi-rest-craft",
-      "title": "FastAPI REST API Production Craft",
-      "category": "coding",
-      "subcategory": "api-design",
-      "version": "1.2.0",
+      "id": "web-frameworks.react-fullstack.nextjs-15-app-router",
+      "name": "nextjs-15-app-router",
+      "title": "Next.js 15 App Router Architecture & Server Actions",
+      "category": "web-frameworks",
+      "subcategory": "react-fullstack",
+      "version": "1.5.0",
+      "tags": [
+        "nextjs",
+        "react-19",
+        "server-actions",
+        "app-router",
+        "typescript",
+        "rsc",
+        "turbopack"
+      ],
+      "trust_rating": 0.99,
+      "estimated_tokens": 1750,
+      "description": "Architect, implement, and optimize Next.js 15 fullstack applications using React Server Components, Server Actions, async request APIs (cookies, headers, params), granular cache revalidation, and streaming suspense boundaries.",
+      "trigger_patterns": [
+        "build nextjs 15 app",
+        "nextjs 15 server actions",
+        "react server components rsc nextjs",
+        "nextjs 15 cache revalidateTag",
+        "nextjs app router nested layouts",
+        "nextjs async cookies headers"
+      ],
+      "relative_path": "skills/web-frameworks/react-fullstack/nextjs-15-app-router/SKILL.md"
+    },
+    {
+      "id": "web-frameworks.python-api.fastapi-production-craft",
+      "name": "fastapi-production-craft",
+      "title": "FastAPI Production Architecture & Async Engineering",
+      "category": "web-frameworks",
+      "subcategory": "python-api",
+      "version": "1.5.0",
       "tags": [
         "fastapi",
         "python",
-        "pydantic",
-        "rest-api",
-        "crud",
-        "openapi"
+        "pydantic-v2",
+        "asyncio",
+        "sqlalchemy-async",
+        "openapi",
+        "rfc7807"
       ],
-      "trust_rating": 0.96,
-      "estimated_tokens": 1400,
-      "description": "Architect, implement, and harden production-grade FastAPI REST services with Pydantic v2 schemas, async database sessions, dependency injection, and standardized RFC 7807 error envelopes.",
+      "trust_rating": 0.98,
+      "estimated_tokens": 1650,
+      "description": "Architect, implement, and harden production-grade FastAPI REST and async services with Pydantic v2 schemas, SQLAlchemy 2.0 async sessions, dependency injection, and standardized RFC 7807 error envelopes.",
       "trigger_patterns": [
-        "create a fastapi backend",
-        "build rest api with fastapi",
-        "fastapi crud endpoints",
-        "pydantic v2 models for fastapi",
-        "async sqlalchemy fastapi"
+        "create fastapi backend",
+        "fastapi production setup",
+        "fastapi async sqlalchemy 2",
+        "pydantic v2 fastapi schemas",
+        "fastapi dependency injection lifespan",
+        "fastapi rfc7807 error handling"
       ],
-      "relative_path": "skills/coding/api-design/fastapi-rest-craft/SKILL.md"
+      "relative_path": "skills/web-frameworks/python-api/fastapi-production-craft/SKILL.md"
     },
     {
-      "id": "coding.api-design.graphql-schema-design",
-      "name": "graphql-schema-design",
-      "title": "GraphQL Schema Architecture & Federation",
-      "category": "coding",
-      "subcategory": "api-design",
-      "version": "1.0.0",
+      "id": "web-frameworks.svelte.sveltekit-5-runes",
+      "name": "sveltekit-5-runes",
+      "title": "SvelteKit 5 Runes & Modern Reactive Fullstack Craft",
+      "category": "web-frameworks",
+      "subcategory": "svelte",
+      "version": "1.2.0",
       "tags": [
-        "graphql",
-        "strawberry",
-        "apollo",
-        "schema",
-        "api",
-        "python",
+        "sveltekit",
+        "svelte-5",
+        "runes",
+        "state",
+        "props",
+        "derived",
         "typescript"
       ],
-      "trust_rating": 0.91,
-      "estimated_tokens": 1200,
-      "description": "Design modular, scalable GraphQL schemas with type safety, DataLoader N+1 query batching, relay-style cursor pagination, and schema-first evolution.",
+      "trust_rating": 0.96,
+      "estimated_tokens": 1600,
+      "description": "Master SvelteKit 5 runes reactive paradigm ($state, $derived, $effect, $props), server load functions, typed form actions with progressive enhancement, and robust state orchestration.",
       "trigger_patterns": [
-        "design graphql schema",
-        "fix n+1 graphql dataloader",
-        "strawberry graphql python",
-        "graphql cursor pagination",
-        "apollo federation schema"
+        "svelte 5 runes setup",
+        "sveltekit 5 $state $derived",
+        "sveltekit 5 form actions enhance",
+        "svelte 5 props runes migration",
+        "sveltekit server load function"
       ],
-      "relative_path": "skills/coding/api-design/graphql-schema-design/SKILL.md"
+      "relative_path": "skills/web-frameworks/svelte/sveltekit-5-runes/SKILL.md"
     },
     {
-      "id": "coding.api-design.grpc-protobuf-specs",
-      "name": "grpc-protobuf-specs",
-      "title": "gRPC & Protocol Buffers Microservice Specs",
-      "category": "coding",
-      "subcategory": "api-design",
-      "version": "1.0.0",
+      "id": "web-frameworks.edge-runtime.hono-edge-api",
+      "name": "hono-edge-api",
+      "title": "Hono Ultra-Fast Edge & Multi-Runtime API Craft",
+      "category": "web-frameworks",
+      "subcategory": "edge-runtime",
+      "version": "1.3.0",
       "tags": [
-        "grpc",
-        "protobuf",
-        "microservices",
-        "rpc",
-        "go",
+        "hono",
+        "cloudflare-workers",
+        "deno",
+        "bun",
+        "edge",
+        "typescript",
+        "zod-validator",
+        "rpc"
+      ],
+      "trust_rating": 0.97,
+      "estimated_tokens": 1550,
+      "description": "Construct high-performance, edge-first API services using Hono with full TypeScript inference, Zod request validation middleware, RPC client generation, and multi-runtime portability.",
+      "trigger_patterns": [
+        "create hono edge api",
+        "hono cloudflare workers setup",
+        "hono zod validator rpc",
+        "hono typed middleware",
+        "fast lightweight edge router hono"
+      ],
+      "relative_path": "skills/web-frameworks/edge-runtime/hono-edge-api/SKILL.md"
+    },
+    {
+      "id": "web-frameworks.react-fullstack.remix-fullstack-patterns",
+      "name": "remix-fullstack-patterns",
+      "title": "Remix & React Router v7 Fullstack Patterns",
+      "category": "web-frameworks",
+      "subcategory": "react-fullstack",
+      "version": "1.2.0",
+      "tags": [
+        "remix",
+        "react-router-v7",
+        "loader",
+        "action",
+        "optimistic-ui",
+        "typescript"
+      ],
+      "trust_rating": 0.95,
+      "estimated_tokens": 1500,
+      "description": "Design resilient fullstack applications with Remix and React Router v7 loaders, actions, optimistic UI with useFetcher, nested error boundaries, and streaming defer responses.",
+      "trigger_patterns": [
+        "remix loader action patterns",
+        "react router v7 fullstack setup",
+        "remix optimistic ui useFetcher",
+        "remix defer streaming suspense"
+      ],
+      "relative_path": "skills/web-frameworks/react-fullstack/remix-fullstack-patterns/SKILL.md"
+    },
+    {
+      "id": "web-frameworks.content-ssg.astro-content-collections",
+      "name": "astro-content-collections",
+      "title": "Astro Content Collections & Islands Architecture",
+      "category": "web-frameworks",
+      "subcategory": "content-ssg",
+      "version": "1.3.0",
+      "tags": [
+        "astro",
+        "content-collections",
+        "islands",
+        "zod",
+        "ssg",
+        "mdx",
+        "performance"
+      ],
+      "trust_rating": 0.97,
+      "estimated_tokens": 1450,
+      "description": "Construct blazing-fast content-driven static and hybrid websites with Astro 5 Content Collections, strict Zod schema validation, and selective island hydration.",
+      "trigger_patterns": [
+        "astro content collections zod",
+        "astro islands architecture hydration",
+        "astro mdx blog static site",
+        "astro client:load client:visible"
+      ],
+      "relative_path": "skills/web-frameworks/content-ssg/astro-content-collections/SKILL.md"
+    },
+    {
+      "id": "web-frameworks.python-api.django-ninja-crud",
+      "name": "django-ninja-crud",
+      "title": "Django Ninja Type-Safe Async REST & Schema Craft",
+      "category": "web-frameworks",
+      "subcategory": "python-api",
+      "version": "1.2.0",
+      "tags": [
+        "django-ninja",
+        "django",
+        "pydantic",
+        "async",
+        "rest-api",
         "python"
       ],
-      "trust_rating": 0.89,
-      "estimated_tokens": 1150,
-      "description": "Define high-performance backward-compatible gRPC service definitions, Proto3 contracts, streaming RPCs, and status code propagation across distributed services.",
+      "trust_rating": 0.94,
+      "estimated_tokens": 1400,
+      "description": "Build high-speed, type-safe REST APIs in Django using Django Ninja with Pydantic schemas, async ORM queries, authentication guards, and automatic OpenAPI generation.",
       "trigger_patterns": [
-        "create grpc proto file",
-        "protobuf backward compatibility",
-        "grpc streaming rpc",
-        "microservice proto definition"
+        "django ninja rest api",
+        "django ninja async crud",
+        "django ninja pydantic schemas",
+        "django ninja auth tokens"
       ],
-      "relative_path": "skills/coding/api-design/grpc-protobuf-specs/SKILL.md"
+      "relative_path": "skills/web-frameworks/python-api/django-ninja-crud/SKILL.md"
     },
     {
-      "id": "coding.database-architecture.postgres-query-tuning",
-      "name": "postgres-query-tuning",
-      "title": "PostgreSQL Performance Optimization & Query Tuning",
-      "category": "coding",
-      "subcategory": "database-architecture",
+      "id": "ui-design-antislop.styling-tokens.tailwind-v4-tokens",
+      "name": "tailwind-v4-tokens",
+      "title": "Tailwind CSS v4 CSS-First Design Tokens & Theme Craft",
+      "category": "ui-design-antislop",
+      "subcategory": "styling-tokens",
+      "version": "1.1.0",
+      "tags": [
+        "tailwind-v4",
+        "css-variables",
+        "design-tokens",
+        "theme",
+        "oklch",
+        "container-queries"
+      ],
+      "trust_rating": 0.98,
+      "estimated_tokens": 1550,
+      "description": "Configure and structure CSS-first theme tokens in Tailwind CSS v4 using @theme directives, OKLCH wide-gamut palettes, dynamic dark mode variables, and container queries without javascript config files.",
+      "trigger_patterns": [
+        "tailwind v4 theme tokens",
+        "tailwind v4 css @theme directive",
+        "tailwind v4 oklch colors",
+        "tailwind 4 container queries",
+        "migrate to tailwind v4"
+      ],
+      "relative_path": "skills/ui-design-antislop/styling-tokens/tailwind-v4-tokens/SKILL.md"
+    },
+    {
+      "id": "ui-design-antislop.component-systems.shadcn-ui-mastery",
+      "name": "shadcn-ui-mastery",
+      "title": "shadcn/ui Component Composition & Radix Primitives",
+      "category": "ui-design-antislop",
+      "subcategory": "component-systems",
       "version": "1.3.0",
+      "tags": [
+        "shadcn-ui",
+        "radix-ui",
+        "cva",
+        "tailwind",
+        "accessibility",
+        "react"
+      ],
+      "trust_rating": 0.99,
+      "estimated_tokens": 1600,
+      "description": "Compose accessible, customizable design systems using shadcn/ui patterns, Radix UI unstyled primitives, Class Variance Authority (CVA), and the cn() tailwind-merge helper.",
+      "trigger_patterns": [
+        "shadcn ui component composition",
+        "radix ui accessibility shadcn",
+        "class variance authority cva button",
+        "cn tailwind merge clsx helper"
+      ],
+      "relative_path": "skills/ui-design-antislop/component-systems/shadcn-ui-mastery/SKILL.md"
+    },
+    {
+      "id": "ui-design-antislop.animations.framer-motion-orchestrator",
+      "name": "framer-motion-orchestrator",
+      "title": "Framer Motion Physics-Based Orchestration & Layout Transitions",
+      "category": "ui-design-antislop",
+      "subcategory": "animations",
+      "version": "1.2.0",
+      "tags": [
+        "framer-motion",
+        "motion",
+        "spring-physics",
+        "layout-animations",
+        "animid-presence",
+        "react"
+      ],
+      "trust_rating": 0.96,
+      "estimated_tokens": 1500,
+      "description": "Orchestrate natural, spring-physics UI animations, shared layout transitions with layoutId, staggered container entrances, and exit transitions using Framer Motion.",
+      "trigger_patterns": [
+        "framer motion spring animation",
+        "framer motion layoutId transition",
+        "framer motion staggered children",
+        "animate presence exit animation"
+      ],
+      "relative_path": "skills/ui-design-antislop/animations/framer-motion-orchestrator/SKILL.md"
+    },
+    {
+      "id": "ui-design-antislop.3d-graphics.threejs-procedural-canvas",
+      "name": "threejs-procedural-canvas",
+      "title": "Three.js & React Three Fiber Procedural 3D Canvas",
+      "category": "ui-design-antislop",
+      "subcategory": "3d-graphics",
+      "version": "1.1.0",
+      "tags": [
+        "threejs",
+        "r3f",
+        "webgl",
+        "shaders",
+        "glsl",
+        "procedural",
+        "canvas"
+      ],
+      "trust_rating": 0.93,
+      "estimated_tokens": 1600,
+      "description": "Construct high-performance interactive 3D procedural scenes, custom GLSL shaders, post-processing bloom, and responsive canvas viewports using Three.js and React Three Fiber.",
+      "trigger_patterns": [
+        "react three fiber canvas setup",
+        "threejs procedural geometry glsl",
+        "r3f custom shader material",
+        "threejs webgl performance dispose"
+      ],
+      "relative_path": "skills/ui-design-antislop/3d-graphics/threejs-procedural-canvas/SKILL.md"
+    },
+    {
+      "id": "ui-design-antislop.visual-design.glassmorphic-dark-ui",
+      "name": "glassmorphic-dark-ui",
+      "title": "Bespoke Glassmorphism, Micro-Gradients & Anti-Slop Visuals",
+      "category": "ui-design-antislop",
+      "subcategory": "visual-design",
+      "version": "1.2.0",
+      "tags": [
+        "glassmorphism",
+        "dark-mode",
+        "visual-design",
+        "backdrop-filter",
+        "mesh-gradient",
+        "css"
+      ],
+      "trust_rating": 0.97,
+      "estimated_tokens": 1500,
+      "description": "Design high-craft visual interfaces that eliminate generic AI slop: multi-stop mesh gradients, specular highlight borders, optical backdrop blur, micro-interactions, and pristine contrast hierarchies.",
+      "trigger_patterns": [
+        "bespoke dark mode ui design",
+        "anti slop modern ui styling",
+        "glassmorphic specular border card",
+        "mesh gradient background css"
+      ],
+      "relative_path": "skills/ui-design-antislop/visual-design/glassmorphic-dark-ui/SKILL.md"
+    },
+    {
+      "id": "ui-design-antislop.responsive-layout.responsive-mobile-first-layout",
+      "name": "responsive-mobile-first-layout",
+      "title": "Responsive Mobile-First Fluid Grid & Adaptive Layouts",
+      "category": "ui-design-antislop",
+      "subcategory": "responsive-layout",
+      "version": "1.2.0",
+      "tags": [
+        "responsive-design",
+        "mobile-first",
+        "css-grid",
+        "clamp",
+        "viewport",
+        "touch-targets"
+      ],
+      "trust_rating": 0.98,
+      "estimated_tokens": 1450,
+      "description": "Construct adaptive, mobile-first responsive layouts using CSS clamp() fluid typography, CSS Grid auto-fit patterns, 44px touch-target compliance, and iOS safe-area insets.",
+      "trigger_patterns": [
+        "mobile first responsive layout",
+        "css clamp fluid typography",
+        "css grid auto-fit responsive minmax",
+        "safe-area-inset mobile web layout"
+      ],
+      "relative_path": "skills/ui-design-antislop/responsive-layout/responsive-mobile-first-layout/SKILL.md"
+    },
+    {
+      "id": "databases-storage.relational-sql.postgres-query-tuning",
+      "name": "postgres-query-tuning",
+      "title": "PostgreSQL Query Tuning, Indexing & EXPLAIN BUFFERS",
+      "category": "databases-storage",
+      "subcategory": "relational-sql",
+      "version": "1.5.0",
       "tags": [
         "postgres",
         "sql",
-        "performance",
-        "indexing",
         "explain-analyze",
-        "database"
+        "indexes",
+        "gin",
+        "brin",
+        "performance"
+      ],
+      "trust_rating": 0.99,
+      "estimated_tokens": 1650,
+      "description": "Diagnose query bottlenecks, inspect EXPLAIN (ANALYZE, BUFFERS) execution trees, design composite, partial, and GIN indexes, eliminate sequential scans, and optimize PostgreSQL connection parameters.",
+      "trigger_patterns": [
+        "optimize slow postgres query",
+        "postgres explain analyze buffers",
+        "postgres composite partial gin index",
+        "fix sequential scan postgres",
+        "tune postgresql query plan"
+      ],
+      "relative_path": "skills/databases-storage/relational-sql/postgres-query-tuning/SKILL.md"
+    },
+    {
+      "id": "databases-storage.backend-as-a-service.supabase-realtime-auth-rls",
+      "name": "supabase-realtime-auth-rls",
+      "title": "Supabase Postgres Row-Level Security (RLS) & Realtime Channels",
+      "category": "databases-storage",
+      "subcategory": "backend-as-a-service",
+      "version": "1.3.0",
+      "tags": [
+        "supabase",
+        "rls",
+        "postgres",
+        "realtime",
+        "auth",
+        "row-level-security"
       ],
       "trust_rating": 0.98,
       "estimated_tokens": 1600,
-      "description": "Diagnose slow SQL queries, analyze EXPLAIN (ANALYZE, BUFFERS) plans, design composite/partial/BRIN indexes, and tune PostgreSQL memory parameters.",
+      "description": "Architect impenetrable PostgreSQL Row-Level Security (RLS) policies, manage JWT role claims, and handle multi-client real-time state synchronization using Supabase Realtime channels.",
       "trigger_patterns": [
-        "optimize slow sql query",
-        "postgres explain analyze",
-        "design postgres indexes",
-        "tune postgres database performance",
-        "resolve sequential scan postgres"
+        "supabase rls policy setup",
+        "postgres row level security auth.uid",
+        "supabase realtime broadcast presence",
+        "supabase multi tenant rls"
       ],
-      "relative_path": "skills/coding/database-architecture/postgres-query-tuning/SKILL.md"
+      "relative_path": "skills/databases-storage/backend-as-a-service/supabase-realtime-auth-rls/SKILL.md"
     },
     {
-      "id": "coding.database-architecture.prisma-orm-patterns",
-      "name": "prisma-orm-patterns",
-      "title": "Prisma ORM Type-Safe Data Modeling & Migrations",
-      "category": "coding",
-      "subcategory": "database-architecture",
-      "version": "1.1.0",
+      "id": "databases-storage.orm-data-access.prisma-orm-mastery",
+      "name": "prisma-orm-mastery",
+      "title": "Prisma ORM Type-Safe Modeling, Relations & Accelerate",
+      "category": "databases-storage",
+      "subcategory": "orm-data-access",
+      "version": "1.3.0",
       "tags": [
         "prisma",
         "typescript",
         "orm",
-        "database",
         "migrations",
-        "nodejs"
+        "relations",
+        "connection-pooling"
       ],
-      "trust_rating": 0.92,
-      "estimated_tokens": 1300,
-      "description": "Master type-safe database access with Prisma ORM in TypeScript, including relation queries, interactive transactions, nested writes, and zero-downtime migrations.",
-      "trigger_patterns": [
-        "prisma schema design",
-        "prisma interactive transactions",
-        "prisma migrations typescript",
-        "optimize prisma queries"
-      ],
-      "relative_path": "skills/coding/database-architecture/prisma-orm-patterns/SKILL.md"
-    },
-    {
-      "id": "coding.refactoring-clean-code.legacy-code-modernizer",
-      "name": "legacy-code-modernizer",
-      "title": "Legacy Codebase Modernizer & Decoupling",
-      "category": "coding",
-      "subcategory": "refactoring-clean-code",
-      "version": "1.2.0",
-      "tags": [
-        "refactoring",
-        "clean-code",
-        "legacy",
-        "architecture",
-        "decoupling"
-      ],
-      "trust_rating": 0.95,
+      "trust_rating": 0.96,
       "estimated_tokens": 1500,
-      "description": "Systematically modernize legacy monoliths, eliminate god classes, extract micro-modules using the Strangler Fig pattern, and introduce characterization tests.",
+      "description": "Design relational database schemas, manage zero-downtime Prisma migrations, optimize complex queries with nested includes, and configure connection pooling.",
       "trigger_patterns": [
-        "refactor legacy codebase",
-        "modernize old code",
-        "decouple monolithic class",
-        "extract module from monolith",
-        "strangler fig pattern"
+        "prisma schema relations",
+        "prisma migrate deploy production",
+        "prisma $transaction batch queries",
+        "prisma connection pooling accelerate"
       ],
-      "relative_path": "skills/coding/refactoring-clean-code/legacy-code-modernizer/SKILL.md"
+      "relative_path": "skills/databases-storage/orm-data-access/prisma-orm-mastery/SKILL.md"
     },
     {
-      "id": "coding.refactoring-clean-code.dry-solid-refactor",
-      "name": "dry-solid-refactor",
-      "title": "DRY & SOLID Architecture Refactoring",
-      "category": "coding",
-      "subcategory": "refactoring-clean-code",
-      "version": "1.0.0",
+      "id": "databases-storage.orm-data-access.drizzle-orm-type-safe",
+      "name": "drizzle-orm-type-safe",
+      "title": "Drizzle ORM Zero-Overhead SQL-First Schema & Queries",
+      "category": "databases-storage",
+      "subcategory": "orm-data-access",
+      "version": "1.3.0",
       "tags": [
-        "solid",
-        "dry",
-        "design-patterns",
-        "clean-architecture",
-        "refactoring"
+        "drizzle-orm",
+        "typescript",
+        "postgres",
+        "sqlite",
+        "type-safety",
+        "sql"
       ],
-      "trust_rating": 0.93,
-      "estimated_tokens": 1250,
-      "description": "Apply Single Responsibility, Open-Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion principles to eliminate code duplication and fragility.",
+      "trust_rating": 0.98,
+      "estimated_tokens": 1550,
+      "description": "Construct ultra-fast, zero-runtime-overhead database layers with Drizzle ORM, schema-as-code definitions, relational queries, prepared statements, and drizzle-kit migrations.",
       "trigger_patterns": [
-        "apply solid principles",
-        "clean code refactoring",
-        "dry refactor duplicate code",
-        "dependency inversion refactor"
+        "drizzle orm schema typescript",
+        "drizzle kit migrate push",
+        "drizzle relational queries db.query",
+        "drizzle prepared statement sql"
       ],
-      "relative_path": "skills/coding/refactoring-clean-code/dry-solid-refactor/SKILL.md"
+      "relative_path": "skills/databases-storage/orm-data-access/drizzle-orm-type-safe/SKILL.md"
     },
     {
-      "id": "coding.frontend-engineering.react-performance-audit",
-      "name": "react-performance-audit",
-      "title": "React & Next.js Performance Audit & Optimization",
-      "category": "coding",
-      "subcategory": "frontend-engineering",
-      "version": "1.2.0",
+      "id": "databases-storage.olap-embedded.duckdb-polars-analytics",
+      "name": "duckdb-polars-analytics",
+      "title": "DuckDB & Polars High-Speed Embedded OLAP Analytics",
+      "category": "databases-storage",
+      "subcategory": "olap-embedded",
+      "version": "1.3.0",
       "tags": [
-        "react",
-        "nextjs",
-        "performance",
-        "frontend",
-        "web-vitals",
-        "re-render"
+        "duckdb",
+        "polars",
+        "python",
+        "arrow",
+        "parquet",
+        "olap",
+        "analytics"
       ],
       "trust_rating": 0.97,
       "estimated_tokens": 1550,
-      "description": "Eliminate wasted React re-renders, optimize Core Web Vitals (LCP, INP, CLS), implement smart memoization, virtualization for large lists, and dynamic code splitting.",
+      "description": "Perform high-speed in-process analytical SQL queries, zero-copy Arrow data transfers, and lazy DataFrame aggregations over gigabytes of Parquet files using DuckDB and Polars.",
       "trigger_patterns": [
-        "fix react re-renders",
-        "optimize nextjs performance",
-        "audit react performance",
-        "improve core web vitals",
-        "react memo usecallback audit"
+        "duckdb polars fast analytics",
+        "duckdb scan parquet files sql",
+        "polars lazy dataframe query",
+        "duckdb arrow zero copy python"
       ],
-      "relative_path": "skills/coding/frontend-engineering/react-performance-audit/SKILL.md"
+      "relative_path": "skills/databases-storage/olap-embedded/duckdb-polars-analytics/SKILL.md"
     },
     {
-      "id": "coding.frontend-engineering.tailwind-design-system",
-      "name": "tailwind-design-system",
-      "title": "Tailwind CSS Tokenized Design System Architecture",
-      "category": "coding",
-      "subcategory": "frontend-engineering",
-      "version": "1.0.0",
-      "tags": [
-        "tailwind",
-        "css",
-        "design-system",
-        "tokens",
-        "dark-mode",
-        "ui"
-      ],
-      "trust_rating": 0.94,
-      "estimated_tokens": 1300,
-      "description": "Build consistent, accessible, and themeable UI component systems with Tailwind CSS tokens, CSS variables, semantic color palettes, and glassmorphism.",
-      "trigger_patterns": [
-        "build tailwind design system",
-        "tailwind css tokens dark mode",
-        "create reusable tailwind components",
-        "themeable tailwind system"
-      ],
-      "relative_path": "skills/coding/frontend-engineering/tailwind-design-system/SKILL.md"
-    },
-    {
-      "id": "testing-quality.unit-integration.pytest-mocking-mastery",
-      "name": "pytest-mocking-mastery",
-      "title": "Pytest Fixtures, Mocking & Async Test Suite",
-      "category": "testing-quality",
-      "subcategory": "unit-integration",
+      "id": "databases-storage.key-value-cache.redis-caching-rate-limiting",
+      "name": "redis-caching-rate-limiting",
+      "title": "Redis High-Performance Caching, Sliding Window Rate Limiting & Pub/Sub",
+      "category": "databases-storage",
+      "subcategory": "key-value-cache",
       "version": "1.4.0",
       "tags": [
-        "pytest",
-        "python",
-        "testing",
-        "mocking",
-        "fixtures",
-        "coverage"
-      ],
-      "trust_rating": 0.99,
-      "estimated_tokens": 1500,
-      "description": "Author deterministic, blazing-fast pytest test suites using scoped fixtures, monkeypatching, respx HTTP mocking, factory-boy test data, and parametrize matrices.",
-      "trigger_patterns": [
-        "write pytest tests",
-        "pytest async mocking",
-        "pytest fixtures best practices",
-        "mock external api pytest",
-        "pytest parametrize test cases"
-      ],
-      "relative_path": "skills/testing-quality/unit-integration/pytest-mocking-mastery/SKILL.md"
-    },
-    {
-      "id": "testing-quality.unit-integration.playwright-e2e-automation",
-      "name": "playwright-e2e-automation",
-      "title": "Playwright End-to-End Test Automation & Flake Elimination",
-      "category": "testing-quality",
-      "subcategory": "unit-integration",
-      "version": "1.1.0",
-      "tags": [
-        "playwright",
-        "e2e",
-        "testing",
-        "typescript",
-        "browser-automation"
-      ],
-      "trust_rating": 0.94,
-      "estimated_tokens": 1400,
-      "description": "Construct rock-solid Playwright end-to-end tests with Page Object Models, auto-waiting locators, network request mocking, and visual regression snapshots.",
-      "trigger_patterns": [
-        "write playwright e2e tests",
-        "playwright page object model",
-        "fix flaky playwright test",
-        "visual regression playwright"
-      ],
-      "relative_path": "skills/testing-quality/unit-integration/playwright-e2e-automation/SKILL.md"
-    },
-    {
-      "id": "testing-quality.security-sast.owasp-top10-scanner",
-      "name": "owasp-top10-scanner",
-      "title": "OWASP Top 10 SAST Security Auditing & Remediation",
-      "category": "testing-quality",
-      "subcategory": "security-sast",
-      "version": "1.3.0",
-      "tags": [
-        "security",
-        "owasp",
-        "sast",
-        "vulnerability",
-        "audit",
-        "injection"
+        "redis",
+        "caching",
+        "rate-limiting",
+        "lua",
+        "sliding-window",
+        "ioredis"
       ],
       "trust_rating": 0.98,
       "estimated_tokens": 1600,
-      "description": "Scan codebases for OWASP Top 10 vulnerabilities (SQLi, XSS, SSRF, IDOR, Broken Auth, Command Injection) and implement robust automated security controls.",
+      "description": "Implement robust Redis cache-aside patterns with jittered TTLs, atomic Lua sliding window rate limiters, distributed locks with Redlock, and Pub/Sub event streams.",
       "trigger_patterns": [
-        "audit owasp vulnerabilities",
-        "security audit code",
-        "fix sql injection xss",
-        "sast security scanning",
-        "check for idor ssrf"
+        "redis sliding window rate limit lua",
+        "redis cache aside ttl jitter",
+        "redis distributed lock redlock",
+        "ioredis connection pool rate limiting"
       ],
-      "relative_path": "skills/testing-quality/security-sast/owasp-top10-scanner/SKILL.md"
+      "relative_path": "skills/databases-storage/key-value-cache/redis-caching-rate-limiting/SKILL.md"
     },
     {
-      "id": "testing-quality.security-sast.secret-leak-detector",
-      "name": "secret-leak-detector",
-      "title": "Automated Secret Leak Detection & Git Pre-Commit Guard",
-      "category": "testing-quality",
-      "subcategory": "security-sast",
-      "version": "1.0.0",
+      "id": "ai-llm-agents.rag-retrieval.rag-chunking-hybrid-search",
+      "name": "rag-chunking-hybrid-search",
+      "title": "RAG Context Chunking, Hybrid Vector & Sparse BM25 Search",
+      "category": "ai-llm-agents",
+      "subcategory": "rag-retrieval",
+      "version": "1.5.0",
       "tags": [
-        "secrets",
-        "gitleaks",
-        "git-guard",
-        "security",
-        "api-keys"
+        "rag",
+        "embeddings",
+        "bm25",
+        "hybrid-search",
+        "reciprocal-rank-fusion",
+        "reranking"
       ],
-      "trust_rating": 0.95,
-      "estimated_tokens": 1100,
-      "description": "Prevent accidental commits of API keys, private certificates, JWT secrets, and database credentials using regex entropy patterns and pre-commit hooks.",
+      "trust_rating": 0.99,
+      "estimated_tokens": 1750,
+      "description": "Construct high-precision Retrieval-Augmented Generation (RAG) pipelines with structure-aware chunking, hybrid dense vector and sparse BM25 retrieval, Reciprocal Rank Fusion (RRF), and cross-encoder reranking.",
       "trigger_patterns": [
-        "detect leaked secrets",
-        "scan for api keys in code",
-        "gitleaks pre-commit setup",
-        "prevent credential leak"
+        "implement hybrid search rag",
+        "bm25 vector dense sparse retrieval",
+        "reciprocal rank fusion rrf rag",
+        "cohere reranker rag pipeline",
+        "semantic chunking markdown headers"
       ],
-      "relative_path": "skills/testing-quality/security-sast/secret-leak-detector/SKILL.md"
+      "relative_path": "skills/ai-llm-agents/rag-retrieval/rag-chunking-hybrid-search/SKILL.md"
     },
     {
-      "id": "devops-cloud.ci-cd.github-actions-matrix-ci",
-      "name": "github-actions-matrix-ci",
-      "title": "GitHub Actions Multi-Matrix CI/CD Pipeline",
-      "category": "devops-cloud",
-      "subcategory": "ci-cd",
-      "version": "1.2.0",
+      "id": "ai-llm-agents.agent-workflows.langgraph-multi-agent-flow",
+      "name": "langgraph-multi-agent-flow",
+      "title": "LangGraph Multi-Agent Stateful Flow & Human-in-the-Loop",
+      "category": "ai-llm-agents",
+      "subcategory": "agent-workflows",
+      "version": "1.4.0",
       "tags": [
-        "github-actions",
-        "ci-cd",
-        "devops",
-        "automation",
-        "matrix",
-        "caching"
+        "langgraph",
+        "langchain",
+        "state-graph",
+        "multi-agent",
+        "human-in-the-loop",
+        "checkpoints"
+      ],
+      "trust_rating": 0.98,
+      "estimated_tokens": 1700,
+      "description": "Architect cyclic, stateful multi-agent workflows using LangGraph, persistent Postgres/Memory checkpointers, dynamic conditional routing, and human-in-the-loop approval interrupts.",
+      "trigger_patterns": [
+        "langgraph multi agent workflow",
+        "langgraph stategraph conditional edges",
+        "langgraph human in the loop interrupt",
+        "langgraph checkpointer persistent state"
+      ],
+      "relative_path": "skills/ai-llm-agents/agent-workflows/langgraph-multi-agent-flow/SKILL.md"
+    },
+    {
+      "id": "ai-llm-agents.prompt-craft.prompt-engineering-distiller",
+      "name": "prompt-engineering-distiller",
+      "title": "System Prompt Engineering, Few-Shot Distillation & Guardrails",
+      "category": "ai-llm-agents",
+      "subcategory": "prompt-craft",
+      "version": "1.3.0",
+      "tags": [
+        "prompt-engineering",
+        "few-shot",
+        "cot",
+        "chain-of-thought",
+        "guardrails",
+        "system-prompts"
+      ],
+      "trust_rating": 0.98,
+      "estimated_tokens": 1500,
+      "description": "Design modular, high-steerability system prompts with structured XML taxonomy, Chain-of-Thought triggers, dynamic few-shot exemplar injection, and injection defenses.",
+      "trigger_patterns": [
+        "system prompt engineering best practices",
+        "structured xml prompt template",
+        "chain of thought few shot prompt",
+        "prompt injection guardrails"
+      ],
+      "relative_path": "skills/ai-llm-agents/prompt-craft/prompt-engineering-distiller/SKILL.md"
+    },
+    {
+      "id": "ai-llm-agents.structured-outputs.instructor-structured-outputs",
+      "name": "instructor-structured-outputs",
+      "title": "Instructor & Pydantic Structured Output Validation",
+      "category": "ai-llm-agents",
+      "subcategory": "structured-outputs",
+      "version": "1.4.0",
+      "tags": [
+        "instructor",
+        "pydantic",
+        "structured-outputs",
+        "validation",
+        "openai",
+        "anthropic"
+      ],
+      "trust_rating": 0.99,
+      "estimated_tokens": 1550,
+      "description": "Extract validated, type-safe data structures from LLMs using Instructor with Pydantic v2 validation models, automated retry loops, and streamable partial schemas.",
+      "trigger_patterns": [
+        "instructor pydantic structured output",
+        "validate llm json response pydantic",
+        "instructor retry validation error",
+        "instructor streaming partial models"
+      ],
+      "relative_path": "skills/ai-llm-agents/structured-outputs/instructor-structured-outputs/SKILL.md"
+    },
+    {
+      "id": "ai-llm-agents.rag-retrieval.llamaindex-hierarchical-rag",
+      "name": "llamaindex-hierarchical-rag",
+      "title": "LlamaIndex Hierarchical Indexing & Sub-Question Query Routing",
+      "category": "ai-llm-agents",
+      "subcategory": "rag-retrieval",
+      "version": "1.3.0",
+      "tags": [
+        "llamaindex",
+        "hierarchical-rag",
+        "sub-question-query-engine",
+        "document-summary",
+        "vector-store"
       ],
       "trust_rating": 0.96,
-      "estimated_tokens": 1400,
-      "description": "Construct high-speed, cached GitHub Actions workflows with test matrices (OS, Python/Node versions), security linting, Docker layer caching, and deployment gates.",
+      "estimated_tokens": 1600,
+      "description": "Construct advanced hierarchical RAG architectures with LlamaIndex using parent-child node parsers, recursive retrievers, and SubQuestionQueryEngine query routing.",
       "trigger_patterns": [
-        "write github actions workflow",
-        "github actions matrix build",
-        "cache dependencies github actions",
-        "ci cd pipeline github"
+        "llamaindex hierarchical node parser",
+        "llamaindex sub question query engine",
+        "llamaindex parent child retriever",
+        "llamaindex auto merging retriever"
       ],
-      "relative_path": "skills/devops-cloud/ci-cd/github-actions-matrix-ci/SKILL.md"
+      "relative_path": "skills/ai-llm-agents/rag-retrieval/llamaindex-hierarchical-rag/SKILL.md"
     },
     {
-      "id": "devops-cloud.ci-cd.docker-multi-stage-build",
-      "name": "docker-multi-stage-build",
-      "title": "Production Docker Multi-Stage Optimization & Distroless",
-      "category": "devops-cloud",
+      "id": "ai-llm-agents.function-calling.openai-anthropic-tool-use",
+      "name": "openai-anthropic-tool-use",
+      "title": "OpenAI & Anthropic Claude Function Calling and Tool Use",
+      "category": "ai-llm-agents",
+      "subcategory": "function-calling",
+      "version": "1.3.0",
+      "tags": [
+        "tool-use",
+        "function-calling",
+        "openai-api",
+        "claude-tools",
+        "anthropic",
+        "typescript",
+        "python"
+      ],
+      "trust_rating": 0.98,
+      "estimated_tokens": 1600,
+      "description": "Implement robust multi-turn function calling and tool execution loops compatible across OpenAI and Anthropic Claude APIs with error reflection and parallel execution.",
+      "trigger_patterns": [
+        "openai function calling tool use",
+        "claude anthropic tool use loop",
+        "parallel tool calling multi turn agent",
+        "handle tool execution errors llm"
+      ],
+      "relative_path": "skills/ai-llm-agents/function-calling/openai-anthropic-tool-use/SKILL.md"
+    },
+    {
+      "id": "ai-llm-agents.mcp-protocol.mcp-server-protocol-craft",
+      "name": "mcp-server-protocol-craft",
+      "title": "Model Context Protocol (MCP) Server & Tool Architecture",
+      "category": "ai-llm-agents",
+      "subcategory": "mcp-protocol",
+      "version": "1.3.0",
+      "tags": [
+        "mcp",
+        "model-context-protocol",
+        "stdio",
+        "sse",
+        "typescript",
+        "python",
+        "fastmcp"
+      ],
+      "trust_rating": 0.98,
+      "estimated_tokens": 1650,
+      "description": "Construct production-ready Model Context Protocol (MCP) servers using FastMCP / TypeScript SDK, exposing tools, resources, and prompts over stdio and Server-Sent Events (SSE).",
+      "trigger_patterns": [
+        "create mcp server python fastmcp",
+        "model context protocol typescript sdk",
+        "mcp stdio sse transport",
+        "mcp tool resource prompt registration"
+      ],
+      "relative_path": "skills/ai-llm-agents/mcp-protocol/mcp-server-protocol-craft/SKILL.md"
+    },
+    {
+      "id": "ai-llm-agents.multi-agent-teams.autogen-crewai-orchestration",
+      "name": "autogen-crewai-orchestration",
+      "title": "CrewAI & AutoGen Autonomous Agent Team Orchestration",
+      "category": "ai-llm-agents",
+      "subcategory": "multi-agent-teams",
+      "version": "1.3.0",
+      "tags": [
+        "crewai",
+        "autogen",
+        "agent-teams",
+        "crew",
+        "tasks",
+        "hierarchical-process",
+        "delegation"
+      ],
+      "trust_rating": 0.96,
+      "estimated_tokens": 1600,
+      "description": "Architect specialized multi-agent crews using CrewAI and AutoGen with distinct roles, goals, backstories, task dependencies, hierarchical manager processes, and memory.",
+      "trigger_patterns": [
+        "crewai multi agent team setup",
+        "autogen groupchat manager",
+        "crewai hierarchical process tasks",
+        "crewai agent roles goals delegation"
+      ],
+      "relative_path": "skills/ai-llm-agents/multi-agent-teams/autogen-crewai-orchestration/SKILL.md"
+    },
+    {
+      "id": "devops-cloud-serverless.containerization.docker-multi-stage-distroless",
+      "name": "docker-multi-stage-distroless",
+      "title": "Docker Multi-Stage Builds with Distroless & Security Hardening",
+      "category": "devops-cloud-serverless",
+      "subcategory": "containerization",
+      "version": "1.4.0",
+      "tags": [
+        "docker",
+        "containers",
+        "distroless",
+        "security",
+        "multi-stage",
+        "cve",
+        "devops"
+      ],
+      "trust_rating": 0.99,
+      "estimated_tokens": 1600,
+      "description": "Construct minimal, secure, vulnerability-free container images using multi-stage Dockerfiles, Google Distroless minimal runtimes, non-root users, and layer caching optimization.",
+      "trigger_patterns": [
+        "docker multi stage distroless",
+        "minimize docker container size cve",
+        "dockerfile non-root security hardening",
+        "docker layer caching best practices"
+      ],
+      "relative_path": "skills/devops-cloud-serverless/containerization/docker-multi-stage-distroless/SKILL.md"
+    },
+    {
+      "id": "devops-cloud-serverless.ci-cd.github-actions-matrix-ci",
+      "name": "github-actions-matrix-ci",
+      "title": "GitHub Actions Matrix CI/CD Workflows & Dependency Caching",
+      "category": "devops-cloud-serverless",
       "subcategory": "ci-cd",
       "version": "1.3.0",
       "tags": [
-        "docker",
-        "container",
-        "multi-stage",
-        "distroless",
-        "security",
-        "devops"
+        "github-actions",
+        "ci-cd",
+        "matrix-builds",
+        "caching",
+        "devops",
+        "automation"
       ],
       "trust_rating": 0.98,
-      "estimated_tokens": 1350,
-      "description": "Author minimal, secure, and reproducible Docker images using multi-stage builds, non-root users, unprivileged distroless base images, and `.dockerignore`.",
+      "estimated_tokens": 1550,
+      "description": "Construct high-speed, parallel matrix CI/CD workflows in GitHub Actions with deterministic dependency caching, concurrency controls, and OIDC cloud authentication.",
       "trigger_patterns": [
-        "optimize dockerfile",
-        "docker multi stage build",
-        "distroless docker image",
-        "secure docker container non-root"
+        "github actions matrix build workflow",
+        "github actions cache node_modules pip",
+        "github actions concurrency cancel in progress",
+        "github actions oidc aws deploy"
       ],
-      "relative_path": "skills/devops-cloud/ci-cd/docker-multi-stage-build/SKILL.md"
+      "relative_path": "skills/devops-cloud-serverless/ci-cd/github-actions-matrix-ci/SKILL.md"
     },
     {
-      "id": "devops-cloud.infrastructure-as-code.terraform-aws-modules",
+      "id": "devops-cloud-serverless.iac-cloud.terraform-aws-modules",
       "name": "terraform-aws-modules",
-      "title": "Terraform AWS Modular Architecture & State Management",
-      "category": "devops-cloud",
-      "subcategory": "infrastructure-as-code",
-      "version": "1.1.0",
+      "title": "Terraform AWS Modular Infrastructure as Code (IaC)",
+      "category": "devops-cloud-serverless",
+      "subcategory": "iac-cloud",
+      "version": "1.3.0",
       "tags": [
         "terraform",
         "aws",
         "iac",
-        "cloud",
+        "modules",
+        "vpc",
+        "ecs",
         "s3",
         "state-locking"
       ],
-      "trust_rating": 0.93,
-      "estimated_tokens": 1450,
-      "description": "Design reusable, secure Terraform modules for AWS (VPC, ECS, RDS, IAM, S3) with remote S3 backend state locking and zero-hardcoded secrets.",
+      "trust_rating": 0.97,
+      "estimated_tokens": 1600,
+      "description": "Structure clean, reusable Terraform modules for AWS with S3 remote state backends, DynamoDB state locking, least-privilege security groups, and automated plan verifications.",
       "trigger_patterns": [
-        "write terraform module aws",
-        "terraform remote state s3",
-        "iac aws infrastructure terraform",
-        "terraform best practices"
+        "terraform aws module architecture",
+        "terraform s3 backend dynamodb state lock",
+        "terraform vpc security group module",
+        "terraform plan automated validation"
       ],
-      "relative_path": "skills/devops-cloud/infrastructure-as-code/terraform-aws-modules/SKILL.md"
+      "relative_path": "skills/devops-cloud-serverless/iac-cloud/terraform-aws-modules/SKILL.md"
     },
     {
-      "id": "devops-cloud.observability.prometheus-grafana-telemetry",
+      "id": "devops-cloud-serverless.edge-serverless.cloudflare-workers-kv-d1",
+      "name": "cloudflare-workers-kv-d1",
+      "title": "Cloudflare Workers, KV, D1 SQL & Durable Objects",
+      "category": "devops-cloud-serverless",
+      "subcategory": "edge-serverless",
+      "version": "1.3.0",
+      "tags": [
+        "cloudflare-workers",
+        "kv",
+        "d1",
+        "durable-objects",
+        "edge",
+        "wrangler",
+        "typescript"
+      ],
+      "trust_rating": 0.98,
+      "estimated_tokens": 1600,
+      "description": "Develop and deploy globally distributed, low-latency edge services using Cloudflare Workers, KV caching, D1 relational SQLite storage, and stateful Durable Objects.",
+      "trigger_patterns": [
+        "cloudflare workers d1 database setup",
+        "cloudflare workers kv binding wrangler",
+        "cloudflare durable objects websocket",
+        "deploy edge service cloudflare workers"
+      ],
+      "relative_path": "skills/devops-cloud-serverless/edge-serverless/cloudflare-workers-kv-d1/SKILL.md"
+    },
+    {
+      "id": "devops-cloud-serverless.deployment-gitops.vercel-zero-downtime-deploy",
+      "name": "vercel-zero-downtime-deploy",
+      "title": "Vercel Zero-Downtime Deployments, Preview GitOps & Edge Middleware",
+      "category": "devops-cloud-serverless",
+      "subcategory": "deployment-gitops",
+      "version": "1.2.0",
+      "tags": [
+        "vercel",
+        "gitops",
+        "zero-downtime",
+        "edge-middleware",
+        "preview-environments",
+        "nextjs"
+      ],
+      "trust_rating": 0.96,
+      "estimated_tokens": 1450,
+      "description": "Configure zero-downtime production rollouts, GitOps branch preview environments, security headers, and edge middleware routing using Vercel CLI and configuration.",
+      "trigger_patterns": [
+        "vercel zero downtime deployment",
+        "vercel preview branch gitops",
+        "vercel.json security headers rewrite",
+        "vercel edge middleware routing"
+      ],
+      "relative_path": "skills/devops-cloud-serverless/deployment-gitops/vercel-zero-downtime-deploy/SKILL.md"
+    },
+    {
+      "id": "devops-cloud-serverless.orchestration.kubernetes-helm-microservice",
+      "name": "kubernetes-helm-microservice",
+      "title": "Kubernetes & Helm Chart Microservice Deployment Specs",
+      "category": "devops-cloud-serverless",
+      "subcategory": "orchestration",
+      "version": "1.3.0",
+      "tags": [
+        "kubernetes",
+        "k8s",
+        "helm",
+        "microservices",
+        "ingress",
+        "hpa",
+        "cloud-native"
+      ],
+      "trust_rating": 0.98,
+      "estimated_tokens": 1650,
+      "description": "Author production Kubernetes manifests and parameterized Helm v3 charts with Horizontal Pod Autoscaling (HPA), Liveness/Readiness probes, and PodDisruptionBudgets.",
+      "trigger_patterns": [
+        "kubernetes helm chart microservice",
+        "k8s hpa autoscaling deployment",
+        "kubernetes readiness liveness probes",
+        "helm values template deployment"
+      ],
+      "relative_path": "skills/devops-cloud-serverless/orchestration/kubernetes-helm-microservice/SKILL.md"
+    },
+    {
+      "id": "devops-cloud-serverless.observability.prometheus-grafana-telemetry",
       "name": "prometheus-grafana-telemetry",
-      "title": "Prometheus, Grafana & OpenTelemetry Observability Stack",
-      "category": "devops-cloud",
+      "title": "Prometheus Metrics, Grafana Dashboards & OpenTelemetry",
+      "category": "devops-cloud-serverless",
       "subcategory": "observability",
-      "version": "1.0.0",
+      "version": "1.3.0",
       "tags": [
         "prometheus",
         "grafana",
         "opentelemetry",
         "metrics",
-        "tracing",
-        "monitoring"
+        "alerts",
+        "telemetry",
+        "tracing"
       ],
-      "trust_rating": 0.91,
-      "estimated_tokens": 1300,
-      "description": "Instrument applications with OpenTelemetry traces, export RED metrics (Rate, Errors, Duration) to Prometheus, and design actionable Grafana alert dashboards.",
+      "trust_rating": 0.97,
+      "estimated_tokens": 1600,
+      "description": "Implement the RED method (Rate, Errors, Duration) metrics with Prometheus, export OpenTelemetry distributed traces, and define actionable alert rules.",
       "trigger_patterns": [
-        "setup prometheus metrics",
-        "grafana dashboard alerts",
-        "opentelemetry tracing instrumentation",
-        "red metrics monitoring"
+        "prometheus metrics promql alerts",
+        "opentelemetry distributed tracing python",
+        "grafana red method dashboard",
+        "prometheus alertmanager rules"
       ],
-      "relative_path": "skills/devops-cloud/observability/prometheus-grafana-telemetry/SKILL.md"
+      "relative_path": "skills/devops-cloud-serverless/observability/prometheus-grafana-telemetry/SKILL.md"
     },
     {
-      "id": "data-ai-engineering.llm-rag.rag-chunking-hybrid-search",
-      "name": "rag-chunking-hybrid-search",
-      "title": "RAG Chunking, Hybrid Vector-BM25 Search & Reranking",
-      "category": "data-ai-engineering",
-      "subcategory": "llm-rag",
+      "id": "security-sast-hardening.application-security.owasp-top10-scanner",
+      "name": "owasp-top10-scanner",
+      "title": "OWASP Top 10 Vulnerability Audit & Defense Craft",
+      "category": "security-sast-hardening",
+      "subcategory": "application-security",
+      "version": "1.4.0",
+      "tags": [
+        "owasp",
+        "security",
+        "sast",
+        "injection",
+        "broken-auth",
+        "csrf",
+        "ssrf",
+        "defense"
+      ],
+      "trust_rating": 0.99,
+      "estimated_tokens": 1650,
+      "description": "Perform comprehensive code audits against the OWASP Top 10 vulnerabilities (SQL/Command Injection, Broken Auth, SSRF, IDOR, Security Misconfigurations) with concrete automated remediation.",
+      "trigger_patterns": [
+        "owasp top 10 vulnerability scan",
+        "prevent ssrf injection vulnerability",
+        "idor broken access control fix",
+        "sast security audit checklist"
+      ],
+      "relative_path": "skills/security-sast-hardening/application-security/owasp-top10-scanner/SKILL.md"
+    },
+    {
+      "id": "security-sast-hardening.auth-security.jwt-oauth2-secureshop",
+      "name": "jwt-oauth2-secureshop",
+      "title": "JWT & OAuth2 Secure Authentication & Token Rotation",
+      "category": "security-sast-hardening",
+      "subcategory": "auth-security",
       "version": "1.3.0",
       "tags": [
-        "rag",
-        "llm",
-        "embeddings",
-        "bm25",
-        "hybrid-search",
-        "reranker",
-        "vector-db"
+        "jwt",
+        "oauth2",
+        "authentication",
+        "token-rotation",
+        "refresh-token",
+        "pkce",
+        "security"
       ],
       "trust_rating": 0.98,
-      "estimated_tokens": 1650,
-      "description": "Build high-accuracy Retrieval-Augmented Generation (RAG) pipelines using semantic chunking, Reciprocal Rank Fusion (RRF) hybrid search, cross-encoder rerankers, and context compression.",
+      "estimated_tokens": 1600,
+      "description": "Implement cryptographically secure JWT authentication flows with asymmetric key signing (RS256), sliding refresh token rotation, HttpOnly SameSite cookies, and PKCE.",
       "trigger_patterns": [
-        "build rag pipeline",
-        "hybrid search vector bm25",
-        "semantic chunking rag",
-        "cross-encoder reranking",
-        "optimize rag accuracy"
+        "jwt refresh token rotation",
+        "oauth2 pkce authorization code",
+        "secure jwt httponly cookie",
+        "jwt rs256 asymmetric signing"
       ],
-      "relative_path": "skills/data-ai-engineering/llm-rag/rag-chunking-hybrid-search/SKILL.md"
+      "relative_path": "skills/security-sast-hardening/auth-security/jwt-oauth2-secureshop/SKILL.md"
     },
     {
-      "id": "data-ai-engineering.llm-rag.prompt-engineering-distiller",
-      "name": "prompt-engineering-distiller",
-      "title": "System Prompt Engineering & Chain-of-Thought Distiller",
-      "category": "data-ai-engineering",
-      "subcategory": "llm-rag",
+      "id": "security-sast-hardening.secrets-management.secret-leak-precommit-guard",
+      "name": "secret-leak-precommit-guard",
+      "title": "Secret Leak Prevention, Gitleaks & Pre-Commit Git Guards",
+      "category": "security-sast-hardening",
+      "subcategory": "secrets-management",
       "version": "1.2.0",
       "tags": [
-        "prompt-engineering",
-        "cot",
-        "llm",
-        "system-prompts",
-        "evals"
-      ],
-      "trust_rating": 0.95,
-      "estimated_tokens": 1400,
-      "description": "Engineer high-leverage agent system prompts with strict XML/JSON formatting, few-shot grounding examples, step-by-step reasoning triggers, and anti-hallucination guardrails.",
-      "trigger_patterns": [
-        "write system prompt for agent",
-        "prompt engineering best practices",
-        "chain of thought prompt template",
-        "reduce llm hallucinations"
-      ],
-      "relative_path": "skills/data-ai-engineering/llm-rag/prompt-engineering-distiller/SKILL.md"
-    },
-    {
-      "id": "data-ai-engineering.data-pipelines.duckdb-fast-analytics",
-      "name": "duckdb-fast-analytics",
-      "title": "DuckDB & Polars High-Speed In-Process Data Pipelines",
-      "category": "data-ai-engineering",
-      "subcategory": "data-pipelines",
-      "version": "1.1.0",
-      "tags": [
-        "duckdb",
-        "polars",
-        "python",
-        "analytics",
-        "parquet",
-        "sql"
-      ],
-      "trust_rating": 0.94,
-      "estimated_tokens": 1300,
-      "description": "Process gigabytes of Parquet, CSV, and JSON data in seconds using DuckDB's vectorized SQL engine and Polars lazy dataframes without external database clusters.",
-      "trigger_patterns": [
-        "duckdb fast analytics python",
-        "polars lazy dataframe pipeline",
-        "process large parquet files",
-        "fast in-memory data processing"
-      ],
-      "relative_path": "skills/data-ai-engineering/data-pipelines/duckdb-fast-analytics/SKILL.md"
-    },
-    {
-      "id": "security-compliance.code-hardening.jwt-oauth2-secureshop",
-      "name": "jwt-oauth2-secureshop",
-      "title": "OAuth2 & JWT Token Security Architecture",
-      "category": "security-compliance",
-      "subcategory": "code-hardening",
-      "version": "1.2.0",
-      "tags": [
-        "oauth2",
-        "jwt",
-        "auth",
+        "secrets",
+        "gitleaks",
+        "pre-commit",
         "security",
-        "tokens",
-        "fastapi",
-        "nodejs"
+        "git-hooks",
+        "environment-variables"
+      ],
+      "trust_rating": 0.99,
+      "estimated_tokens": 1450,
+      "description": "Prevent accidental commits of API keys, private tokens, and passwords using Gitleaks, automated pre-commit git hooks, and CI repository scanners.",
+      "trigger_patterns": [
+        "prevent secret leaks gitleaks",
+        "pre-commit hook gitleaks setup",
+        "scan repo for exposed api keys",
+        "git filter repo remove committed secrets"
+      ],
+      "relative_path": "skills/security-sast-hardening/secrets-management/secret-leak-precommit-guard/SKILL.md"
+    },
+    {
+      "id": "security-sast-hardening.web-defense.input-sanitization-xss-defense",
+      "name": "input-sanitization-xss-defense",
+      "title": "Input Sanitization, DOMPurify & XSS Defense Craft",
+      "category": "security-sast-hardening",
+      "subcategory": "web-defense",
+      "version": "1.3.0",
+      "tags": [
+        "xss",
+        "sanitization",
+        "dompurify",
+        "csp",
+        "content-security-policy",
+        "security"
+      ],
+      "trust_rating": 0.98,
+      "estimated_tokens": 1500,
+      "description": "Defend modern web applications from Stored, Reflected, and DOM-based Cross-Site Scripting (XSS) using DOMPurify sanitization and strict Content Security Policies.",
+      "trigger_patterns": [
+        "prevent xss dompurify sanitize",
+        "content security policy csp strict",
+        "sanitize user input html xss",
+        "dangerouslySetInnerHTML secure sanitize"
+      ],
+      "relative_path": "skills/security-sast-hardening/web-defense/input-sanitization-xss-defense/SKILL.md"
+    },
+    {
+      "id": "security-sast-hardening.supply-chain.dependency-cve-vulnerability-audit",
+      "name": "dependency-cve-vulnerability-audit",
+      "title": "Software Supply Chain Security, Dependabot & CVE Remediation",
+      "category": "security-sast-hardening",
+      "subcategory": "supply-chain",
+      "version": "1.2.0",
+      "tags": [
+        "cve",
+        "supply-chain",
+        "dependabot",
+        "snyk",
+        "npm-audit",
+        "pip-audit",
+        "sbom"
       ],
       "trust_rating": 0.97,
       "estimated_tokens": 1450,
-      "description": "Implement bulletproof JWT authentication and OAuth2 token lifecycles with asymmetric RS256/EdDSA signing, token revocation blacklists, and rotation.",
+      "description": "Secure the software supply chain through automated SBOM generation, Dependabot configuration, lockfile integrity validation, and CVE vulnerability remediation.",
       "trigger_patterns": [
-        "implement secure jwt auth",
-        "oauth2 token rotation",
-        "jwt rs256 asymmetric signing",
-        "refresh token revocation"
+        "audit cve dependency vulnerabilities",
+        "dependabot config setup",
+        "generate sbom cyclonedx",
+        "pip-audit npm audit supply chain"
       ],
-      "relative_path": "skills/security-compliance/code-hardening/jwt-oauth2-secureshop/SKILL.md"
+      "relative_path": "skills/security-sast-hardening/supply-chain/dependency-cve-vulnerability-audit/SKILL.md"
     },
     {
-      "id": "security-compliance.code-hardening.input-sanitization-guard",
-      "name": "input-sanitization-guard",
-      "title": "Input Sanitization, Schema Validation & XSS Defense",
-      "category": "security-compliance",
-      "subcategory": "code-hardening",
-      "version": "1.0.0",
+      "id": "testing-qa-automation.unit-integration-python.pytest-mocking-mastery",
+      "name": "pytest-mocking-mastery",
+      "title": "Pytest Fixture Architecture, Async Mocks & Parametrization",
+      "category": "testing-qa-automation",
+      "subcategory": "unit-integration-python",
+      "version": "1.4.0",
       "tags": [
-        "sanitization",
-        "xss",
-        "security",
-        "validation",
-        "pydantic",
-        "zod"
+        "pytest",
+        "unittest-mock",
+        "python",
+        "fixtures",
+        "parametrize",
+        "pytest-asyncio"
       ],
-      "trust_rating": 0.93,
-      "estimated_tokens": 1200,
-      "description": "Defend against DOM XSS, prototype pollution, HTML injection, and untrusted payload deserialization using strict schema boundaries (Zod/Pydantic) and DOMPurify.",
+      "trust_rating": 0.99,
+      "estimated_tokens": 1650,
+      "description": "Design modular, maintainable Pytest test suites with conftest fixtures, AsyncMock and MagicMock patching, parameterized test tables, and coverage enforcement.",
       "trigger_patterns": [
-        "input sanitization security",
-        "prevent xss attacks",
-        "validate untrusted input",
-        "dompurify sanitize html"
+        "pytest fixtures conftest setup",
+        "pytest async mock patching",
+        "pytest mark parametrize table test",
+        "pytest mock external api call"
       ],
-      "relative_path": "skills/security-compliance/code-hardening/input-sanitization-guard/SKILL.md"
+      "relative_path": "skills/testing-qa-automation/unit-integration-python/pytest-mocking-mastery/SKILL.md"
     },
     {
-      "id": "documentation-communication.api-docs.openapi-swagger-generator",
-      "name": "openapi-swagger-generator",
-      "title": "OpenAPI 3.1 & Swagger Documentation Architect",
-      "category": "documentation-communication",
-      "subcategory": "api-docs",
-      "version": "1.1.0",
+      "id": "testing-qa-automation.e2e-testing.playwright-e2e-automation",
+      "name": "playwright-e2e-automation",
+      "title": "Playwright E2E Automation, Page Object Model & Visual Regression",
+      "category": "testing-qa-automation",
+      "subcategory": "e2e-testing",
+      "version": "1.3.0",
       "tags": [
-        "openapi",
-        "swagger",
-        "documentation",
-        "api-docs",
-        "rest"
+        "playwright",
+        "e2e-testing",
+        "typescript",
+        "page-object-model",
+        "test-automation",
+        "snapshots"
       ],
-      "trust_rating": 0.92,
-      "estimated_tokens": 1250,
-      "description": "Generate comprehensive, interactive OpenAPI 3.1 specifications with clear endpoint summaries, JSON request/response examples, status codes, and authentication schemas.",
+      "trust_rating": 0.98,
+      "estimated_tokens": 1600,
+      "description": "Construct resilient end-to-end browser automation suites with Playwright using the Page Object Model (POM), accessible role-based locators, and auth storage state reuse.",
       "trigger_patterns": [
-        "generate openapi specification",
-        "document rest api swagger",
-        "openapi 3.1 schema examples",
-        "api documentation standards"
+        "playwright e2e test page object model",
+        "playwright storageState auth reuse",
+        "playwright getByRole locators",
+        "playwright visual regression screenshot test"
       ],
-      "relative_path": "skills/documentation-communication/api-docs/openapi-swagger-generator/SKILL.md"
+      "relative_path": "skills/testing-qa-automation/e2e-testing/playwright-e2e-automation/SKILL.md"
     },
     {
-      "id": "documentation-communication.architecture-decision-records.adr-writer-reviewer",
-      "name": "adr-writer-reviewer",
-      "title": "Architecture Decision Record (ADR) Writer & Reviewer",
-      "category": "documentation-communication",
-      "subcategory": "architecture-decision-records",
-      "version": "1.0.0",
+      "id": "testing-qa-automation.frontend-unit.vitest-react-testing-library",
+      "name": "vitest-react-testing-library",
+      "title": "Vitest & React Testing Library (RTL) Component Testing",
+      "category": "testing-qa-automation",
+      "subcategory": "frontend-unit",
+      "version": "1.3.0",
+      "tags": [
+        "vitest",
+        "react-testing-library",
+        "rtl",
+        "user-event",
+        "jsdom",
+        "unit-testing"
+      ],
+      "trust_rating": 0.97,
+      "estimated_tokens": 1500,
+      "description": "Author lightning-fast React component unit tests using Vitest, React Testing Library, user-event interactions, and accessibility-first queries.",
+      "trigger_patterns": [
+        "vitest react testing library setup",
+        "test react component user-event",
+        "rtl getByRole accessibility queries",
+        "mock service worker msw vitest"
+      ],
+      "relative_path": "skills/testing-qa-automation/frontend-unit/vitest-react-testing-library/SKILL.md"
+    },
+    {
+      "id": "testing-qa-automation.load-testing.locust-performance-load-testing",
+      "name": "locust-performance-load-testing",
+      "title": "Locust Distributed Load Testing & Latency Benchmarking",
+      "category": "testing-qa-automation",
+      "subcategory": "load-testing",
+      "version": "1.2.0",
+      "tags": [
+        "locust",
+        "load-testing",
+        "performance",
+        "benchmarking",
+        "stress-testing",
+        "python"
+      ],
+      "trust_rating": 0.96,
+      "estimated_tokens": 1500,
+      "description": "Benchmark API throughput, p95/p99 latencies, and concurrency limits using Locust Python-as-code distributed load test scenarios.",
+      "trigger_patterns": [
+        "locust python load testing setup",
+        "benchmark api p99 latency locust",
+        "distributed load testing locust workers",
+        "locust task weighting user journey"
+      ],
+      "relative_path": "skills/testing-qa-automation/load-testing/locust-performance-load-testing/SKILL.md"
+    },
+    {
+      "id": "business-ecommerce-growth.payments-billing.stripe-subscription-webhooks",
+      "name": "stripe-subscription-webhooks",
+      "title": "Stripe Subscription Lifecycle, Webhook Verification & Checkout",
+      "category": "business-ecommerce-growth",
+      "subcategory": "payments-billing",
+      "version": "1.4.0",
+      "tags": [
+        "stripe",
+        "payments",
+        "subscriptions",
+        "webhooks",
+        "checkout",
+        "billing",
+        "saas"
+      ],
+      "trust_rating": 0.99,
+      "estimated_tokens": 1650,
+      "description": "Implement end-to-end SaaS recurring billing with Stripe Checkout Sessions, cryptographic webhook signature verification, and subscription state machines.",
+      "trigger_patterns": [
+        "stripe subscription checkout session",
+        "stripe webhook signature verification",
+        "handle stripe customer.subscription.updated",
+        "stripe customer portal integration"
+      ],
+      "relative_path": "skills/business-ecommerce-growth/payments-billing/stripe-subscription-webhooks/SKILL.md"
+    },
+    {
+      "id": "business-ecommerce-growth.seo-growth.open-seo-audit-engine",
+      "name": "open-seo-audit-engine",
+      "title": "Technical SEO Engine, OpenGraph & Core Web Vitals",
+      "category": "business-ecommerce-growth",
+      "subcategory": "seo-growth",
+      "version": "1.3.0",
+      "tags": [
+        "seo",
+        "opengraph",
+        "core-web-vitals",
+        "sitemap",
+        "json-ld",
+        "meta-tags"
+      ],
+      "trust_rating": 0.98,
+      "estimated_tokens": 1550,
+      "description": "Optimize web platforms for search engine visibility with JSON-LD structured data schemas, dynamic OpenGraph image generators, XML sitemaps, and Core Web Vitals tuning.",
+      "trigger_patterns": [
+        "technical seo json-ld structured data",
+        "dynamic opengraph image generation",
+        "xml sitemap robots.txt nextjs",
+        "core web vitals lcp cls optimization"
+      ],
+      "relative_path": "skills/business-ecommerce-growth/seo-growth/open-seo-audit-engine/SKILL.md"
+    },
+    {
+      "id": "business-ecommerce-growth.marketplace-apis.torob-marketplace-integration",
+      "name": "torob-marketplace-integration",
+      "title": "Torob Marketplace API Integration & Price Feed Sync",
+      "category": "business-ecommerce-growth",
+      "subcategory": "marketplace-apis",
+      "version": "1.2.0",
+      "tags": [
+        "torob",
+        "marketplace",
+        "price-comparison",
+        "e-commerce",
+        "api",
+        "feed-sync",
+        "crawler"
+      ],
+      "trust_rating": 0.95,
+      "estimated_tokens": 1500,
+      "description": "Integrate with the Torob price comparison marketplace API, serving structured product feeds, real-time price/availability updates, and crawler optimization.",
+      "trigger_patterns": [
+        "torob api integration feed",
+        "torob price comparison webhook",
+        "ecommerce product feed torob format",
+        "sync inventory price torob"
+      ],
+      "relative_path": "skills/business-ecommerce-growth/marketplace-apis/torob-marketplace-integration/SKILL.md"
+    },
+    {
+      "id": "business-ecommerce-growth.chat-automation.telegram-bot-agent-controller",
+      "name": "telegram-bot-agent-controller",
+      "title": "Telegram Bot Agent Controller & AI Webhook Engine",
+      "category": "business-ecommerce-growth",
+      "subcategory": "chat-automation",
+      "version": "1.3.0",
+      "tags": [
+        "telegram-bot",
+        "ai-agent",
+        "webhooks",
+        "python-telegram-bot",
+        "aiogram",
+        "bot-father"
+      ],
+      "trust_rating": 0.97,
+      "estimated_tokens": 1600,
+      "description": "Construct high-throughput Telegram AI bot controllers using webhooks, state machines, inline keyboard callbacks, and streaming LLM agent integrations.",
+      "trigger_patterns": [
+        "telegram bot ai agent webhook",
+        "aiogram python telegram bot",
+        "telegram inline keyboard callback",
+        "stream ai response telegram bot"
+      ],
+      "relative_path": "skills/business-ecommerce-growth/chat-automation/telegram-bot-agent-controller/SKILL.md"
+    },
+    {
+      "id": "business-ecommerce-growth.marketplace-apis.divar-marketplace-automation",
+      "name": "divar-marketplace-automation",
+      "title": "Divar Marketplace OAuth2 API & Listing Automation",
+      "category": "business-ecommerce-growth",
+      "subcategory": "marketplace-apis",
+      "version": "1.2.0",
+      "tags": [
+        "divar",
+        "marketplace",
+        "oauth2",
+        "listing-automation",
+        "iran-tech",
+        "api-integration"
+      ],
+      "trust_rating": 0.95,
+      "estimated_tokens": 1500,
+      "description": "Automate listing creation, inquiry management, and OAuth2 authorization on the Divar Open Platform marketplace API.",
+      "trigger_patterns": [
+        "divar api open platform integration",
+        "divar listing automation oauth2",
+        "divar marketplace webhook",
+        "divar post creation api"
+      ],
+      "relative_path": "skills/business-ecommerce-growth/marketplace-apis/divar-marketplace-automation/SKILL.md"
+    },
+    {
+      "id": "clean-architecture-refactoring.principles-patterns.dry-solid-clean-architecture",
+      "name": "dry-solid-clean-architecture",
+      "title": "DRY, SOLID Principles & Clean Hexagonal Architecture",
+      "category": "clean-architecture-refactoring",
+      "subcategory": "principles-patterns",
+      "version": "1.4.0",
+      "tags": [
+        "solid",
+        "dry",
+        "clean-architecture",
+        "hexagonal-architecture",
+        "domain-driven-design",
+        "refactoring"
+      ],
+      "trust_rating": 0.99,
+      "estimated_tokens": 1700,
+      "description": "Refactor monolithic and tightly-coupled codebases into Clean Hexagonal Architecture adhering to SOLID and DRY principles with decoupled domain entities, ports, and adapters.",
+      "trigger_patterns": [
+        "clean architecture refactoring solid",
+        "hexagonal architecture ports and adapters",
+        "dependency inversion python typescript",
+        "dry solid principles code review"
+      ],
+      "relative_path": "skills/clean-architecture-refactoring/principles-patterns/dry-solid-clean-architecture/SKILL.md"
+    },
+    {
+      "id": "clean-architecture-refactoring.code-modernization.legacy-code-modernizer",
+      "name": "legacy-code-modernizer",
+      "title": "Legacy Code Modernization, Characterization Tests & Strangler Pattern",
+      "category": "clean-architecture-refactoring",
+      "subcategory": "code-modernization",
+      "version": "1.3.0",
+      "tags": [
+        "refactoring",
+        "legacy-code",
+        "strangler-pattern",
+        "characterization-tests",
+        "technical-debt"
+      ],
+      "trust_rating": 0.98,
+      "estimated_tokens": 1600,
+      "description": "Modernize legacy systems safely using the Strangler Fig pattern, characterization testing, incremental seams, and automated type enrichment.",
+      "trigger_patterns": [
+        "refactor legacy codebase strangler pattern",
+        "characterization tests legacy code",
+        "incremental modernization technical debt",
+        "safely rewrite legacy monolith"
+      ],
+      "relative_path": "skills/clean-architecture-refactoring/code-modernization/legacy-code-modernizer/SKILL.md"
+    },
+    {
+      "id": "clean-architecture-refactoring.architecture-patterns.event-driven-cqrs-messaging",
+      "name": "event-driven-cqrs-messaging",
+      "title": "Command Query Responsibility Segregation (CQRS) & Event-Driven Messaging",
+      "category": "clean-architecture-refactoring",
+      "subcategory": "architecture-patterns",
+      "version": "1.3.0",
+      "tags": [
+        "cqrs",
+        "event-driven",
+        "message-bus",
+        "event-sourcing",
+        "outbox-pattern",
+        "rabbitmq",
+        "kafka"
+      ],
+      "trust_rating": 0.97,
+      "estimated_tokens": 1650,
+      "description": "Architect scalable event-driven systems decoupling read and write models via CQRS, Transactional Outbox pattern, and idempotent event consumer handlers.",
+      "trigger_patterns": [
+        "cqrs event driven architecture",
+        "transactional outbox pattern postgres",
+        "idempotent event consumer message bus",
+        "event sourcing command query separation"
+      ],
+      "relative_path": "skills/clean-architecture-refactoring/architecture-patterns/event-driven-cqrs-messaging/SKILL.md"
+    },
+    {
+      "id": "clean-architecture-refactoring.architectural-docs.adr-architecture-decision-records",
+      "name": "adr-architecture-decision-records",
+      "title": "Architecture Decision Records (ADR) Craft & Review",
+      "category": "clean-architecture-refactoring",
+      "subcategory": "architectural-docs",
+      "version": "1.3.0",
       "tags": [
         "adr",
         "architecture",
-        "decisions",
+        "decision-records",
         "documentation",
-        "rfc"
+        "rfc",
+        "governance"
       ],
-      "trust_rating": 0.94,
-      "estimated_tokens": 1150,
-      "description": "Document significant technical architecture decisions using standard ADR templates (Context, Decision, Consequences, Status, Alternatives Considered).",
+      "trust_rating": 0.99,
+      "estimated_tokens": 1400,
+      "description": "Document, evaluate, and track critical architectural trade-offs using structured Michael Nygard Architecture Decision Record (ADR) templates and decision matrices.",
       "trigger_patterns": [
-        "write architecture decision record",
-        "adr template for system design",
-        "document technical decision",
-        "software architecture rfc"
+        "write architecture decision record adr",
+        "adr template michael nygard",
+        "document technical trade offs adr",
+        "architecture decision log governance"
       ],
-      "relative_path": "skills/documentation-communication/architecture-decision-records/adr-writer-reviewer/SKILL.md"
+      "relative_path": "skills/clean-architecture-refactoring/architectural-docs/adr-architecture-decision-records/SKILL.md"
     }
   ]
 }

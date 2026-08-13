@@ -1,14 +1,15 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="askill",
-    version="1.0.0",
-    description="Lightweight Agentic Skill Vault CLI & Smart Search Engine for Autonomous AI Agents",
+    name="eshkill",
+    version="1.1.0",
+    description="The npm / apt for AI Agent Skills — Autonomous Skill Router, MCP Server, and Smart Search Engine",
     author="Unified Agentic Skill Manager Team",
     packages=find_packages(),
     entry_points={
         "console_scripts": [
-            "askill=askill.cli:main",
+            "eshkill=eshkill.cli:main",
+            "askill=eshkill.cli:main",
         ],
     },
     python_requires=">=3.8",
