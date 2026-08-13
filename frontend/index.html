@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
 </head>
 <body>
     <div id="toast-container"></div>
@@ -52,7 +52,70 @@
                 </div>
             </header>
             <div id="app" class="view-container">
-                <!-- Content injected via JS -->
+                <!-- Initial Prerendered Dashboard -->
+                <div class="dashboard-view animate-fade-in">
+                    <div class="stats-grid">
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon cyan"><i data-lucide="box"></i></div>
+                            <div class="stat-details">
+                                <span class="stat-label">Total Skills</span>
+                                <span class="stat-value" id="stat-skills">10</span>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon purple"><i data-lucide="git-commit"></i></div>
+                            <div class="stat-details">
+                                <span class="stat-label">Total Versions</span>
+                                <span class="stat-value" id="stat-versions">12</span>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon yellow"><i data-lucide="file-edit"></i></div>
+                            <div class="stat-details">
+                                <span class="stat-label">Pending Proposals</span>
+                                <span class="stat-value" id="stat-proposals">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon red"><i data-lucide="shield-off"></i></div>
+                            <div class="stat-details">
+                                <span class="stat-label">Quarantined</span>
+                                <span class="stat-value" id="stat-quarantined">1</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Neural Graph Hero Card -->
+                    <div class="neural-hero-card glass-panel mb-6" onclick="window.location.hash='#/graph'">
+                        <div class="neural-hero-content">
+                            <div class="neural-badge"><span class="pulse"></span> LIVE NEURAL ECOSYSTEM</div>
+                            <h2>Living Skill Neural Graph & Cortex Visualizer</h2>
+                            <p>Explore dynamic skill hubs, nonlinear attention weighting synapses, unforgeable trust agent orbits, and quarantine isolation pods in real-time.</p>
+                            <div class="neural-hero-action">
+                                <button class="btn btn-gradient"><i data-lucide="network"></i> Open Interactive Neural Node Graph</button>
+                                <span class="text-muted"><i data-lucide="zap"></i> Physics Simulation & Live Synaptic Pulses Active</span>
+                            </div>
+                        </div>
+                        <div class="neural-hero-preview">
+                            <canvas id="dashboard-neural-preview" width="280" height="150"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-panel glass-panel">
+                            <h2>Category Breakdown</h2>
+                            <div class="chart-container" id="category-chart">
+                                <!-- CSS Bar chart -->
+                            </div>
+                        </div>
+                        <div class="dashboard-panel glass-panel">
+                            <h2>Recent Activity</h2>
+                            <div class="activity-feed" id="activity-feed">
+                                <!-- Activity items -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -283,7 +346,7 @@
             <div class="glass-panel">
                 <div class="panel-header mb-4">
                     <h2>Audit Queue (Quarantined)</h2>
-                    <button class="btn btn-icon"><i data-lucide="refresh-cw"></i></button>
+                    <button class="btn btn-icon" onclick="initAudit()"><i data-lucide="refresh-cw"></i></button>
                 </div>
                 
                 <div class="table-responsive">
@@ -314,6 +377,8 @@
                 <!-- Audit Detail View -->
             </div>
         </div>
+    </template>
+
     <template id="tpl-graph">
         <div class="neural-graph-view animate-fade-in">
             <!-- Top Synaptic HUD bar -->
@@ -392,6 +457,7 @@
         </div>
     </template>
 
+    <!-- App Script -->
     <script src="app.js"></script>
 </body>
 </html>
