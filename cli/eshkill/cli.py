@@ -189,6 +189,28 @@ def main():
     p_auto_prop.add_argument("--agent-id", default="agent:autonomous-worker", help="Autonomous agent identifier")
     p_auto_prop.add_argument("--model", default="claude-3-5-sonnet", help="Model name of the autonomous agent")
 
+    # 9c. Rank / Best-For-Task (Task-Aware Empirical Ranking)
+    p_rank = subparsers.add_parser("rank", parents=[parent_parser], help="Autonomously retrieve highest-ranked proven skill workflow based on task and repo context")
+    p_rank.add_argument("--task", "-t", required=True, help="Engineering task to solve (e.g. 'Fix CI on rust compiler plugin')")
+    p_rank.add_argument("--repo", "-r", default="", help="Repository or project context (e.g. 'Rust compiler plugin')")
+    p_rank.add_argument("--ecosystem", "-e", default="", help="Language or ecosystem (e.g. 'rust', 'python', 'typescript')")
+    p_rank.add_argument("--model", "-m", default="GPT-5", help="Target LLM model (e.g. 'GPT-5', 'claude-3-5-sonnet')")
+    p_rank.add_argument("--max-skills", type=int, default=3, help="Maximum candidate skills to rank")
+
+    # 9d. Report-Evidence (Empirical Real-World Telemetry)
+    p_ev = subparsers.add_parser("report-evidence", parents=[parent_parser], help="Record real-world execution evidence, cost, duration, and outcome")
+    p_ev.add_argument("--skill", "-s", required=True, help="Skill ID used during execution")
+    p_ev.add_argument("--repo", "-r", required=True, help="Project repository name (e.g. 'Rust compiler plugin')")
+    p_ev.add_argument("--task", "-t", required=True, help="Task description performed")
+    p_ev.add_argument("--outcome", "-o", default="success", choices=["success", "failure", "partial", "timeout"], help="Execution outcome")
+    p_ev.add_argument("--duration", "-d", type=float, default=0.0, help="Duration in seconds (e.g. 180 for 3 min)")
+    p_ev.add_argument("--model", "-m", default="GPT-5", help="Model used during execution")
+    p_ev.add_argument("--cost", "-c", type=float, default=0.0, help="Execution cost in USD (e.g. 0.19)")
+    p_ev.add_argument("--tokens", type=int, default=0, help="Total token count")
+    p_ev.add_argument("--version", "-v", default="1.0.0", help="Skill version applied (e.g. '4.1.0')")
+    p_ev.add_argument("--notes", default="", help="Feedback or self-healing notes")
+    p_ev.add_argument("--logs", default="", help="Terminal logs or error stack trace")
+
     # 10. MCP (Model Context Protocol)
     p_mcp = subparsers.add_parser("mcp", parents=[parent_parser], help="Launch Model Context Protocol (MCP) server for Claude / Cursor / Antigravity via stdio")
 
@@ -563,6 +585,79 @@ def main():
         else:
             print(f"\n{RED}{BOLD}✖ Autonomous proposal submission failed:{RESET} {res.message}\n")
             sys.exit(1)
+
+    # --- COMMAND: RANK / BEST-FOR-TASK ---
+    elif args.command == "rank":
+        router = AutoRouter(vault)
+        decision = router.rank_skills_for_task(
+            task=args.task,
+            repository_context=args.repo,
+            ecosystem=args.ecosystem,
+            model=args.model,
+            max_skills=args.max_skills
+        )
+
+        if args.json:
+            print(json.dumps(decision.to_dict(), indent=2))
+            return
+
+        print(f"\n{BOLD}{CYAN}⚡ EMPIRICAL SKILL RANKING (EVIDENCE-BASED ENGINE){RESET}")
+        print(f"• Target Task: {BOLD}{args.task}{RESET}")
+        if args.repo:
+            print(f"• Repository Context: {CYAN}{args.repo}{RESET}")
+        if args.ecosystem:
+            print(f"• Ecosystem: {DIM}{args.ecosystem}{RESET}")
+        print(f"• Target Model: {DIM}{args.model}{RESET}")
+        print(f"─" * 60)
+
+        if decision.top_skill:
+            top = decision.top_skill
+            print(f"\n{GREEN}{BOLD}🏆 #1 TOP PROVEN WORKFLOW:{RESET} {BOLD}{top.title}{RESET} ({CYAN}{top.id}{RESET})")
+            print(f"• Empirical Reliability: {GREEN}{int(decision.success_rate * 100)}% Success Rate{RESET}")
+            print(f"• Avg Resolution Time (MTTR): {CYAN}{round(decision.avg_duration_seconds/60, 1)} min{RESET}")
+            print(f"• Avg Cost Efficiency: {YELLOW}${round(decision.avg_cost_usd, 2)}{RESET}")
+            print(f"• Real-World Runs: {BOLD}{decision.evidence_count} evidence records{RESET}")
+            print(f"• Recommended Version: {DIM}v{top.version}{RESET}")
+            print(f"\n{DIM}{decision.reasoning}{RESET}")
+
+            # Quick action banner
+            print(f"\n{DIM}Quick Action: run 'eshkill get {top.id}' or load into MCP agent context.{RESET}\n")
+        else:
+            print(f"\n{YELLOW}No empirical match found. Try a broader task query.{RESET}\n")
+
+    # --- COMMAND: REPORT-EVIDENCE ---
+    elif args.command == "report-evidence":
+        router = AutoRouter(vault)
+        rec = router.record_execution_evidence(
+            skill_id=args.skill,
+            repository_name=args.repo,
+            task_description=args.task,
+            outcome=args.outcome,
+            duration_seconds=args.duration,
+            model_name=args.model,
+            cost_usd=args.cost,
+            tokens_used=args.tokens,
+            skill_version=args.version,
+            feedback_notes=args.notes,
+            execution_logs=args.logs
+        )
+
+        if args.json:
+            print(json.dumps(rec.to_dict(), indent=2))
+            return
+
+        badge = f"{GREEN}✅ SUCCESS{RESET}" if rec.outcome == "success" else f"{RED}❌ {rec.outcome.upper()}{RESET}"
+        print(f"\n{GREEN}{BOLD}✔ Execution Evidence Recorded in Living Ledger!{RESET}")
+        print(f"• Repository: {BOLD}{rec.repository_name}{RESET}")
+        print(f"• Task: {CYAN}{rec.task_description}{RESET}")
+        print(f"• Outcome: {badge}")
+        print(f"• Time: {rec.duration_seconds}s ({round(rec.duration_seconds/60, 1)} min)")
+        print(f"• Model: {rec.model_name}")
+        print(f"• Cost: ${rec.cost_usd}")
+        print(f"• Skill Version: {rec.skill_version}")
+        if rec.feedback_notes:
+            print(f"• Feedback: {DIM}{rec.feedback_notes}{RESET}")
+        print(f"\n{DIM}This empirical run now influences dynamic skill rankings for all autonomous agents.{RESET}\n")
 
     # --- COMMAND: SERVE ---
     elif args.command == "serve":

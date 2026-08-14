@@ -67,6 +67,13 @@ class RiskVerdict(str, enum.Enum):
     SUSPICIOUS = "suspicious"
 
 
+class ExecutionOutcome(str, enum.Enum):
+    SUCCESS = "success"
+    FAILURE = "failure"
+    PARTIAL = "partial"
+    TIMEOUT = "timeout"
+
+
 # ═══════════════════════════════════════════════════════════════════════════
 # Skill
 # ═══════════════════════════════════════════════════════════════════════════
@@ -92,10 +99,11 @@ class Skill(Base):
     current_version = relationship(
         "Version", foreign_keys=[current_version_id], post_update=True,
     )
-    versions     = relationship("Version",  foreign_keys="Version.skill_id",    back_populates="skill", order_by="Version.created_at")
-    proposals    = relationship("Proposal", back_populates="skill",             order_by="Proposal.submitted_at")
-    usage_events = relationship("UsageEvent", back_populates="skill")
-    batches      = relationship("Batch",    back_populates="skill",             order_by="Batch.created_at")
+    versions            = relationship("Version",  foreign_keys="Version.skill_id", back_populates="skill", order_by="Version.created_at")
+    proposals           = relationship("Proposal", back_populates="skill", order_by="Proposal.submitted_at")
+    usage_events        = relationship("UsageEvent", back_populates="skill")
+    execution_evidences = relationship("ExecutionEvidence", back_populates="skill", order_by="ExecutionEvidence.created_at.desc()")
+    batches             = relationship("Batch", back_populates="skill", order_by="Batch.created_at")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -239,6 +247,46 @@ class UsageEvent(Base):
 
     # relationships
     skill   = relationship("Skill", back_populates="usage_events")
+    version = relationship("Version")
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ExecutionEvidence (Empirical Real-World Benchmarking Ledger)
+# ═══════════════════════════════════════════════════════════════════════════
+
+class ExecutionEvidence(Base):
+    __tablename__ = "execution_evidence"
+
+    id                 = Column(String, primary_key=True, default=_uuid)
+    skill_id           = Column(String, ForeignKey("skills.id"), nullable=False, index=True)
+    version_id         = Column(String, ForeignKey("versions.id"), nullable=True, index=True)
+    skill_version_tag  = Column(String(32), default="1.0.0")
+
+    # Real-world execution context
+    repository_name    = Column(String(256), nullable=False, index=True) # e.g. "Rust compiler plugin"
+    repository_url     = Column(String(512), nullable=True)
+    ecosystem          = Column(String(64), nullable=True, index=True)   # e.g. "rust", "python", "typescript"
+    task_description   = Column(Text, nullable=False)                    # e.g. "Fix CI"
+    task_category      = Column(String(64), nullable=True, index=True)   # e.g. "ci-cd", "debugging", "refactoring"
+
+    # Performance & telemetry
+    outcome            = Column(Enum(ExecutionOutcome), nullable=False, default=ExecutionOutcome.SUCCESS, index=True)
+    duration_seconds   = Column(Float, nullable=False, default=0.0)      # e.g. 180.0 (3 min)
+    model_name         = Column(String(64), nullable=False, default="GPT-5", index=True)
+    cost_usd           = Column(Float, nullable=False, default=0.0)      # e.g. 0.19
+    tokens_used        = Column(Integer, nullable=True, default=0)
+
+    # Logs and feedback
+    agent_id           = Column(String(128), default="agent:autonomous-worker", index=True)
+    is_agent           = Column(Boolean, default=True)
+    execution_logs     = Column(Text, default="")
+    feedback_notes     = Column(Text, default="")
+    metadata_json      = Column(JSON, default=dict)
+
+    created_at         = Column(DateTime, default=datetime.utcnow, index=True)
+
+    # relationships
+    skill   = relationship("Skill", back_populates="execution_evidences")
     version = relationship("Version")
 
 

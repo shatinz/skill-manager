@@ -57,16 +57,17 @@ app.add_middleware(
 
 
 # ── Routers ─────────────────────────────────────────────────────────────────
-from app.routers import skills, proposals, batches, audit, ingestion, graph  # noqa: E402
+from app.routers import skills, proposals, batches, audit, ingestion, graph, benchmarks  # noqa: E402
 
-# Note: skills, batches, ingestion, and graph routers define their own prefix= internally.
+# Note: skills, batches, ingestion, graph, and benchmarks routers define their own prefix= internally.
 # proposals and audit do not, so they get prefixed here.
-app.include_router(skills.router,     prefix="/api",            tags=["Skills"])
-app.include_router(proposals.router,  prefix="/api/proposals",  tags=["Proposals"])
-app.include_router(batches.router,    prefix="/api",            tags=["Batches"])
-app.include_router(audit.router,      prefix="/api/audit",      tags=["Audit"])
-app.include_router(ingestion.router,  prefix="/api",            tags=["Ingestion"])
-app.include_router(graph.router,      prefix="/api",            tags=["Neural Graph"])
+app.include_router(skills.router,      prefix="/api",            tags=["Skills"])
+app.include_router(proposals.router,   prefix="/api/proposals",  tags=["Proposals"])
+app.include_router(batches.router,     prefix="/api",            tags=["Batches"])
+app.include_router(audit.router,       prefix="/api/audit",      tags=["Audit"])
+app.include_router(ingestion.router,   prefix="/api",            tags=["Ingestion"])
+app.include_router(graph.router,       prefix="/api",            tags=["Neural Graph"])
+app.include_router(benchmarks.router,  prefix="/api",            tags=["Benchmarks & Evidence"])
 
 
 # ── Health ──────────────────────────────────────────────────────────────────

@@ -220,7 +220,58 @@ class MCPToolResult:
     is_error: bool = False
 
     def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Execution Evidence & Real-World Benchmarking Dataclasses
+# ═══════════════════════════════════════════════════════════════════════════
+
+@dataclass
+class ExecutionEvidenceRecord:
+    skill_id: str
+    repository_name: str
+    task_description: str
+    outcome: str = "success"  # 'success' | 'failure' | 'partial' | 'timeout'
+    duration_seconds: float = 0.0
+    model_name: str = "GPT-5"
+    cost_usd: float = 0.0
+    tokens_used: int = 0
+    skill_version: str = "1.0.0"
+    ecosystem: str = ""
+    agent_id: str = "agent:autonomous-worker"
+    is_agent: bool = True
+    feedback_notes: str = ""
+    execution_logs: str = ""
+    created_at: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class TaskRankDecision:
+    query_task: str
+    repository_context: str
+    top_skill: Optional[SkillSummary] = None
+    empirical_score: float = 0.0
+    success_rate: float = 1.0
+    avg_duration_seconds: float = 0.0
+    avg_cost_usd: float = 0.0
+    evidence_count: int = 0
+    reasoning: str = ""
+    all_ranked_skills: List[Dict[str, Any]] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, Any]:
         return {
-            "content": self.content,
-            "isError": self.is_error
+            "query_task": self.query_task,
+            "repository_context": self.repository_context,
+            "top_skill": self.top_skill.to_dict() if self.top_skill else None,
+            "empirical_score": self.empirical_score,
+            "success_rate": self.success_rate,
+            "avg_duration_seconds": self.avg_duration_seconds,
+            "avg_cost_usd": self.avg_cost_usd,
+            "evidence_count": self.evidence_count,
+            "reasoning": self.reasoning,
+            "all_ranked_skills": self.all_ranked_skills
         }

@@ -254,3 +254,98 @@ class DashboardStats(BaseModel):
     pending_proposals: int
     quarantined_proposals: int
     categories: Dict[str, int]                       # category → skill count
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Execution Evidence & Real-World Benchmarks
+# ═══════════════════════════════════════════════════════════════════════════
+
+class ExecutionEvidenceCreate(BaseModel):
+    skill_id: str
+    version_id: Optional[str] = None
+    skill_version_tag: str = "1.0.0"
+    repository_name: str                             # e.g. "Rust compiler plugin"
+    repository_url: Optional[str] = None
+    ecosystem: Optional[str] = None                  # e.g. "rust", "python", "typescript"
+    task_description: str                            # e.g. "Fix CI"
+    task_category: Optional[str] = None
+    outcome: str = "success"                         # success, failure, partial, timeout
+    duration_seconds: float = 0.0                    # e.g. 180.0 (3 min)
+    model_name: str = "GPT-5"
+    cost_usd: float = 0.0                            # e.g. 0.19
+    tokens_used: int = 0
+    agent_id: str = "agent:autonomous-worker"
+    is_agent: bool = True
+    execution_logs: str = ""
+    feedback_notes: str = ""
+    metadata_json: Dict[str, Any] = {}
+
+
+class ExecutionEvidenceResponse(BaseModel):
+    id: str
+    skill_id: str
+    version_id: Optional[str] = None
+    skill_version_tag: str
+    repository_name: str
+    repository_url: Optional[str] = None
+    ecosystem: Optional[str] = None
+    task_description: str
+    task_category: Optional[str] = None
+    outcome: str
+    duration_seconds: float
+    model_name: str
+    cost_usd: float
+    tokens_used: int
+    agent_id: str
+    is_agent: bool
+    execution_logs: str
+    feedback_notes: str
+    metadata_json: Dict[str, Any]
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class SkillBenchmarkSummary(BaseModel):
+    skill_id: str
+    skill_name: str
+    total_runs: int
+    successful_runs: int
+    success_rate: float                              # 0.0 to 1.0 (e.g. 0.96)
+    avg_duration_seconds: float
+    avg_cost_usd: float
+    models_tested: List[str]
+    repositories_tested: List[str]
+    recent_evidences: List[ExecutionEvidenceResponse]
+
+
+class TaskRankRequest(BaseModel):
+    task: str                                        # e.g. "Fix CI on rust compiler plugin"
+    repository_context: Optional[str] = None         # e.g. "Rust compiler plugin"
+    ecosystem: Optional[str] = None                  # e.g. "rust"
+    model: Optional[str] = None                      # e.g. "GPT-5"
+    max_results: int = 3
+
+
+class TaskRankResult(BaseModel):
+    skill_id: str
+    skill_name: str
+    category: str
+    empirical_rank_score: float                      # Composite score (0.0 to 1.0)
+    success_rate: float
+    avg_duration_seconds: float
+    avg_cost_usd: float
+    evidence_count: int
+    best_matching_evidence: Optional[ExecutionEvidenceResponse] = None
+    recommended_version: str
+    content_snippet: str
+    reasoning: str
+
+
+class TaskRankResponse(BaseModel):
+    query_task: str
+    repository_context: Optional[str] = None
+    top_skill: Optional[TaskRankResult] = None
+    ranked_skills: List[TaskRankResult]
+    total_candidates_evaluated: int
+

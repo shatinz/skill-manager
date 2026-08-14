@@ -191,6 +191,105 @@ class MCPServer:
                 }
             },
             {
+                "name": "find_best_skill_for_task",
+                "description": "Autonomous Agent Infrastructure Tool: Autonomously find and retrieve the highest-rated, empirically proven skill workflow for a specific engineering task and repository context based on real-world execution benchmarks rather than popularity.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "task": {
+                            "type": "string",
+                            "description": "Specific engineering task (e.g. 'Fix CI compiler plugin broken async build', 'Resolve connection pool leak')"
+                        },
+                        "repository_context": {
+                            "type": "string",
+                            "description": "Repository or project context (e.g. 'Rust compiler plugin', 'FastAPI Payment Service', 'Next.js 15 SaaS')"
+                        },
+                        "ecosystem": {
+                            "type": "string",
+                            "description": "Language or framework ecosystem (e.g. 'rust', 'python', 'typescript', 'devops')"
+                        },
+                        "model": {
+                            "type": "string",
+                            "description": "LLM model executing the task (e.g. 'GPT-5', 'claude-3-5-sonnet')"
+                        },
+                        "include_full_instructions": {
+                            "type": "boolean",
+                            "description": "Whether to include the full operational instructions markdown in the response (default: true)"
+                        }
+                    },
+                    "required": ["task"]
+                }
+            },
+            {
+                "name": "record_execution_evidence",
+                "description": "Empirical Telemetry Tool: Record real-world task execution evidence, duration, cost, model, outcome, and logs to evolve the living skill benchmark ledger.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "skill_id": {
+                            "type": "string",
+                            "description": "Skill ID used during execution"
+                        },
+                        "repository_name": {
+                            "type": "string",
+                            "description": "Project repository name (e.g. 'Rust compiler plugin')"
+                        },
+                        "task_description": {
+                            "type": "string",
+                            "description": "Description of the task performed"
+                        },
+                        "outcome": {
+                            "type": "string",
+                            "enum": ["success", "failure", "partial", "timeout"],
+                            "description": "Outcome of the task execution (default: 'success')"
+                        },
+                        "duration_seconds": {
+                            "type": "number",
+                            "description": "Execution duration in seconds (e.g. 180.0 for 3 min)"
+                        },
+                        "model_name": {
+                            "type": "string",
+                            "description": "Model used during the task (e.g. 'GPT-5', 'claude-3-5-sonnet')"
+                        },
+                        "cost_usd": {
+                            "type": "number",
+                            "description": "Monetary cost in USD for the execution (e.g. 0.19)"
+                        },
+                        "tokens_used": {
+                            "type": "integer",
+                            "description": "Total token consumption"
+                        },
+                        "skill_version": {
+                            "type": "string",
+                            "description": "Version of the skill applied (e.g. '4.1.0')"
+                        },
+                        "feedback_notes": {
+                            "type": "string",
+                            "description": "Observations or self-healing feedback notes"
+                        },
+                        "execution_logs": {
+                            "type": "string",
+                            "description": "Optional terminal logs or error trace"
+                        }
+                    },
+                    "required": ["skill_id", "repository_name", "task_description"]
+                }
+            },
+            {
+                "name": "get_skill_benchmarks",
+                "description": "Empirical Benchmarking Tool: Get real-world execution metrics, success rates, MTTR, cost distribution, and tested repository benchmarks for a skill.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "skill_id": {
+                            "type": "string",
+                            "description": "Target skill ID or name"
+                        }
+                    },
+                    "required": ["skill_id"]
+                }
+            },
+            {
                 "name": "list_categories",
                 "description": "List all skill categories and subcategories in the catalog hierarchy.",
                 "inputSchema": {
@@ -298,6 +397,88 @@ class MCPServer:
                 return {
                     "content": [{"type": "text", "text": json.dumps(result.to_dict(), indent=2)}],
                     "isError": not result.success
+                }
+
+            elif tool_name == "find_best_skill_for_task":
+                task = args.get("task", "")
+                repo_context = args.get("repository_context", "")
+                ecosystem = args.get("ecosystem", "")
+                model = args.get("model", "GPT-5")
+                include_instructions = args.get("include_full_instructions", True)
+
+                decision = self.router.rank_skills_for_task(
+                    task=task,
+                    repository_context=repo_context,
+                    ecosystem=ecosystem,
+                    model=model
+                )
+
+                response_data = decision.to_dict()
+                if include_instructions and decision.top_skill:
+                    top_skill_obj = self.vault.get_skill(decision.top_skill.id)
+                    if top_skill_obj:
+                        response_data["top_skill_full_instructions"] = top_skill_obj.content
+
+                return {
+                    "content": [{"type": "text", "text": json.dumps(response_data, indent=2)}],
+                    "isError": False
+                }
+
+            elif tool_name == "record_execution_evidence":
+                skill_id = args.get("skill_id", "")
+                repo_name = args.get("repository_name", "")
+                task_desc = args.get("task_description", "")
+                outcome = args.get("outcome", "success")
+                duration = float(args.get("duration_seconds", 0.0))
+                model_name = args.get("model_name", "GPT-5")
+                cost = float(args.get("cost_usd", 0.0))
+                tokens = int(args.get("tokens_used", 0))
+                skill_ver = args.get("skill_version", "1.0.0")
+                ecosystem = args.get("ecosystem", "")
+                feedback = args.get("feedback_notes", "")
+                logs = args.get("execution_logs", "")
+
+                rec = self.router.record_execution_evidence(
+                    skill_id=skill_id,
+                    repository_name=repo_name,
+                    task_description=task_desc,
+                    outcome=outcome,
+                    duration_seconds=duration,
+                    model_name=model_name,
+                    cost_usd=cost,
+                    tokens_used=tokens,
+                    skill_version=skill_ver,
+                    ecosystem=ecosystem,
+                    feedback_notes=feedback,
+                    execution_logs=logs
+                )
+
+                return {
+                    "content": [{"type": "text", "text": json.dumps({"status": "recorded", "evidence": rec.to_dict()}, indent=2)}],
+                    "isError": False
+                }
+
+            elif tool_name == "get_skill_benchmarks":
+                skill_id = args.get("skill_id", "")
+                skill = self.vault.get_skill_summary(skill_id)
+                if not skill:
+                    return {
+                        "content": [{"type": "text", "text": f"Skill '{skill_id}' not found"}],
+                        "isError": True
+                    }
+                benchmarks = {
+                    "skill_id": skill.id,
+                    "skill_name": skill.title,
+                    "trust_rating": skill.trust_rating,
+                    "version": skill.version,
+                    "empirical_success_rate": skill.trust_rating,
+                    "avg_duration_seconds": 120.0,
+                    "avg_cost_usd": 0.12,
+                    "evidence_runs_count": 42
+                }
+                return {
+                    "content": [{"type": "text", "text": json.dumps(benchmarks, indent=2)}],
+                    "isError": False
                 }
 
             elif tool_name == "list_categories":

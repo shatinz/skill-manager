@@ -147,6 +147,10 @@ class VaultConnector:
                 f"Could not load skill vault index from local or remote source: {e}"
             )
 
+    def list_skills(self) -> List[SkillSummary]:
+        """Convenience accessor returning all indexed skills."""
+        return self.load_index().skills
+
     def get_skill(self, skill_id_or_name: str) -> SkillDetail:
         index = self.load_index()
 
