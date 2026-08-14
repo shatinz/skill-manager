@@ -1,198 +1,248 @@
-# 🌐 Unified Agentic Skill Manager & Public Skill Vault
+# 🌐 Skill Manager — The Empirical Infrastructure Layer for Autonomous Agents
 
-> **A living, evolutionary ecosystem for AI agent skills.**  
-> Skills are treated like open-source libraries: shaped by real usage, nonlinearly weighted by unforgeable trust signals, audited for security, versioned with full provenance, and accessible on-demand via a lightweight CLI search engine.
+<div align="center">
 
----
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![MCP Standard](https://img.shields.io/badge/MCP-2024--11--05-purple.svg)](https://modelcontextprotocol.io/)
+[![Security: Audited](https://img.shields.io/badge/Security%20Gate-Verified%200%20Vulns-success)](security_audit_report.md)
+[![Ecosystem](https://img.shields.io/badge/Vault-60%20Curated%20Skills-cyan)](#-the-living-skill-vault-60-skills)
 
-## ⚡ Key Features & Highlights
+**[English](README.md)** • **[فارسی (Persian)](README.fa.md)** • **[Русский (Russian)](README.ru.md)** • **[中文 (Chinese)](README.zh.md)**
 
-- **🏛️ Public Agentic Skill Vault:** 24+ production-ready agent skills organized by categories and subcategories (API Design, Database Architecture, Refactoring, SAST Security, Multi-Stage Docker, RAG & Vector Search, OAuth2, and ADRs).
-- **⚡ Lightweight Agent CLI (`askill`):** Ultra-fast, zero-overhead CLI and Python SDK for AI agents to discover, search, fetch on-demand, and inject skills without cloning the entire repository.
-- **🔍 Smart Search Engine:** Hybrid BM25 lexical token scoring, action intent classification, and trigger pattern matching that finds the exact skill an agent needs for its specific task.
-- **🧬 Prompt Context Injection:** Direct output formatting in XML (`<agent_skill>`), system prompt text, or compact token-efficient summaries.
-- **Attention-Style Nonlinear Merge Weighting:**
-  - **Redundancy Multiplier:** Independent proposals converging on the same fix multiply each other's influence logarithmically:
-    $$\text{bonus} = \left(\sum \text{trust}_i\right) \times (1 + \ln(N) \cdot W_{\text{redundancy}})$$
-  - **Disruptiveness Dampening:** Radical rewrites from unproven accounts are heavily dampened; established contributors retain latitude to make structural changes.
-- **Unforgeable Trust Scoring:** Based on immutable track records (account maturity, verified star scale, prior accepted contributions) rather than gameable star metrics.
-- **Defense-in-Depth Security Audit:**
-  - **Static AST & Pattern Analysis:** Detects network calls, dangerous file system actions, code execution (`eval`/`exec`/`subprocess`), and safety overrides.
-  - **Semantic Intent Diff Review:** Compares semantic divergence between live and candidate versions.
-  - **Sandbox Canary Checks:** Evaluates code blocks for unwanted side effects.
-  - **Sybil Timing Cluster Detection:** Identifies coordinated proposal clusters from nascent accounts.
-- **Quarantine & Cherry-Picking:** Suspicious proposals are isolated into an Admin Review Queue while clean proposals merge without blocking the batch.
-- **Append-Only Version Lineage:** Full provenance chain from root version to current live state.
-- **Interactive Neural Graph & SPA:** Force-directed neural network canvas with dynamic physics, live particle pulses, category breakdowns, and audit telemetry.
+</div>
 
 ---
 
-## 💻 Lightweight Agent CLI (`askill`)
+## 💡 The Core Philosophy: Evidence Over Popularity
 
-### 1. Smart Search for Agents
-Find the best skill for any task description or prompt:
+> **Skill Manager is not a static skill repository. It is an infrastructure layer for autonomous AI agents.**
 
-```bash
-askill search "build production fastapi rest api with pydantic v2"
+Traditional skill repositories operate like static app stores:
+> *"Here is a list of 500 markdown files. Search through them, star your favorites, or install 50 skills at once."*
+
+**This model breaks down for autonomous agents.** Agents don't need vanity GitHub stars, unvetted prompt dumps, or bloated context windows.
+
+### The Agentic Paradigm Shift
+
+When an autonomous agent tackles an engineering task, it does not think:
+> ❌ *"Let me search through a folder of 50 skills to see what might fit."*
+
+The agent thinks:
+> 🧠 **"I am debugging a Rust networking issue. Let me retrieve the highest-rated Rust debugging workflow that has proven to succeed for similar repositories."**
+
 ```
-
-Output for machine agents (`--json`):
-```bash
-askill search "docker multi stage build distroless" --json
-```
-
-### 2. Direct Prompt Injection (`match`)
-Automatically find and format the matching skill directly for LLM context injection:
-
-```bash
-# Formatted as XML tags (<agent_skill>...</agent_skill>)
-askill match --task "optimize slow postgres queries with explain analyze" --format xml
-
-# Formatted as System Prompt Preamble
-askill match --task "write unit tests with pytest mocks" --format system
-
-# Formatted as Compact Token-Efficient Summary
-askill match --task "jwt oauth2 token security" --format compact
-```
-
-### 3. Fetch Skill On-Demand (`get`)
-Stream skill instructions directly without saving locally:
-
-```bash
-askill get coding.api-design.fastapi-rest-craft
-```
-
-Or save locally on demand:
-```bash
-askill get coding.api-design.fastapi-rest-craft --save ./SKILL.md
-```
-
-### 4. Propose Improvements & PRs (`propose`)
-Agents or human developers submit modifications:
-
-```bash
-askill propose \
-  --skill fastapi-rest-craft \
-  --file patch.diff \
-  --reason "Added Pydantic v2 model_config support" \
-  --proposer "ai_agent_dev_01"
-```
-
-### 5. Run Lightweight Micro-Daemon (`serve`)
-Start zero-dependency REST daemon on port 8080 for subagents:
-
-```bash
-askill serve --port 8080
+                TRADITIONAL SKILL REPOS vs. SKILL MANAGER
+┌───────────────────────────────────────┐   ┌──────────────────────────────────────────┐
+│        Static Repositories            │   │              Skill Manager               │
+├───────────────────────────────────────┤   ├──────────────────────────────────────────┤
+│ • Popularity & star-driven metrics    │   │ • Real-world empirical evidence ledger   │
+│ • Static markdown copy-paste          │   │ • Task-aware dynamic ranking engine      │
+│ • Monolithic "install everything"     │   │ • Sub-millisecond on-demand injection   │
+│ • Stagnant, unverified instructions   │   │ • 7-stage nonlinear evolutionary merge   │
+│ • Blind prompt execution              │   │ • Closed feedback loops (Outcome, Cost)  │
+└───────────────────────────────────────┘   └──────────────────────────────────────────┘
 ```
 
 ---
 
-## 🗂️ Public Skill Vault Taxonomy (`skills-vault/`)
+## 📊 Real-World Project Feedback & Empirical Evidence Ledger
 
+Skills in Skill Manager are benchmarked and ranked using actual task execution outcomes on real-world codebases. Every agent execution contributes to the global evidence ledger:
+
+<div align="center">
+
+```yaml
+Repository:    "Rust compiler plugin"
+Task:          "Fix CI async deadlock in worker channels"
+Outcome:       ✅ Success
+Time (MTTR):   3 min (180s)
+Model:         GPT-5
+Cost:          $0.19
+Tokens:        14,500
+Skill Version: v4.1.0
+Evidence Note: "Resolved non-blocking tokio task channels and updated lifetime bounds."
 ```
-skills-vault/
-├── vault.json                       # Compiled index with keywords, triggers, metadata
-├── README.md                        # Vault documentation & GitHub contributor guide
-└── skills/
-    ├── coding/
-    │   ├── api-design/
-    │   │   ├── fastapi-rest-craft/SKILL.md
-    │   │   ├── graphql-schema-design/SKILL.md
-    │   │   └── grpc-protobuf-specs/SKILL.md
-    │   ├── database-architecture/
-    │   │   ├── postgres-query-tuning/SKILL.md
-    │   │   └── prisma-orm-patterns/SKILL.md
-    │   ├── refactoring-clean-code/
-    │   │   ├── legacy-code-modernizer/SKILL.md
-    │   │   └── dry-solid-refactor/SKILL.md
-    │   └── frontend-engineering/
-    │       ├── react-performance-audit/SKILL.md
-    │       └── tailwind-design-system/SKILL.md
-    ├── testing-quality/
-    │   ├── unit-integration/
-    │   │   ├── pytest-mocking-mastery/SKILL.md
-    │   │   └── playwright-e2e-automation/SKILL.md
-    │   └── security-sast/
-    │       ├── owasp-top10-scanner/SKILL.md
-    │       └── secret-leak-detector/SKILL.md
-    ├── devops-cloud/
-    │   ├── ci-cd/
-    │   │   ├── github-actions-matrix-ci/SKILL.md
-    │   │   └── docker-multi-stage-build/SKILL.md
-    │   ├── infrastructure-as-code/
-    │   │   └── terraform-aws-modules/SKILL.md
-    │   └── observability/
-    │       └── prometheus-grafana-telemetry/SKILL.md
-    ├── data-ai-engineering/
-    │   ├── llm-rag/
-    │   │   ├── rag-chunking-hybrid-search/SKILL.md
-    │   │   └── prompt-engineering-distiller/SKILL.md
-    │   └── data-pipelines/
-    │       └── duckdb-fast-analytics/SKILL.md
-    ├── security-compliance/
-    │   └── code-hardening/
-    │       ├── jwt-oauth2-secureshop/SKILL.md
-    │       └── input-sanitization-guard/SKILL.md
-    └── documentation-communication/
-        ├── api-docs/
-        │   └── openapi-swagger-generator/SKILL.md
-        └── architecture-decision-records/
-            └── adr-writer-reviewer/SKILL.md
-```
+
+</div>
+
+When another agent encounters a related task, Skill Manager evaluates semantic compatibility, empirical success rates, MTTR, and model performance to return the single most proven workflow.
 
 ---
 
-## 🏗️ 7-Stage Pipeline Architecture
+## ⚡ The 7-Stage Evolutionary Intelligence Pipeline
 
-```mermaid
-graph TD
-    A[Stage A: Ingestion] -->|Parsed & Deduplicated| S[(Skills Database)]
-    S --> B[Stage B: Usage & Feedback]
-    B -->|Proposals & Telemetry| C[Stage C: Batch Accumulation]
-    C -->|Window Closed| D[Stage D: Nonlinear Weighting & Merge]
-    D -->|Candidate Version| E[Stage E: Security Audit]
-    E -->|Clean Proposals| F[Stage F: Version Release]
-    E -->|Suspicious Diff| Q[Quarantine Review Queue]
-    Q -->|Approved by Human| C
-    F -->|New Live Version| G[Stage G: Serving API / UI]
 ```
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │                 7-STAGE AUTONOMOUS EVOLUTION ARCHITECTURE                   │
+  └─────────────────────────────────────────────────────────────────────────────┘
+      │
+  [Stage A: Ingestion] ──────► Ingests from GitHub repos, AST parser, RFC schemas
+      │
+  [Stage B: Evidence & Usage] ► Logs real project telemetry (Repo, Task, MTTR, Cost)
+      │
+  [Stage C: Batch Accumulation] Dynamic window clustering of agent & human proposals
+      │
+  [Stage D: Nonlinear Merge] ─► Attention-weighted synthesis (Sybil-resistant trust)
+      │
+  [Stage E: Security Sentinel]  SAST AST scanner, Canary sandboxing, zero vulnerabilities
+      │
+  [Stage F: Canary Release] ──► Canary rollouts with automated fallback & lineage chains
+      │
+  [Stage G: Agent Serving] ───► Task-aware ranking, FastMCP stdio/SSE & REST daemon
+```
+
+### Nonlinear Trust Synthesis Formula
+Proposals converging on identical fixes multiply influence logarithmically while dampening radical rewrites from unproven accounts:
+$$\text{Effective Weight} = \left(\sum \text{Trust}_i\right) \times \left(1 + \ln(N) \cdot W_{\text{redundancy}}\right) \times (1 - \text{Dampening})$$
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start for Autonomous Agents & Developers
 
-### 1. Run the Web App & Backend
+### 1. Installation
+Install the lightweight agent CLI (`eshkill` / `askill`):
+
 ```bash
-./run.sh
+# Clone the repository
+git clone https://github.com/shatinz/skill-manager.git
+cd skill-manager
+
+# Install CLI locally in editable mode
+pip install -e ./cli
 ```
-Open **[http://localhost:8000](http://localhost:8000)** in your browser.
 
-### 2. Run All Tests
+### 2. Task-Aware Dynamic Skill Retrieval (`rank`)
+Instead of manually searching, request the highest-ranked proven workflow for your task:
+
 ```bash
-# Run CLI & Smart Search Test Suite (25 Tests)
-/home/shatix/venv-skm/bin/python3 -m unittest discover -s tests -p "test_*.py" -v
+# Agent queries highest-proven workflow based on task & repository context
+eshkill rank --task "Fix CI" --repo "Rust compiler plugin" --model "GPT-5"
+```
 
-# Run 7-Stage Pipeline End-to-End Tests
-/home/shatix/venv-skm/bin/python3 backend/test_e2e.py
+**Output:**
+```text
+⚡ EMPIRICAL SKILL RANKING (EVIDENCE-BASED ENGINE)
+• Target Task: Fix CI
+• Repository Context: Rust compiler plugin
+• Target Model: GPT-5
+────────────────────────────────────────────────────────────
+
+🏆 #1 TOP PROVEN WORKFLOW: Rust Axum & Tokio High-Throughput Async Architecture
+• Empirical Reliability: 99% Success Rate
+• Avg Resolution Time (MTTR): 2.0 min
+• Avg Cost Efficiency: $0.12
+• Real-World Runs: 42 evidence records
+• Recommended Version: v1.3.0
+
+Selected based on verified real-world runs on similar Rust compiler plugins.
+```
+
+### 3. Record Execution Telemetry (`report-evidence`)
+Close the loop by recording execution outcome back to the platform:
+
+```bash
+eshkill report-evidence \
+  --skill rust-axum-tokio-async \
+  --repo "Rust compiler plugin" \
+  --task "Fix CI" \
+  --outcome success \
+  --duration 180 \
+  --model "GPT-5" \
+  --cost 0.19 \
+  --version "4.1.0" \
+  --notes "Resolved non-blocking tokio task channels"
+```
+
+### 4. Autonomous Agent Self-Healing & Proposal (`auto-propose`)
+When an agent encounters compiler warnings, deprecations, or runtime errors, it automatically submits a proposal with explicit `🤖 Autonomous Agent` origin tagging:
+
+```bash
+eshkill auto-propose \
+  --skill fastapi-production-craft \
+  --feedback "DeprecationWarning: Starlette 0.40 form parsing changed" \
+  --fix "Enforce async request.form() with python-multipart>=0.0.20" \
+  --reason "Resolve Starlette async form deprecation" \
+  --agent-id "agent:autonomous-debugger" \
+  --model "claude-3-5-sonnet"
 ```
 
 ---
 
-## 📡 API Reference Overview
+## 🔌 Model Context Protocol (MCP) Integration
 
-| Route | Method | Description |
-|---|---|---|
-| `/api/skills/` | GET | List skills with category filter & search |
-| `/api/skills/{id}` | GET | Get skill details & current version |
-| `/api/skills/{id}/use` | POST | Log skill usage telemetry |
-| `/api/skills/{id}/versions` | GET | Full version history chain |
-| `/api/proposals/skills/{id}/proposals` | POST | Submit content modification or issue |
-| `/api/batches/process` | POST | Force close batch & generate merge candidate |
-| `/api/audit/batch/{id}/audit` | POST | Run static analysis, canary, and sybil audit |
-| `/api/audit/batch/{id}/release` | POST | Promote audited candidate to live version |
-| `/api/audit/pipeline/{id}/run-full` | POST | End-to-end batch → audit → release pipeline |
-| `/api/audit/quarantined` | GET | View quarantined suspicious proposals |
-| `/api/audit/proposal/{id}/review` | POST | Admin approve/reject quarantined proposal |
-| `/api/audit/stats` | GET | Global analytics & telemetry metrics |
-| `/api/graph/neural-data` | GET | Live node & synapse topology for neural visualizer |
-| `/api/ingestion/seed` | POST | Ingest curated demo skill sets |
+Skill Manager provides native Model Context Protocol (MCP) support over standard JSON-RPC 2.0 stdio and SSE transports. Compatible with **Claude Desktop**, **Cursor**, **Windsurf**, and **Antigravity**.
+
+### Configuration (`claude_desktop_config.json` / Cursor MCP)
+```json
+{
+  "mcpServers": {
+    "skill-manager": {
+      "command": "python",
+      "args": ["-m", "eshkill.cli", "mcp"],
+      "env": {
+        "SKILL_MANAGER_API_URL": "http://127.0.0.1:8000/api"
+      }
+    }
+  }
+}
+```
+
+### Exposed MCP Agent Tools:
+1. `find_best_skill_for_task`: Autonomously retrieves the highest-rated workflow for any engineering task and repository context based on empirical evidence.
+2. `record_execution_evidence`: Logs task execution duration, cost, outcome, and telemetry into the benchmark ledger.
+3. `auto_propose_skill_fix`: Self-improves skills based on runtime error feedback.
+4. `get_skill`: Streams skill instructions formatted as Markdown, XML, or System Prompts.
+5. `auto_select_skill`: Automatically compiles a multi-skill context stack for vibe-coding prompts.
+
+---
+
+## 🏛️ The Living Skill Vault (60 Curated Skills)
+
+The Skill Vault houses 60 high-impact, battle-tested skills across 9 core engineering categories:
+
+| Category | Description & Key Patterns |
+| :--- | :--- |
+| **🤖 AI & LLM Agents** | FastMCP Server Dev, Knowledge Graph Memory, Sequential Thinking & Tree-of-Thought, LangGraph Multi-Agent Workflows, RAG Hybrid Search. |
+| **🌐 Web Frameworks** | Next.js 15 App Router, TanStack Router & Query v5, React 19 Server Actions, FastAPI Production Craft, Hono Cloudflare Edge, Astro 5. |
+| **🎨 UI & Anti-Slop Design** | Shadcn UI & Tailwind v4 Tokens, Dark Mode Ambient Gradients, Responsive Fluid Layouts, Accessible Micro-Interactions. |
+| **🗄️ Databases & Storage** | Postgres Explain Analyze Tuning, Supabase RLS Realtime, Prisma ORM, Drizzle Type-Safe SQL, DuckDB & Polars Analytics. |
+| **☁️ DevOps & Cloud** | ArgoCD GitOps & Kubernetes Helm, Docker Distroless Multi-Stage, GitHub Actions Matrix CI, OpenTelemetry & Prometheus Telemetry. |
+| **🛡️ SAST & Security** | OWASP Top 10 Scanner, Secret Leak Pre-Commit Guards, JWT OAuth2 Defense, Input Sanitization & XSS Prevention. |
+| **🧪 Testing & QA** | Pytest Mocking & Fixtures, Playwright E2E Automation, Hypothesis Property-Based Testing, Chaos Fault Injection. |
+| **📈 Business & E-Commerce** | Stripe Billing & Webhooks, Multi-Currency Ledger, SEO Meta Generation, Funnel Conversion Optimization. |
+| **📐 Clean Architecture** | Rust Axum & Tokio Async, Event Sourcing & Outbox Pattern, Michael Nygard ADR Decision Records, DRY/SOLID Modernization. |
+
+---
+
+## 🖥️ Live Full-Stack Architecture & Web Dashboard
+
+Skill Manager includes a FastAPI backend and a responsive Single Page Application (SPA) dashboard:
+
+```bash
+# Start backend server
+cd backend
+source .venv/bin/activate
+uvicorn app.main:app --reload --port 8000
+```
+
+Open `http://localhost:8000` to inspect:
+- **📊 Real-Time Evidence Ledger**: Inspect live project execution telemetry (Repo, Task, Outcome, Model, Cost, Time).
+- **🧭 Dynamic Workflow Matcher**: Test task-aware empirical ranking queries interactively.
+- **🕸️ Neural Skill Network Canvas**: Interactive force-directed physics graph visualizing skill dependencies and cluster merges.
+- **🛡️ Security Quarantine Queue**: Review flagged AST mutations and safety overrides.
+
+---
+
+## 📜 Documentation & Deep Dives
+
+- [Detailed Architecture & Lifecycle Stages](docs/ARCHITECTURE.md)
+- [Security Sentinel Audit Report (Zero Findings)](security_audit_report.md)
+- [CLI Reference & Cheatsheet](docs/CLI_REFERENCE.md)
+- [MCP Integration Guide](docs/MCP_INTEGRATION.md)
+
+---
+
+## 📄 License
+
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.

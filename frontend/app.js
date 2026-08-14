@@ -15,6 +15,7 @@ function safeCreateIcons() {
 const routes = {
     '#/dashboard': { title: 'Dashboard', template: 'tpl-dashboard', init: initDashboard },
     '#/graph': { title: 'Neural Graph', template: 'tpl-graph', init: initGraph },
+    '#/benchmarks': { title: 'Evidence & Benchmarks Ledger', template: 'tpl-benchmarks', init: initBenchmarks },
     '#/skills': { title: 'Skill Browser', template: 'tpl-skills', init: initSkills },
     '#/skill/': { title: 'Skill Detail', template: 'tpl-skill-detail', init: initSkillDetail },
     '#/pipeline': { title: 'Pipeline Control', template: 'tpl-pipeline', init: initPipeline },
@@ -1269,5 +1270,172 @@ async function initGraph() {
     }
 }
 
+// --- Benchmarks & Empirical Evidence View ---
+async function initBenchmarks() {
+    const tableContainer = document.getElementById('evidence-table-container');
+    const btnRefresh = document.getElementById('btn-refresh-evidence');
+    const btnRunRank = document.getElementById('btn-run-rank');
+    const rankResultBox = document.getElementById('bench-rank-result');
+
+    async function loadEvidence() {
+        if (!tableContainer) return;
+        tableContainer.innerHTML = '<p class="text-muted"><i data-lucide="loader"></i> Fetching telemetry logs...</p>';
+        safeCreateIcons();
+
+        try {
+            const evidences = await apiFetch('/benchmarks/recent?limit=25');
+            if (!evidences || evidences.length === 0) {
+                tableContainer.innerHTML = '<p class="text-muted">No execution evidence recorded yet. Use the CLI `eshkill report-evidence` or MCP tools to log runs.</p>';
+                return;
+            }
+
+            // Update stats
+            const succCount = evidences.filter(e => e.outcome === 'success').length;
+            const rate = Math.round((succCount / evidences.length) * 100);
+            const avgDur = (evidences.reduce((a, b) => a + (b.duration_seconds || 0), 0) / evidences.length / 60).toFixed(1);
+            const avgCost = (evidences.reduce((a, b) => a + (b.cost_usd || 0), 0) / evidences.length).toFixed(2);
+
+            const statSucc = document.getElementById('bench-stat-success');
+            const statTime = document.getElementById('bench-stat-time');
+            const statCost = document.getElementById('bench-stat-cost');
+            const statRuns = document.getElementById('bench-stat-runs');
+
+            if (statSucc) statSucc.textContent = `${rate}%`;
+            if (statTime) statTime.textContent = `${avgDur} min`;
+            if (statCost) statCost.textContent = `$${avgCost}`;
+            if (statRuns) statRuns.textContent = `${evidences.length}`;
+
+            let html = `
+                <div style="overflow-x:auto;">
+                    <table class="table w-full" style="width:100%; border-collapse:collapse; text-align:left; font-size:0.875rem;">
+                        <thead>
+                            <tr style="border-bottom:1px solid rgba(255,255,255,0.15); color:var(--text-muted); font-size:0.75rem; text-transform:uppercase;">
+                                <th style="padding:10px;">Repository / Project</th>
+                                <th style="padding:10px;">Engineering Task</th>
+                                <th style="padding:10px;">Outcome</th>
+                                <th style="padding:10px;">Time</th>
+                                <th style="padding:10px;">Model</th>
+                                <th style="padding:10px;">Cost</th>
+                                <th style="padding:10px;">Skill Ver</th>
+                                <th style="padding:10px;">Logged By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            evidences.forEach(e => {
+                const isSucc = e.outcome === 'success';
+                const badge = isSucc 
+                    ? `<span style="color:#34d399; font-weight:600;">✅ Success</span>`
+                    : `<span style="color:#f87171; font-weight:600;">❌ ${e.outcome}</span>`;
+                
+                const timeMin = (e.duration_seconds / 60).toFixed(1);
+
+                html += `
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+                        <td style="padding:12px 10px; font-weight:600;">${e.repository_name}</td>
+                        <td style="padding:12px 10px; color:var(--color-cyan);">${e.task_description}</td>
+                        <td style="padding:12px 10px;">${badge}</td>
+                        <td style="padding:12px 10px;">${timeMin} min</td>
+                        <td style="padding:12px 10px; font-weight:500;">${e.model_name}</td>
+                        <td style="padding:12px 10px; color:#fbbf24;">$${e.cost_usd.toFixed(2)}</td>
+                        <td style="padding:12px 10px; font-family:monospace; font-size:0.8rem; color:var(--text-muted);">${e.skill_version_tag}</td>
+                        <td style="padding:12px 10px; font-size:0.75rem; color:var(--text-muted);">${e.agent_id}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            tableContainer.innerHTML = html;
+            safeCreateIcons();
+        } catch (err) {
+            console.error('Evidence load error', err);
+            tableContainer.innerHTML = '<p class="text-danger">Failed to load evidence records.</p>';
+        }
+    }
+
+    if (btnRefresh) {
+        btnRefresh.addEventListener('click', loadEvidence);
+    }
+
+    if (btnRunRank) {
+        btnRunRank.addEventListener('click', async () => {
+            const task = document.getElementById('bench-query-task')?.value || 'Fix CI';
+            const repo = document.getElementById('bench-query-repo')?.value || 'Rust compiler plugin';
+            const model = document.getElementById('bench-query-model')?.value || 'GPT-5';
+
+            if (!rankResultBox) return;
+            rankResultBox.style.display = 'block';
+            rankResultBox.innerHTML = '<p class="text-muted"><i data-lucide="loader"></i> Evaluating candidate skills with empirical evidence ledger...</p>';
+            safeCreateIcons();
+
+            try {
+                const res = await apiFetch('/benchmarks/rank', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        task: task,
+                        repository_context: repo,
+                        model: model,
+                        max_results: 3
+                    })
+                });
+
+                if (!res || !res.top_skill) {
+                    rankResultBox.innerHTML = '<p class="text-muted">No matching skill workflow found.</p>';
+                    return;
+                }
+
+                const top = res.top_skill;
+                rankResultBox.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+                        <div>
+                            <span class="badge" style="background:rgba(6,182,212,0.2); color:#22d3ee; border:1px solid rgba(6,182,212,0.4); padding:4px 10px; font-weight:700; border-radius:6px;">
+                                🏆 #1 TOP PROVEN WORKFLOW
+                            </span>
+                            <h4 style="margin:8px 0 2px 0; font-size:1.15rem; color:var(--text-primary);">${top.skill_name}</h4>
+                            <span style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;">${top.skill_id} (Recommended: ${top.recommended_version})</span>
+                        </div>
+                        <div style="display:flex; gap:12px; text-align:right;">
+                            <div>
+                                <span style="font-size:0.7rem; color:var(--text-muted); display:block;">Reliability</span>
+                                <strong style="color:#34d399; font-size:1.1rem;">${Math.round(top.success_rate * 100)}%</strong>
+                            </div>
+                            <div>
+                                <span style="font-size:0.7rem; color:var(--text-muted); display:block;">MTTR Time</span>
+                                <strong style="color:var(--color-cyan); font-size:1.1rem;">${(top.avg_duration_seconds / 60).toFixed(1)}m</strong>
+                            </div>
+                            <div>
+                                <span style="font-size:0.7rem; color:var(--text-muted); display:block;">Avg Cost</span>
+                                <strong style="color:#fbbf24; font-size:1.1rem;">$${top.avg_cost_usd.toFixed(2)}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin:0 0 12px 0; padding:8px 12px; background:rgba(255,255,255,0.03); border-radius:6px; border-left:3px solid var(--color-purple);">
+                        <strong>Empirical Decision Rationale:</strong> ${top.reasoning}
+                    </p>
+                    <div style="display:flex; justify-content:flex-end; gap:8px;">
+                        <button class="btn btn-outline btn-sm" onclick="window.location.hash='#/skills'">Browse in Skills Catalog</button>
+                        <button class="btn btn-primary btn-sm" onclick="navigator.clipboard.writeText('eshkill get ${top.skill_id}'); showToast('CLI get command copied!', 'success');">
+                            <i data-lucide="copy"></i> Copy CLI Command
+                        </button>
+                    </div>
+                `;
+                safeCreateIcons();
+            } catch (err) {
+                console.error('Ranking error', err);
+                rankResultBox.innerHTML = '<p class="text-danger">Failed to calculate empirical rankings.</p>';
+            }
+        });
+    }
+
+    loadEvidence();
+}
+
 // Start
 document.addEventListener('DOMContentLoaded', initApp);
+

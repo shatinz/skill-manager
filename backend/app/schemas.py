@@ -280,6 +280,8 @@ class ExecutionEvidenceCreate(BaseModel):
     feedback_notes: str = ""
     metadata_json: Dict[str, Any] = {}
 
+    model_config = {"protected_namespaces": ()}
+
 
 class ExecutionEvidenceResponse(BaseModel):
     id: str
@@ -303,7 +305,7 @@ class ExecutionEvidenceResponse(BaseModel):
     metadata_json: Dict[str, Any]
     created_at: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = {"from_attributes": True, "protected_namespaces": ()}
 
 
 class SkillBenchmarkSummary(BaseModel):
