@@ -137,6 +137,9 @@ class Proposal(Base):
     # Proposer identity & trust features (snapshotted at submission time)
     proposer_id               = Column(String, ForeignKey("proposer_profiles.id"), nullable=False, index=True)
     proposer_trust_snapshot    = Column(JSON, default=dict)   # raw feature dict logged for future model training
+    is_agent                  = Column(Boolean, default=False, nullable=False, index=True) # Autonomous agent origin
+    tags                      = Column(JSON, default=list)   # e.g. ["autonomous_agent", "ai_generated", "deprecation_fix"]
+    agent_metadata            = Column(JSON, default=dict)   # agent model, execution feedback, trigger context
 
     # Content
     proposal_type     = Column(Enum(ProposalType), nullable=False, default=ProposalType.MODIFICATION)
@@ -210,6 +213,7 @@ class ProposerProfile(Base):
 
     id                     = Column(String, primary_key=True)  # e.g. github username or generated id
     display_name           = Column(String(256), default="")
+    is_agent               = Column(Boolean, default=False, nullable=False) # True if autonomous agent
     account_created_at     = Column(DateTime, nullable=False)
     project_stars          = Column(Integer, default=0)
     contribution_history   = Column(JSON, default=list)        # [{skill_id, proposal_id, outcome, timestamp}]

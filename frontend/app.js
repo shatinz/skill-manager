@@ -463,6 +463,7 @@ async function initSkillDetail(id) {
             const content = isModify ? document.getElementById('proposal-content')?.value : null;
             const issue = isModify ? null : document.getElementById('proposal-issue')?.value;
             const proposer = document.getElementById('proposal-proposer')?.value;
+            const isAgent = proposer && proposer.startsWith('agent:');
 
             try {
                 await apiFetch(`/proposals/skills/${id}/proposals`, {
@@ -471,10 +472,12 @@ async function initSkillDetail(id) {
                         proposer_id: proposer,
                         proposal_type: type,
                         proposed_content: content,
-                        issue_text: issue
+                        issue_text: issue,
+                        is_agent: isAgent,
+                        tags: isAgent ? ['autonomous_agent', 'ai_generated', 'interactive_demo'] : ['human', 'community_proposal']
                     })
                 });
-                showToast('Proposal submitted successfully', 'success');
+                showToast(`Proposal submitted successfully as ${isAgent ? 'Autonomous Agent' : 'Human'}!`, 'success');
                 initSkillDetail(id);
             } catch (e) {}
         });
@@ -505,13 +508,29 @@ async function initSkillDetail(id) {
             if (proposals && proposals.length > 0) {
                 proposals.forEach(p => {
                     let badgeClass = p.status === 'pending' ? 'yellow' : (p.status === 'rejected' ? 'red' : 'green');
+                    let isAgent = p.is_agent || (p.proposer_id && (p.proposer_id.startsWith('agent:') || p.proposer_id.startsWith('bot:'))) || (p.tags && p.tags.includes('autonomous_agent'));
+                    let agentBadge = isAgent 
+                        ? `<span class="badge" style="font-size:0.68rem; font-weight:600; padding:2px 8px; border-radius:12px; background:rgba(168,85,247,0.18); color:#c084fc; border:1px solid rgba(168,85,247,0.4); display:inline-flex; align-items:center; gap:3px;">🤖 Autonomous Agent</span>`
+                        : `<span class="badge" style="font-size:0.68rem; font-weight:600; padding:2px 8px; border-radius:12px; background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); display:inline-flex; align-items:center; gap:3px;">👤 Human</span>`;
+                    
+                    let tagsHtml = '';
+                    if (p.tags && p.tags.length > 0) {
+                        tagsHtml = `<div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;">` + 
+                            p.tags.map(t => `<span style="font-size:0.65rem; padding:1px 6px; background:rgba(255,255,255,0.06); border-radius:4px; color:var(--text-muted);">${t}</span>`).join('') + 
+                            `</div>`;
+                    }
+
                     activeProps.innerHTML += `
                         <div class="p-3 border-b border-gray-700 last:border-0" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 12px 0;">
-                            <div style="display:flex; justify-content:space-between;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span style="font-size:0.875rem; font-weight:600;">${p.proposal_type}</span>
-                                <span style="font-size:0.75rem; color:var(--color-${badgeClass})">${p.status}</span>
+                                <span style="font-size:0.75rem; color:var(--color-${badgeClass}); text-transform:capitalize; font-weight:600;">${p.status}</span>
                             </div>
-                            <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">by ${p.proposer_id}</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+                                <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">by <strong style="color:var(--text-primary);">${p.proposer_id}</strong></p>
+                                ${agentBadge}
+                            </div>
+                            ${tagsHtml}
                         </div>
                     `;
                 });

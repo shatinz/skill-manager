@@ -569,5 +569,262 @@ print(result)
 - ❌ Creating monolithic agents with vague catch-all instructions rather than distinct specialist personas.
 - ❌ Allowing circular inter-agent delegation without a hard max-iteration ceiling.
 """
+    },
+    {
+        "id": "ai-llm-agents.agent-tooling.modelcontextprotocol-server-dev",
+        "name": "modelcontextprotocol-server-dev",
+        "title": "Model Context Protocol (MCP) Server Development & FastMCP Integration",
+        "category": "ai-llm-agents",
+        "subcategory": "agent-tooling",
+        "version": "1.2.0",
+        "tags": ["mcp", "model-context-protocol", "fastmcp", "json-rpc", "tools", "resources", "prompts", "claude", "cursor"],
+        "trust_rating": 0.99,
+        "estimated_tokens": 1850,
+        "description": "Architect and deploy production-ready Model Context Protocol (MCP) servers using Python FastMCP and TypeScript MCP SDK, exposing typed tools, dynamic resources, prompts, and stdio/SSE transports to Claude Desktop, Cursor, and Antigravity agents.",
+        "trigger_patterns": [
+            "create model context protocol server",
+            "fastmcp python tool definition",
+            "mcp server claude cursor integration",
+            "mcp dynamic resources json-rpc 2.0",
+            "mcp sse stdio transport server"
+        ],
+        "content": """# Model Context Protocol (MCP) Server Development & FastMCP Integration
+
+## Objective
+Build standardized, secure Model Context Protocol (MCP) servers that connect AI agents directly to enterprise databases, local developer tools, APIs, and custom execution runtimes over JSON-RPC 2.0 stdio and SSE transports.
+
+## Architecture Blueprint
+```
+Claude Desktop / Cursor / Antigravity Agent
+   | (JSON-RPC 2.0 over stdio or SSE)
+   v
+FastMCP Server (`server.py`)
+   ├── Tools: Executable functions with Pydantic type validation & docstrings
+   ├── Resources: Dynamic URI templates (`sqlite:///{db}/tables/{table}`)
+   └── Prompts: Reusable parameterized prompt templates for user interaction
+```
+
+## Production FastMCP Python Implementation (`mcp_server.py`)
+```python
+from mcp.server.fastmcp import FastMCP, Context
+from pydantic import BaseModel, Field
+from typing import List, Dict, Any, Optional
+import sqlite3
+import os
+
+# 1. Initialize MCP Server instance
+mcp = FastMCP(
+    "Enterprise Data & Dev Tools",
+    dependencies=["pydantic", "sqlite3"]
+)
+
+# 2. Expose Typed Tool with Rich Docstring & Parameter Schema
+@mcp.tool()
+async def query_database(
+    sql_query: str = Field(..., description="Read-only SQL query to execute against the analytics database"),
+    max_rows: int = Field(default=50, ge=1, le=500, description="Max rows to return"),
+    ctx: Context = None
+) -> Dict[str, Any]:
+    \"\"\"
+    Execute a read-only SQL query against the local SQLite analytics store.
+    Prevents destructive operations (DROP, DELETE, UPDATE) and returns structured JSON rows.
+    \"\"\"
+    if ctx:
+        await ctx.info(f"Executing query: {sql_query[:60]}...")
+
+    # Guardrail against write operations
+    forbidden = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "TRUNCATE"]
+    if any(kw in sql_query.upper() for kw in forbidden):
+        raise ValueError("Write operations are forbidden. Use dedicated migration tools.")
+
+    conn = sqlite3.connect(os.environ.get("ANALYTICS_DB_PATH", "analytics.db"))
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute(sql_query)
+        rows = [dict(row) for row in cursor.fetchmany(max_rows)]
+        return {"row_count": len(rows), "data": rows}
+    finally:
+        conn.close()
+
+# 3. Expose Dynamic Resource Template
+@mcp.resource("schema://{table_name}")
+def get_table_schema(table_name: str) -> str:
+    \"\"\"Retrieve SQL CREATE TABLE schema definition for an analytics table.\"\"\"
+    conn = sqlite3.connect(os.environ.get("ANALYTICS_DB_PATH", "analytics.db"))
+    cursor = conn.cursor()
+    cursor.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
+    row = cursor.fetchone()
+    conn.close()
+    if not row or not row[0]:
+        return f"Table '{table_name}' does not exist."
+    return row[0]
+
+# 4. Standard stdio entrypoint
+if __name__ == "__main__":
+    mcp.run(transport="stdio")
+```
+
+## Client Configuration (`claude_desktop_config.json`)
+```json
+{
+  "mcpServers": {
+    "enterprise-tools": {
+      "command": "python",
+      "args": ["/absolute/path/to/mcp_server.py"],
+      "env": {
+        "ANALYTICS_DB_PATH": "/data/analytics.db"
+      }
+    }
+  }
+}
+```
+
+## Anti-Patterns
+- ❌ Logging non-protocol messages to `stdout` in stdio mode (stdout is strictly reserved for JSON-RPC messages; use `stderr` or `ctx.info()` instead).
+- ❌ Omitting parameter descriptions and type annotations (LLMs rely on Pydantic `Field(description=...)` to understand tool arguments).
+"""
+    },
+
+    {
+        "id": "ai-llm-agents.agent-memory.knowledge-graph-memory-agent",
+        "name": "knowledge-graph-memory-agent",
+        "title": "Knowledge Graph Associative Memory for Autonomous Agents",
+        "category": "ai-llm-agents",
+        "subcategory": "agent-memory",
+        "version": "1.2.0",
+        "tags": ["knowledge-graph", "agent-memory", "entities", "relations", "graph-rag", "networkx", "persistent-memory"],
+        "trust_rating": 0.98,
+        "estimated_tokens": 1800,
+        "description": "Construct persistent, graph-structured associative memory systems for long-running autonomous agents, enabling relational entity extraction, multi-hop contextual traversal, and temporal memory decay.",
+        "trigger_patterns": [
+            "agent knowledge graph memory",
+            "entity relation extraction agent memory",
+            "graph rag multi hop associative recall",
+            "persistent agent memory networkx"
+        ],
+        "content": """# Knowledge Graph Associative Memory for Autonomous Agents
+
+## Objective
+Enable autonomous AI agents to retain, query, and reason over complex relational facts across weeks of interaction using dynamic entity-relation knowledge graphs, multi-hop sub-graph traversal, and semantic similarity search.
+
+## Knowledge Graph Pipeline
+```
+Agent Conversation / Task Execution
+   -> Entity & Relation Extraction (LLM Structured Output: Source, Relation, Target)
+   -> Graph Upsert (Nodes = Entities, Edges = Semantic Relations + Timestamps)
+   -> Multi-Hop Subgraph Retrieval:
+      Query -> Seed Entities -> 2-Hop Neighbor Expansion -> Context Injection
+```
+
+## Python Implementation (`agent_memory_graph.py`)
+```python
+from typing import List, Dict, Any, Tuple
+import networkx as nx
+from pydantic import BaseModel, Field
+import json
+import time
+
+class EntityRelation(BaseModel):
+    source_entity: str = Field(..., description="Subject entity name")
+    relation_type: str = Field(..., description="Action, property, or link (e.g. 'owns', 'depends_on', 'prefers')")
+    target_entity: str = Field(..., description="Object entity or property value")
+    confidence: float = Field(default=1.0, ge=0.0, le=1.0)
+
+class AgentKnowledgeGraph:
+    def __init__(self):
+        self.graph = nx.MultiDiGraph()
+
+    def add_facts(self, facts: List[EntityRelation]):
+        for fact in facts:
+            src = fact.source_entity.strip().lower()
+            tgt = fact.target_entity.strip().lower()
+            self.graph.add_node(src, label=fact.source_entity)
+            self.graph.add_node(tgt, label=fact.target_entity)
+            self.graph.add_edge(
+                src, tgt,
+                relation=fact.relation_type,
+                timestamp=time.time(),
+                confidence=fact.confidence
+            )
+
+    def retrieve_context_subgraph(self, seed_entities: List[str], max_hops: int = 2) -> List[str]:
+        \"\"\"Extract associative multi-hop context surrounding the seed entities.\"\"\"
+        subgraph_nodes = set()
+        for seed in seed_entities:
+            s_clean = seed.strip().lower()
+            if s_clean in self.graph:
+                subgraph_nodes.add(s_clean)
+                # Expand N hops
+                lengths = nx.single_source_shortest_path_length(self.graph.to_undirected(), s_clean, cutoff=max_hops)
+                subgraph_nodes.update(lengths.keys())
+
+        facts_summary = []
+        for u, v, data in self.graph.edges(subgraph_nodes, data=True):
+            if v in subgraph_nodes:
+                facts_summary.append(f"- ({u}) --[{data['relation']}]--> ({v})")
+
+        return facts_summary
+```
+
+## Anti-Patterns
+- ❌ Dumping raw unindexed conversation transcripts into flat vector stores without relational linking.
+- ❌ Unbounded graph growth without edge pruning or temporal relevance decay.
+"""
+    },
+
+    {
+        "id": "ai-llm-agents.agent-reasoning.sequential-thinking-reasoning",
+        "name": "sequential-thinking-reasoning",
+        "title": "Sequential Thinking & Tree-of-Thought Dynamic Reasoning",
+        "category": "ai-llm-agents",
+        "subcategory": "agent-reasoning",
+        "version": "1.3.0",
+        "tags": ["sequential-thinking", "tree-of-thought", "chain-of-thought", "reasoning", "self-correction", "backtracking"],
+        "trust_rating": 0.99,
+        "estimated_tokens": 1750,
+        "description": "Implement structured sequential reasoning and tree-of-thought exploration loops for complex multi-step coding, debugging, and architecture design tasks with branch evaluation, backtracking, and hypothesis testing.",
+        "trigger_patterns": [
+            "sequential thinking reasoning loop",
+            "tree of thought branch backtracking",
+            "agent self reflection hypothesis testing",
+            "dynamic step by step problem solving"
+        ],
+        "content": """# Sequential Thinking & Tree-of-Thought Dynamic Reasoning
+
+## Objective
+Guide autonomous AI agents through complex, ambiguous, or multi-faceted engineering problems by enforcing dynamic, hypothesis-driven sequential reasoning steps that support hypothesis branching, self-critique, and backtracking.
+
+## Reasoning Loop Protocol
+```
+Task Prompt
+  ├── Step 1: Problem Decomposition & Hypothesis Formulation (Branch 1)
+  ├── Step 2: Intermediate Evidence Evaluation & Reality Check
+  ├── Step 3: Self-Critique / Contradiction Discovery -> Backtrack to Step 1 (Branch 2)
+  ├── Step 4: Refined Execution Path Verification
+  └── Step 5: Final Synthesis & Concrete Action Plan
+```
+
+## Structured Step Schema
+```json
+{
+  "thought_number": 3,
+  "total_thoughts_estimated": 6,
+  "is_revision": true,
+  "revises_thought": 1,
+  "branch_id": "branch-B",
+  "branch_from_thought": 1,
+  "thought_content": "Hypothesis A assumed SQLite locked during concurrent writes in WAL mode. But WAL mode permits 1 writer and concurrent readers. Therefore the root cause must be unclosed transaction handles.",
+  "next_action": "search_code_for_unclosed_sessions"
+}
+```
+
+## Golden Rules
+1. **Never commit prematurely to an unverified assumption**: Formulate at least two rival hypotheses for puzzling bug reports.
+2. **Explicitly mark revisions and branches**: When new observations contradict earlier conclusions, acknowledge the discrepancy and prune the dead branch.
+3. **Verify edge conditions**: Check boundary values (0, 1, empty, negative, max limits) before declaring a solution complete.
+"""
     }
 ]
+

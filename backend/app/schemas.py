@@ -20,6 +20,7 @@ from pydantic import BaseModel, Field
 class ProposerCreate(BaseModel):
     id: str
     display_name: str = ""
+    is_agent: bool = False
     account_created_at: datetime
     project_stars: int = 0
     contribution_history: List[Dict[str, Any]] = []
@@ -28,6 +29,7 @@ class ProposerCreate(BaseModel):
 class ProposerResponse(BaseModel):
     id: str
     display_name: str
+    is_agent: bool = False
     account_created_at: datetime
     project_stars: int
     trust_score: float
@@ -118,6 +120,9 @@ class ProposalCreate(BaseModel):
     proposed_content: str = ""                       # full replacement (modification)
     diff_content: str = ""                           # unified diff (optional)
     issue_text: str = ""                             # free text (issue_report)
+    is_agent: bool = False                           # True if submitted autonomously by AI agent
+    tags: List[str] = []                             # e.g. ["autonomous_agent", "ai_generated"]
+    agent_metadata: Dict[str, Any] = {}              # agent model, execution logs, feedback
 
 
 class ProposalResponse(BaseModel):
@@ -127,6 +132,9 @@ class ProposalResponse(BaseModel):
     batch_id: Optional[str] = None
     proposer_id: str
     proposer_trust_snapshot: Dict[str, Any]
+    is_agent: bool = False
+    tags: List[str] = []
+    agent_metadata: Dict[str, Any] = {}
     proposal_type: str
     diff_content: str
     proposed_content: str

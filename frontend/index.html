@@ -253,11 +253,18 @@
                         </div>
 
                         <div class="form-group mt-4">
-                            <label>Proposer Profile (Demo)</label>
+                            <label>Proposer Identity & Origin</label>
                             <select id="proposal-proposer" class="form-select">
-                                <option value="veteran_dev">Veteran Developer (Trust: ~0.95)</option>
-                                <option value="moderate_dev">Regular Contributor (Trust: ~0.50)</option>
-                                <option value="newcomer_dev">New User (Trust: ~0.05)</option>
+                                <optgroup label="🤖 Autonomous AI Agents">
+                                    <option value="agent:claude-3-5-sonnet">🤖 Agent: Claude 3.5 Sonnet (Autonomous)</option>
+                                    <option value="agent:gpt-4o">🤖 Agent: GPT-4o Worker (Autonomous)</option>
+                                    <option value="agent:antigravity-sentinel">🤖 Agent: Antigravity Sentinel (Autonomous)</option>
+                                </optgroup>
+                                <optgroup label="👤 Human Contributors">
+                                    <option value="veteran_dev">👤 Veteran Developer (Trust: ~0.95)</option>
+                                    <option value="moderate_dev">👤 Regular Contributor (Trust: ~0.50)</option>
+                                    <option value="newcomer_dev">👤 New User (Trust: ~0.05)</option>
+                                </optgroup>
                             </select>
                         </div>
                         

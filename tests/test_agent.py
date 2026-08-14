@@ -37,15 +37,31 @@ class TestAgentAndPropose(unittest.TestCase):
         self.assertIn("-Line 2", diff)
         self.assertIn("+Line 2 Updated", diff)
 
-    def test_submit_proposal(self):
+    def test_submit_proposal_autonomous_agent(self):
         res = self.proposer.submit_proposal(
             skill_id="fastapi-production-craft",
-            proposer_id="unit_test_agent",
+            proposer_id="agent:claude-3-5-sonnet",
             proposed_content="# Enhanced FastAPI Guidelines\n\nAdded RFC 7807 problem details.",
-            reason="Add RFC 7807 compliance"
+            reason="Autonomous RFC 7807 compliance update",
+            is_agent=True,
+            tags=["autonomous_agent", "self_healing"]
         )
         self.assertTrue(res.success)
-        self.assertIn(res.status, ["pending", "ready_for_pr"])
+        self.assertTrue(res.is_agent)
+        self.assertIn("autonomous_agent", res.tags)
+
+    def test_auto_propose_from_feedback(self):
+        res = self.proposer.auto_propose_from_feedback(
+            skill_id="fastapi-production-craft",
+            execution_feedback="DeprecationWarning: Starlette 0.40 deprecated synchronous form parsing",
+            suggested_modifications="Always use `await request.form()` with python-multipart>=0.0.20",
+            agent_id="agent:autonomous-debugger",
+            reason="Fix Starlette form parsing deprecation"
+        )
+        self.assertTrue(res.success)
+        self.assertTrue(res.is_agent)
+        self.assertIn("autonomous_agent", res.tags)
+        self.assertIn("self_healing", res.tags)
 
 
 if __name__ == "__main__":

@@ -27,6 +27,7 @@ class TestMCPServer(unittest.TestCase):
             "auto_select_skill",
             "install_skill",
             "propose_skill_update",
+            "auto_propose_skill_fix",
             "list_categories"
         ]
         for exp in expected_tools:
@@ -91,6 +92,29 @@ class TestMCPServer(unittest.TestCase):
         }
         resp_read = self.server.handle_request(req_read)
         self.assertIn("total_skills", resp_read["result"]["contents"][0]["text"])
+
+    def test_mcp_tool_call_auto_propose(self):
+        req = {
+            "jsonrpc": "2.0",
+            "id": 8,
+            "method": "tools/call",
+            "params": {
+                "name": "auto_propose_skill_fix",
+                "arguments": {
+                    "skill_id": "fastapi-production-craft",
+                    "execution_feedback": "RuntimeError: sqlalchemy query without async session failed",
+                    "suggested_fix": "Always use AsyncSession and `await session.execute()`",
+                    "reason": "Fix async sqlalchemy execution in FastAPI",
+                    "agent_model": "claude-3-5-sonnet"
+                }
+            }
+        }
+        resp = self.server.handle_request(req)
+        self.assertFalse(resp["result"]["isError"])
+        data = json.loads(resp["result"]["content"][0]["text"])
+        self.assertTrue(data["success"])
+        self.assertTrue(data["is_agent"])
+        self.assertIn("autonomous_agent", data["tags"])
 
 
 if __name__ == "__main__":

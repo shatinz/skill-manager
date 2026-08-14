@@ -127,7 +127,7 @@ class MCPServer:
             },
             {
                 "name": "propose_skill_update",
-                "description": "Propose an improvement, bugfix, or modern pattern update to a living skill in the vault with unified diffing.",
+                "description": "Autonomous Agent Tool: Propose an improvement, bugfix, or modern pattern update to a living skill in the vault with automatic agent tagging and unified diffing.",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
@@ -145,10 +145,49 @@ class MCPServer:
                         },
                         "proposer_id": {
                             "type": "string",
-                            "description": "Identifier of the agent or developer making the proposal"
+                            "description": "Identifier of the agent or developer making the proposal (e.g. 'agent:claude-3-5-sonnet')"
+                        },
+                        "is_agent": {
+                            "type": "boolean",
+                            "description": "Flag indicating this proposal is submitted autonomously by an AI agent (default: true)"
+                        },
+                        "tags": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Tags describing the proposal origin and focus (e.g. ['autonomous_agent', 'runtime_feedback'])"
                         }
                     },
                     "required": ["skill_id", "proposed_content"]
+                }
+            },
+            {
+                "name": "auto_propose_skill_fix",
+                "description": "Autonomous Self-Improvement Tool: Automatically formulates and submits a proposal to improve a skill based on live execution feedback, deprecations, or runtime error recoveries.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "skill_id": {
+                            "type": "string",
+                            "description": "Target skill ID to improve"
+                        },
+                        "execution_feedback": {
+                            "type": "string",
+                            "description": "Runtime error trace, compiler warning, or task outcome observation"
+                        },
+                        "suggested_fix": {
+                            "type": "string",
+                            "description": "The specific guideline, rule addition, or code fix to append/integrate into the skill"
+                        },
+                        "reason": {
+                            "type": "string",
+                            "description": "Brief explanation of why the fix is necessary"
+                        },
+                        "agent_model": {
+                            "type": "string",
+                            "description": "Name/version of the autonomous LLM agent (e.g. 'claude-3-5-sonnet', 'gpt-4o')"
+                        }
+                    },
+                    "required": ["skill_id", "execution_feedback", "suggested_fix"]
                 }
             },
             {
@@ -227,12 +266,34 @@ class MCPServer:
                 skill_id = args.get("skill_id", "")
                 content = args.get("proposed_content", "")
                 reason = args.get("reason", "")
-                proposer = args.get("proposer_id", "mcp_agent")
+                proposer = args.get("proposer_id", "agent:mcp-autonomous-worker")
+                is_agent = args.get("is_agent", True)
+                tags = args.get("tags", ["autonomous_agent", "ai_generated"])
                 result = self.proposer.submit_proposal(
                     skill_id=skill_id,
                     proposer_id=proposer,
                     proposed_content=content,
-                    reason=reason
+                    reason=reason,
+                    is_agent=is_agent,
+                    tags=tags
+                )
+                return {
+                    "content": [{"type": "text", "text": json.dumps(result.to_dict(), indent=2)}],
+                    "isError": not result.success
+                }
+
+            elif tool_name == "auto_propose_skill_fix":
+                skill_id = args.get("skill_id", "")
+                feedback = args.get("execution_feedback", "")
+                suggested_fix = args.get("suggested_fix", "")
+                reason = args.get("reason", "Autonomous skill refinement based on runtime feedback")
+                agent_model = args.get("agent_model", "claude-3-5-sonnet")
+                result = self.proposer.auto_propose_from_feedback(
+                    skill_id=skill_id,
+                    execution_feedback=feedback,
+                    suggested_modifications=suggested_fix,
+                    reason=reason,
+                    agent_model=agent_model
                 )
                 return {
                     "content": [{"type": "text", "text": json.dumps(result.to_dict(), indent=2)}],

@@ -184,6 +184,9 @@ class ProposalPayload:
     diff_text: Optional[str] = None
     reason: str = ""
     author_github: Optional[str] = None
+    is_agent: bool = False
+    tags: List[str] = field(default_factory=list)
+    agent_metadata: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -197,6 +200,8 @@ class ProposalResult:
     status: str = "pending"
     pr_url: Optional[str] = None
     patch_file: Optional[str] = None
+    is_agent: bool = False
+    tags: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

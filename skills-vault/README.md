@@ -3,13 +3,19 @@
 > The production-grade registry and repository of reusable agentic capabilities, instructions, workflows, and blueprints for autonomous AI agents.
 
 ## 📊 Overview
-- **Total Skills**: 52
+- **Total Skills**: 60
 - **Categories**: 9
-- **Subcategories**: 47
+- **Subcategories**: 53
 
 ## 🗂️ Categories & Taxonomy
 
 ### 📁 `ai-llm-agents`
+- **`agent-memory`** (1 skills)
+  - [`knowledge-graph-memory-agent`](skills/ai-llm-agents/agent-memory/knowledge-graph-memory-agent/SKILL.md)
+- **`agent-reasoning`** (1 skills)
+  - [`sequential-thinking-reasoning`](skills/ai-llm-agents/agent-reasoning/sequential-thinking-reasoning/SKILL.md)
+- **`agent-tooling`** (1 skills)
+  - [`modelcontextprotocol-server-dev`](skills/ai-llm-agents/agent-tooling/modelcontextprotocol-server-dev/SKILL.md)
 - **`agent-workflows`** (1 skills)
   - [`langgraph-multi-agent-flow`](skills/ai-llm-agents/agent-workflows/langgraph-multi-agent-flow/SKILL.md)
 - **`function-calling`** (1 skills)
@@ -46,6 +52,8 @@
   - [`legacy-code-modernizer`](skills/clean-architecture-refactoring/code-modernization/legacy-code-modernizer/SKILL.md)
 - **`principles-patterns`** (1 skills)
   - [`dry-solid-clean-architecture`](skills/clean-architecture-refactoring/principles-patterns/dry-solid-clean-architecture/SKILL.md)
+- **`systems-engineering`** (1 skills)
+  - [`rust-axum-tokio-async`](skills/clean-architecture-refactoring/systems-engineering/rust-axum-tokio-async/SKILL.md)
 
 ### 📁 `databases-storage`
 - **`backend-as-a-service`** (1 skills)
@@ -69,6 +77,8 @@
   - [`vercel-zero-downtime-deploy`](skills/devops-cloud-serverless/deployment-gitops/vercel-zero-downtime-deploy/SKILL.md)
 - **`edge-serverless`** (1 skills)
   - [`cloudflare-workers-kv-d1`](skills/devops-cloud-serverless/edge-serverless/cloudflare-workers-kv-d1/SKILL.md)
+- **`gitops-orchestration`** (1 skills)
+  - [`kubernetes-helm-gitops-argocd`](skills/devops-cloud-serverless/gitops-orchestration/kubernetes-helm-gitops-argocd/SKILL.md)
 - **`iac-cloud`** (1 skills)
   - [`terraform-aws-modules`](skills/devops-cloud-serverless/iac-cloud/terraform-aws-modules/SKILL.md)
 - **`observability`** (1 skills)
@@ -103,6 +113,8 @@
   - [`threejs-procedural-canvas`](skills/ui-design-antislop/3d-graphics/threejs-procedural-canvas/SKILL.md)
 - **`animations`** (1 skills)
   - [`framer-motion-orchestrator`](skills/ui-design-antislop/animations/framer-motion-orchestrator/SKILL.md)
+- **`component-design`** (1 skills)
+  - [`shadcn-tailwind-accessible-ui`](skills/ui-design-antislop/component-design/shadcn-tailwind-accessible-ui/SKILL.md)
 - **`component-systems`** (1 skills)
   - [`shadcn-ui-mastery`](skills/ui-design-antislop/component-systems/shadcn-ui-mastery/SKILL.md)
 - **`responsive-layout`** (1 skills)
@@ -120,9 +132,11 @@
 - **`python-api`** (2 skills)
   - [`fastapi-production-craft`](skills/web-frameworks/python-api/fastapi-production-craft/SKILL.md)
   - [`django-ninja-crud`](skills/web-frameworks/python-api/django-ninja-crud/SKILL.md)
-- **`react-fullstack`** (2 skills)
+- **`react-fullstack`** (4 skills)
   - [`nextjs-15-app-router`](skills/web-frameworks/react-fullstack/nextjs-15-app-router/SKILL.md)
   - [`remix-fullstack-patterns`](skills/web-frameworks/react-fullstack/remix-fullstack-patterns/SKILL.md)
+  - [`tanstack-query-router-modern`](skills/web-frameworks/react-fullstack/tanstack-query-router-modern/SKILL.md)
+  - [`react-19-actions-suspense`](skills/web-frameworks/react-fullstack/react-19-actions-suspense/SKILL.md)
 - **`svelte`** (1 skills)
   - [`sveltekit-5-runes`](skills/web-frameworks/svelte/sveltekit-5-runes/SKILL.md)
 

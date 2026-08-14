@@ -112,7 +112,24 @@ def run_e2e_test():
     })
     assert r3.status_code == 200
     p3 = r3.json()
-    print(f"✅ Proposal 3 submitted by newcomer_dev (Trust Score: {p3['proposer_trust_snapshot']['computed_score']:.2f}) - Disruptive")
+    assert p3["is_agent"] is False
+    assert "human" in p3["tags"]
+    print(f"✅ Proposal 3 submitted by newcomer_dev (Trust Score: {p3['proposer_trust_snapshot']['computed_score']:.2f}, Tag: Human)")
+
+    # Proposal 4 (Autonomous AI Agent)
+    p4_content = current_content + "\n\n### Self-Healing Telemetry\n- Added OpenTelemetry distributed trace spans around DB sessions."
+    r4 = client.post(f"/api/proposals/skills/{skill_id}/proposals", json={
+        "proposer_id": "agent:claude-3-5-sonnet",
+        "proposal_type": "modification",
+        "proposed_content": p4_content,
+        "is_agent": True,
+        "tags": ["autonomous_agent", "self_healing", "telemetry"]
+    })
+    assert r4.status_code == 200
+    p4 = r4.json()
+    assert p4["is_agent"] is True
+    assert "autonomous_agent" in p4["tags"]
+    print(f"✅ Proposal 4 submitted autonomously by agent:claude-3-5-sonnet (is_agent=True, Tags={p4['tags']})")
 
     # 6. Stage C & D: Batch Accumulation & Nonlinear Merge Synthesis
     print("\n[Step 6] Closing Batch & Executing Nonlinear Merge (Stages C & D)...")

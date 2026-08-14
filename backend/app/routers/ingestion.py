@@ -13,11 +13,28 @@ router = APIRouter(prefix="/ingestion", tags=["ingestion"])
 
 @router.post("/seed", response_model=SeedResponse)
 def seed_database(db: Session = Depends(get_db)):
-    # Create simulated proposer profiles
+    # Create simulated proposer profiles (Agents + Humans)
     profiles = [
+        ProposerProfile(
+            id="agent:claude-3-5-sonnet",
+            display_name="Autonomous Agent: Claude 3.5 Sonnet",
+            is_agent=True,
+            account_created_at=datetime.utcnow() - timedelta(days=365),
+            project_stars=2500,
+            contribution_history=[{"outcome": "accepted"} for _ in range(12)]
+        ),
+        ProposerProfile(
+            id="agent:antigravity-sentinel",
+            display_name="Autonomous Agent: Antigravity Sentinel",
+            is_agent=True,
+            account_created_at=datetime.utcnow() - timedelta(days=200),
+            project_stars=1800,
+            contribution_history=[{"outcome": "accepted"} for _ in range(8)]
+        ),
         ProposerProfile(
             id="veteran_dev",
             display_name="Veteran Dev",
+            is_agent=False,
             account_created_at=datetime.utcnow() - timedelta(days=730),
             project_stars=5000,
             contribution_history=[{"outcome": "accepted"} for _ in range(15)]
@@ -25,6 +42,7 @@ def seed_database(db: Session = Depends(get_db)):
         ProposerProfile(
             id="moderate_dev",
             display_name="Moderate Dev",
+            is_agent=False,
             account_created_at=datetime.utcnow() - timedelta(days=180),
             project_stars=200,
             contribution_history=[{"outcome": "accepted"} for _ in range(3)]
@@ -32,6 +50,7 @@ def seed_database(db: Session = Depends(get_db)):
         ProposerProfile(
             id="newcomer_dev",
             display_name="Newcomer Dev",
+            is_agent=False,
             account_created_at=datetime.utcnow() - timedelta(days=7),
             project_stars=0,
             contribution_history=[]

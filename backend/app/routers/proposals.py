@@ -16,10 +16,56 @@ def submit_proposal(skill_id: str, proposal: ProposalCreate, db: Session = Depen
     skill = db.query(Skill).filter(Skill.id == skill_id).first()
     if not skill:
         raise HTTPException(status_code=404, detail="Skill not found")
-        
+
+    # Determine autonomous agent status
+    is_agent = (
+        proposal.is_agent
+        or proposal.proposer_id.startswith("agent:")
+        or proposal.proposer_id.startswith("bot:")
+        or "autonomous_agent" in proposal.tags
+        or "ai_generated" in proposal.tags
+    )
+
+    # Process and guarantee standard tags
+    tags = list(proposal.tags)
+    if is_agent:
+        if "autonomous_agent" not in tags:
+            tags.insert(0, "autonomous_agent")
+        if "ai_generated" not in tags:
+            tags.append("ai_generated")
+    else:
+        if "human" not in tags:
+            tags.append("human")
+
+    # Find or auto-register proposer profile
     proposer = db.query(ProposerProfile).filter(ProposerProfile.id == proposal.proposer_id).first()
     if not proposer:
-        raise HTTPException(status_code=404, detail="Proposer not found")
+        if is_agent:
+            # Auto-register autonomous agent profile
+            proposer = ProposerProfile(
+                id=proposal.proposer_id,
+                display_name=proposal.proposer_id.replace("agent:", "Autonomous Agent: "),
+                is_agent=True,
+                account_created_at=datetime.utcnow(),
+                project_stars=10,
+                trust_score=0.5,
+                contribution_history=[]
+            )
+            db.add(proposer)
+            db.flush()
+        else:
+            # Auto-register human proposer profile for frictionless community proposals
+            proposer = ProposerProfile(
+                id=proposal.proposer_id,
+                display_name=proposal.proposer_id,
+                is_agent=False,
+                account_created_at=datetime.utcnow(),
+                project_stars=0,
+                trust_score=0.2,
+                contribution_history=[]
+            )
+            db.add(proposer)
+            db.flush()
 
     target_version_id = skill.current_version_id
     if not target_version_id:
@@ -62,6 +108,9 @@ def submit_proposal(skill_id: str, proposal: ProposalCreate, db: Session = Depen
         batch_id=batch.id,
         proposer_id=proposer.id,
         proposer_trust_snapshot=trust_snapshot,
+        is_agent=is_agent,
+        tags=tags,
+        agent_metadata=proposal.agent_metadata,
         proposal_type=proposal.proposal_type,
         diff_content=diff_content,
         proposed_content=proposal.proposed_content,
@@ -77,11 +126,14 @@ def submit_proposal(skill_id: str, proposal: ProposalCreate, db: Session = Depen
 def list_proposals(
     skill_id: str, 
     status: Optional[str] = None,
+    is_agent: Optional[bool] = None,
     db: Session = Depends(get_db)
 ):
     query = db.query(Proposal).filter(Proposal.skill_id == skill_id)
     if status:
         query = query.filter(Proposal.status == status)
+    if is_agent is not None:
+        query = query.filter(Proposal.is_agent == is_agent)
     return query.all()
 
 @router.get("/proposals/{proposal_id}", response_model=ProposalResponse)

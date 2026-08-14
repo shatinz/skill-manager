@@ -176,7 +176,18 @@ def main():
     p_prop.add_argument("--content", "-c", help="Direct string content of proposed modification")
     p_prop.add_argument("--reason", "-r", default="", help="Reason for proposal / changes made")
     p_prop.add_argument("--proposer", "-p", default="agent_worker", help="Proposer ID or GitHub username")
+    p_prop.add_argument("--is-agent", "--agent", dest="is_agent", action="store_true", help="Tag proposal as autonomously submitted by an AI agent")
+    p_prop.add_argument("--tag", "-t", action="append", dest="tags", help="Custom tags for the proposal (e.g. --tag runtime_feedback)")
     p_prop.add_argument("--patch-out", help="Path to save generated .patch file")
+
+    # 9b. Auto-Propose (Autonomous Agent Self-Improvement)
+    p_auto_prop = subparsers.add_parser("auto-propose", parents=[parent_parser], help="Autonomous agent self-improvement: formulate & submit fix from execution feedback")
+    p_auto_prop.add_argument("--skill", "-s", required=True, help="Skill ID or name to improve")
+    p_auto_prop.add_argument("--feedback", "-f", required=True, help="Execution error trace, compiler warning, or test failure logs")
+    p_auto_prop.add_argument("--fix", "-x", required=True, help="Suggested rule, code fix, or guideline update")
+    p_auto_prop.add_argument("--reason", "-r", default="Autonomous refinement from execution feedback", help="Reason for proposal")
+    p_auto_prop.add_argument("--agent-id", default="agent:autonomous-worker", help="Autonomous agent identifier")
+    p_auto_prop.add_argument("--model", default="claude-3-5-sonnet", help="Model name of the autonomous agent")
 
     # 10. MCP (Model Context Protocol)
     p_mcp = subparsers.add_parser("mcp", parents=[parent_parser], help="Launch Model Context Protocol (MCP) server for Claude / Cursor / Antigravity via stdio")
@@ -499,7 +510,9 @@ def main():
             proposed_content=args.content,
             file_path=args.file,
             reason=args.reason,
-            output_patch=args.patch_out
+            output_patch=args.patch_out,
+            is_agent=args.is_agent,
+            tags=args.tags
         )
 
         if args.json:
@@ -507,15 +520,48 @@ def main():
             return
 
         if res.success:
-            print(f"\n{GREEN}{BOLD}✔ Proposal successfully generated!{RESET}")
+            agent_badge = f"{PURPLE}[🤖 Autonomous Agent]{RESET}" if res.is_agent else f"{CYAN}[👤 Human]{RESET}"
+            print(f"\n{GREEN}{BOLD}✔ Proposal successfully generated!{RESET} {agent_badge}")
             print(f"• Status: {CYAN}{res.status}{RESET}")
             if res.proposal_id:
                 print(f"• Proposal ID: {res.proposal_id}")
+            if res.tags:
+                print(f"• Tags: {DIM}{', '.join(res.tags)}{RESET}")
             if res.patch_file:
                 print(f"• Patch Saved: {res.patch_file}")
             print(f"\n{DIM}{res.message}{RESET}\n")
         else:
             print(f"\n{RED}{BOLD}✖ Proposal submission failed:{RESET} {res.message}\n")
+            sys.exit(1)
+
+    # --- COMMAND: AUTO-PROPOSE ---
+    elif args.command == "auto-propose":
+        proposer = ProposalManager(vault)
+        res = proposer.auto_propose_from_feedback(
+            skill_id=args.skill,
+            execution_feedback=args.feedback,
+            suggested_modifications=args.fix,
+            agent_id=args.agent_id,
+            reason=args.reason,
+            agent_model=args.model
+        )
+
+        if args.json:
+            print(json.dumps(res.to_dict(), indent=2))
+            return
+
+        if res.success:
+            print(f"\n{GREEN}{BOLD}✔ Autonomous Agent Proposal Dispatched!{RESET} {PURPLE}[🤖 Autonomous Agent]{RESET}")
+            print(f"• Agent: {args.agent_id} ({args.model})")
+            print(f"• Target Skill: {CYAN}{args.skill}{RESET}")
+            print(f"• Status: {CYAN}{res.status}{RESET}")
+            if res.proposal_id:
+                print(f"• Proposal ID: {res.proposal_id}")
+            if res.tags:
+                print(f"• Tags: {DIM}{', '.join(res.tags)}{RESET}")
+            print(f"\n{DIM}{res.message}{RESET}\n")
+        else:
+            print(f"\n{RED}{BOLD}✖ Autonomous proposal submission failed:{RESET} {res.message}\n")
             sys.exit(1)
 
     # --- COMMAND: SERVE ---

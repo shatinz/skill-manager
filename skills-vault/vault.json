@@ -1,11 +1,13 @@
 {
   "version": "2.0.0",
-  "total_skills": 52,
+  "total_skills": 60,
   "categories": {
     "web-frameworks": {
       "react-fullstack": [
         "nextjs-15-app-router",
-        "remix-fullstack-patterns"
+        "remix-fullstack-patterns",
+        "tanstack-query-router-modern",
+        "react-19-actions-suspense"
       ],
       "python-api": [
         "fastapi-production-craft",
@@ -39,6 +41,9 @@
       ],
       "responsive-layout": [
         "responsive-mobile-first-layout"
+      ],
+      "component-design": [
+        "shadcn-tailwind-accessible-ui"
       ]
     },
     "databases-storage": {
@@ -81,6 +86,15 @@
       ],
       "multi-agent-teams": [
         "autogen-crewai-orchestration"
+      ],
+      "agent-tooling": [
+        "modelcontextprotocol-server-dev"
+      ],
+      "agent-memory": [
+        "knowledge-graph-memory-agent"
+      ],
+      "agent-reasoning": [
+        "sequential-thinking-reasoning"
       ]
     },
     "devops-cloud-serverless": {
@@ -104,6 +118,9 @@
       ],
       "observability": [
         "prometheus-grafana-telemetry"
+      ],
+      "gitops-orchestration": [
+        "kubernetes-helm-gitops-argocd"
       ]
     },
     "security-sast-hardening": {
@@ -164,6 +181,9 @@
       ],
       "architectural-docs": [
         "adr-architecture-decision-records"
+      ],
+      "systems-engineering": [
+        "rust-axum-tokio-async"
       ]
     }
   },
@@ -363,6 +383,59 @@
       "relative_path": "skills/web-frameworks/python-api/django-ninja-crud/SKILL.md"
     },
     {
+      "id": "web-frameworks.react-fullstack.tanstack-query-router-modern",
+      "name": "tanstack-query-router-modern",
+      "title": "TanStack Router & Query v5 Type-Safe Fullstack Architecture",
+      "category": "web-frameworks",
+      "subcategory": "react-fullstack",
+      "version": "1.3.0",
+      "tags": [
+        "tanstack-router",
+        "tanstack-query",
+        "react",
+        "type-safety",
+        "loaders",
+        "cache-invalidation",
+        "ssr"
+      ],
+      "trust_rating": 0.99,
+      "estimated_tokens": 1900,
+      "description": "Construct 100% type-safe single-page and SSR web applications with TanStack Router, TanStack Query v5, search parameter schemas with Zod, route loaders, and automatic cache invalidation.",
+      "trigger_patterns": [
+        "tanstack router type safe routes",
+        "tanstack query v5 loader prefetching",
+        "tanstack router search params zod validation",
+        "tanstack router createRoute queryClient"
+      ],
+      "relative_path": "skills/web-frameworks/react-fullstack/tanstack-query-router-modern/SKILL.md"
+    },
+    {
+      "id": "web-frameworks.react-fullstack.react-19-actions-suspense",
+      "name": "react-19-actions-suspense",
+      "title": "React 19 Server Actions, useActionState & Optimistic UI",
+      "category": "web-frameworks",
+      "subcategory": "react-fullstack",
+      "version": "1.2.0",
+      "tags": [
+        "react-19",
+        "server-actions",
+        "useActionState",
+        "useOptimistic",
+        "suspense",
+        "forms"
+      ],
+      "trust_rating": 0.98,
+      "estimated_tokens": 1800,
+      "description": "Master React 19 async form actions, progressive enhancement, useActionState, useOptimistic updates, and Suspense boundaries for zero-flicker interactive web apps.",
+      "trigger_patterns": [
+        "react 19 server actions useActionState",
+        "react 19 useOptimistic form submission",
+        "react 19 async transitions formStatus",
+        "react 19 progressive enhancement forms"
+      ],
+      "relative_path": "skills/web-frameworks/react-fullstack/react-19-actions-suspense/SKILL.md"
+    },
+    {
       "id": "ui-design-antislop.styling-tokens.tailwind-v4-tokens",
       "name": "tailwind-v4-tokens",
       "title": "Tailwind CSS v4 CSS-First Design Tokens & Theme Craft",
@@ -519,6 +592,33 @@
         "safe-area-inset mobile web layout"
       ],
       "relative_path": "skills/ui-design-antislop/responsive-layout/responsive-mobile-first-layout/SKILL.md"
+    },
+    {
+      "id": "ui-design-antislop.component-design.shadcn-tailwind-accessible-ui",
+      "name": "shadcn-tailwind-accessible-ui",
+      "title": "Shadcn UI & Tailwind CSS Accessible Component Craft",
+      "category": "ui-design-antislop",
+      "subcategory": "component-design",
+      "version": "1.3.0",
+      "tags": [
+        "shadcn",
+        "radix-ui",
+        "tailwind-css",
+        "cva",
+        "accessibility",
+        "wcag",
+        "aria"
+      ],
+      "trust_rating": 0.99,
+      "estimated_tokens": 1850,
+      "description": "Construct accessible, themeable design systems using Radix UI primitives, Class Variance Authority (CVA), Tailwind CSS v4 variables, and keyboard navigation.",
+      "trigger_patterns": [
+        "shadcn ui component design",
+        "class variance authority cva button",
+        "radix ui dialog accessible modal",
+        "tailwind css design system tokens"
+      ],
+      "relative_path": "skills/ui-design-antislop/component-design/shadcn-tailwind-accessible-ui/SKILL.md"
     },
     {
       "id": "databases-storage.relational-sql.postgres-query-tuning",
@@ -891,6 +991,89 @@
       "relative_path": "skills/ai-llm-agents/multi-agent-teams/autogen-crewai-orchestration/SKILL.md"
     },
     {
+      "id": "ai-llm-agents.agent-tooling.modelcontextprotocol-server-dev",
+      "name": "modelcontextprotocol-server-dev",
+      "title": "Model Context Protocol (MCP) Server Development & FastMCP Integration",
+      "category": "ai-llm-agents",
+      "subcategory": "agent-tooling",
+      "version": "1.2.0",
+      "tags": [
+        "mcp",
+        "model-context-protocol",
+        "fastmcp",
+        "json-rpc",
+        "tools",
+        "resources",
+        "prompts",
+        "claude",
+        "cursor"
+      ],
+      "trust_rating": 0.99,
+      "estimated_tokens": 1850,
+      "description": "Architect and deploy production-ready Model Context Protocol (MCP) servers using Python FastMCP and TypeScript MCP SDK, exposing typed tools, dynamic resources, prompts, and stdio/SSE transports to Claude Desktop, Cursor, and Antigravity agents.",
+      "trigger_patterns": [
+        "create model context protocol server",
+        "fastmcp python tool definition",
+        "mcp server claude cursor integration",
+        "mcp dynamic resources json-rpc 2.0",
+        "mcp sse stdio transport server"
+      ],
+      "relative_path": "skills/ai-llm-agents/agent-tooling/modelcontextprotocol-server-dev/SKILL.md"
+    },
+    {
+      "id": "ai-llm-agents.agent-memory.knowledge-graph-memory-agent",
+      "name": "knowledge-graph-memory-agent",
+      "title": "Knowledge Graph Associative Memory for Autonomous Agents",
+      "category": "ai-llm-agents",
+      "subcategory": "agent-memory",
+      "version": "1.2.0",
+      "tags": [
+        "knowledge-graph",
+        "agent-memory",
+        "entities",
+        "relations",
+        "graph-rag",
+        "networkx",
+        "persistent-memory"
+      ],
+      "trust_rating": 0.98,
+      "estimated_tokens": 1800,
+      "description": "Construct persistent, graph-structured associative memory systems for long-running autonomous agents, enabling relational entity extraction, multi-hop contextual traversal, and temporal memory decay.",
+      "trigger_patterns": [
+        "agent knowledge graph memory",
+        "entity relation extraction agent memory",
+        "graph rag multi hop associative recall",
+        "persistent agent memory networkx"
+      ],
+      "relative_path": "skills/ai-llm-agents/agent-memory/knowledge-graph-memory-agent/SKILL.md"
+    },
+    {
+      "id": "ai-llm-agents.agent-reasoning.sequential-thinking-reasoning",
+      "name": "sequential-thinking-reasoning",
+      "title": "Sequential Thinking & Tree-of-Thought Dynamic Reasoning",
+      "category": "ai-llm-agents",
+      "subcategory": "agent-reasoning",
+      "version": "1.3.0",
+      "tags": [
+        "sequential-thinking",
+        "tree-of-thought",
+        "chain-of-thought",
+        "reasoning",
+        "self-correction",
+        "backtracking"
+      ],
+      "trust_rating": 0.99,
+      "estimated_tokens": 1750,
+      "description": "Implement structured sequential reasoning and tree-of-thought exploration loops for complex multi-step coding, debugging, and architecture design tasks with branch evaluation, backtracking, and hypothesis testing.",
+      "trigger_patterns": [
+        "sequential thinking reasoning loop",
+        "tree of thought branch backtracking",
+        "agent self reflection hypothesis testing",
+        "dynamic step by step problem solving"
+      ],
+      "relative_path": "skills/ai-llm-agents/agent-reasoning/sequential-thinking-reasoning/SKILL.md"
+    },
+    {
       "id": "devops-cloud-serverless.containerization.docker-multi-stage-distroless",
       "name": "docker-multi-stage-distroless",
       "title": "Docker Multi-Stage Builds with Distroless & Security Hardening",
@@ -1077,6 +1260,33 @@
         "prometheus alertmanager rules"
       ],
       "relative_path": "skills/devops-cloud-serverless/observability/prometheus-grafana-telemetry/SKILL.md"
+    },
+    {
+      "id": "devops-cloud-serverless.gitops-orchestration.kubernetes-helm-gitops-argocd",
+      "name": "kubernetes-helm-gitops-argocd",
+      "title": "ArgoCD GitOps, Helm Orchestration & Multi-Cluster Sync",
+      "category": "devops-cloud-serverless",
+      "subcategory": "gitops-orchestration",
+      "version": "1.3.0",
+      "tags": [
+        "argocd",
+        "gitops",
+        "kubernetes",
+        "helm",
+        "kustomize",
+        "multi-cluster",
+        "declarative"
+      ],
+      "trust_rating": 0.98,
+      "estimated_tokens": 1750,
+      "description": "Implement declarative Kubernetes continuous delivery with ArgoCD ApplicationSets, Helm chart overlays, automated drift detection, self-healing, and zero-downtime progressive rollouts.",
+      "trigger_patterns": [
+        "argocd gitops application manifest",
+        "helm values override argocd sync",
+        "argocd applicationset multi cluster",
+        "kubernetes declarative gitops pipeline"
+      ],
+      "relative_path": "skills/devops-cloud-serverless/gitops-orchestration/kubernetes-helm-gitops-argocd/SKILL.md"
     },
     {
       "id": "security-sast-hardening.application-security.owasp-top10-scanner",
@@ -1551,6 +1761,34 @@
         "architecture decision log governance"
       ],
       "relative_path": "skills/clean-architecture-refactoring/architectural-docs/adr-architecture-decision-records/SKILL.md"
+    },
+    {
+      "id": "clean-architecture-refactoring.systems-engineering.rust-axum-tokio-async",
+      "name": "rust-axum-tokio-async",
+      "title": "Rust Axum & Tokio High-Throughput Async Architecture",
+      "category": "clean-architecture-refactoring",
+      "subcategory": "systems-engineering",
+      "version": "1.3.0",
+      "tags": [
+        "rust",
+        "axum",
+        "tokio",
+        "async",
+        "sqlx",
+        "tower",
+        "high-performance",
+        "zero-cost-abstractions"
+      ],
+      "trust_rating": 0.99,
+      "estimated_tokens": 1900,
+      "description": "Architect ultra-high-throughput, memory-safe asynchronous web services and microservices using Rust, Axum, Tokio multi-threaded runtime, Tower middleware, and SQLx compile-time query validation.",
+      "trigger_patterns": [
+        "rust axum rest api server",
+        "tokio async rust web service",
+        "sqlx compile time postgres rust",
+        "tower middleware layers axum"
+      ],
+      "relative_path": "skills/clean-architecture-refactoring/systems-engineering/rust-axum-tokio-async/SKILL.md"
     }
   ]
 }
