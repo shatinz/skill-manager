@@ -14,6 +14,7 @@ import urllib.error
 from pathlib import Path
 from typing import List, Dict, Optional, Tuple, Any, Set
 from .models import SkillSource, SkillPackage, SourceType, SkillFormat
+from .remote import RemoteRepoScanner, is_remote_location, parse_git_url
 
 
 DEFAULT_SOURCES = [
@@ -101,6 +102,7 @@ class SourceManager:
         self.sources_file = os.path.join(self.config_dir, "sources.json")
         os.makedirs(self.config_dir, exist_ok=True)
         os.makedirs(self.cache_dir, exist_ok=True)
+        self.remote_scanner = RemoteRepoScanner(self.cache_dir)
         self.sources: Dict[str, SkillSource] = {}
         self._load_sources()
 
@@ -147,6 +149,10 @@ class SourceManager:
         branch: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None
     ) -> SkillSource:
+        # Auto-detect git_repo if remote URL provided
+        if source_type == SourceType.LOCAL_DIR and is_remote_location(location):
+            source_type = SourceType.GIT_REPO
+
         src = SkillSource(
             id=id,
             name=name,
@@ -177,43 +183,42 @@ class SourceManager:
         return False
 
     def sync_source(self, source_id: str) -> Tuple[bool, str, int]:
-        """Sync or clone a remote or local source."""
+        """Sync or index a remote or local source without full repository download."""
         src = self.get_source(source_id)
         if not src:
             return False, f"Source '{source_id}' not found", 0
 
-        if src.source_type == SourceType.GIT_REPO:
-            repo_cache = os.path.join(self.cache_dir, f"repo_{src.id}")
+        if src.is_remote or src.source_type in (SourceType.GIT_REPO, SourceType.HTTP_REGISTRY) or is_remote_location(src.location):
             try:
-                if os.path.exists(os.path.join(repo_cache, ".git")):
-                    subprocess.run(
-                        ["git", "-C", repo_cache, "pull", "--ff-only"],
-                        check=False,
-                        capture_output=True,
-                        timeout=30
-                    )
-                else:
-                    cmd = ["git", "clone", "--depth", "1"]
-                    if src.branch:
-                        cmd.extend(["-b", src.branch])
-                    cmd.extend([src.location, repo_cache])
-                    subprocess.run(cmd, check=True, capture_output=True, timeout=45)
+                packages = self.remote_scanner.scan_remote_source(
+                    source=src,
+                    parse_frontmatter_func=parse_frontmatter,
+                    infer_capabilities_func=self._infer_capabilities,
+                    infer_frameworks_func=self._infer_frameworks,
+                    estimate_tokens_func=estimate_tokens,
+                    force_refresh=True
+                )
                 
-                # Count skills
-                packages = self.scan_source_skills(src)
+                # If remote network yielded nothing (e.g. offline sandbox), check scratch fallback
+                if not packages:
+                    scratch_alt = os.path.expanduser("~/.gemini/antigravity/scratch/skills-and-rules")
+                    if os.path.exists(scratch_alt):
+                        packages = self._scan_directory(scratch_alt, src)
+
                 src.skill_count = len(packages)
-                src.last_synced = os.path.getmtime(repo_cache) if os.path.exists(repo_cache) else None
+                import time
+                src.last_synced = time.time()
                 self.save_sources()
-                return True, f"Successfully synced git repository '{src.name}' ({len(packages)} skills found)", len(packages)
+                return True, f"Successfully indexed remote repository '{src.name}' ({len(packages)} skills found via zero-clone discovery)", len(packages)
             except Exception as e:
-                # If git fails, try checking if a local clone exists in scratch
+                # If remote fails, try checking if a local clone exists in scratch
                 scratch_alt = os.path.expanduser("~/.gemini/antigravity/scratch/skills-and-rules")
                 if os.path.exists(scratch_alt):
                     packages = self._scan_directory(scratch_alt, src)
                     src.skill_count = len(packages)
                     self.save_sources()
                     return True, f"Synced from local mirror '{scratch_alt}' ({len(packages)} skills)", len(packages)
-                return False, f"Failed to sync git source {src.location}: {str(e)}", 0
+                return False, f"Failed to sync remote source {src.location}: {str(e)}", 0
 
         elif src.source_type in (SourceType.LOCAL_DIR, SourceType.ANTIGRAVITY_SYSTEM, SourceType.BUILTIN_VAULT, SourceType.CURSOR_RULES):
             resolved_path = os.path.expanduser(src.location)
@@ -232,11 +237,19 @@ class SourceManager:
         if not source.enabled:
             return []
 
-        if source.source_type == SourceType.GIT_REPO:
-            repo_cache = os.path.join(self.cache_dir, f"repo_{source.id}")
-            if os.path.exists(repo_cache):
-                return self._scan_directory(repo_cache, source)
-            # Try fallback scratch path if git clone wasn't run yet
+        if source.is_remote or source.source_type in (SourceType.GIT_REPO, SourceType.HTTP_REGISTRY) or is_remote_location(source.location):
+            packages = self.remote_scanner.scan_remote_source(
+                source=source,
+                parse_frontmatter_func=parse_frontmatter,
+                infer_capabilities_func=self._infer_capabilities,
+                infer_frameworks_func=self._infer_frameworks,
+                estimate_tokens_func=estimate_tokens,
+                force_refresh=False
+            )
+            if packages:
+                return packages
+
+            # Fallback to local scratch clone if offline or uninitialized
             scratch_path = os.path.expanduser("~/.gemini/antigravity/scratch/skills-and-rules")
             if os.path.exists(scratch_path):
                 return self._scan_directory(scratch_path, source)
@@ -460,10 +473,16 @@ class SourceManager:
 
         packages = self.scan_source_skills(src)
         for pkg in packages:
-            if pkg.id == skill_id or pkg.name == skill_id:
+            if pkg.id == skill_id or pkg.name == skill_id or pkg.qualified_id == skill_id:
                 if pkg.raw_content:
                     return pkg.raw_content
+                if src.is_remote or pkg.remote_url:
+                    content = self.remote_scanner.fetch_skill_raw_content(src, pkg)
+                    if content:
+                        pkg.raw_content = content
+                        return content
                 if pkg.file_path and os.path.exists(pkg.file_path):
                     with open(pkg.file_path, "r", encoding="utf-8") as f:
                         return f.read()
         return None
+

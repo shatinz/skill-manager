@@ -45,6 +45,13 @@ class SkillSource:
     skill_count: int = 0
     metadata: Dict[str, Any] = field(default_factory=dict)
 
+    @property
+    def is_remote(self) -> bool:
+        if self.source_type in (SourceType.GIT_REPO, SourceType.HTTP_REGISTRY):
+            return True
+        loc = (self.location or "").strip().lower()
+        return loc.startswith("http://") or loc.startswith("https://") or loc.startswith("git@") or "github.com" in loc
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "id": self.id,
@@ -57,6 +64,7 @@ class SkillSource:
             "branch": self.branch,
             "last_synced": self.last_synced,
             "skill_count": self.skill_count,
+            "is_remote": self.is_remote,
             "metadata": self.metadata,
         }
 
@@ -100,6 +108,7 @@ class SkillPackage:
     required_tools: List[str] = field(default_factory=list)
     actionability_score: float = 0.9  # How concrete/runnable code vs docs
     file_path: Optional[str] = None
+    remote_url: Optional[str] = None
     raw_content: Optional[str] = None
     token_count: int = 0
     metadata: Dict[str, Any] = field(default_factory=dict)
@@ -127,6 +136,7 @@ class SkillPackage:
             "required_tools": self.required_tools,
             "actionability_score": self.actionability_score,
             "file_path": self.file_path,
+            "remote_url": self.remote_url,
             "token_count": self.token_count,
             "metadata": self.metadata,
         }

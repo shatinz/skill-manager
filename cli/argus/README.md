@@ -96,13 +96,16 @@ Sources Queried:   builtin-vault, antigravity-system, skills-and-rules-repo, cur
 
 ### 2. Multi-Repository Management (`argus sources`)
 
-Manage distributed repositories, local folders, and upstream Git mirrors:
+Manage distributed repositories, local folders, and upstream Git mirrors without downloading entire repositories:
+
+- **Zero-Clone Remote Discovery:** Argus connects to remote GitHub & Git repositories using the GitHub Recursive Trees API, streaming archive extraction, and sparse git filters. It indexes skill frontmatters, capabilities, and tags without downloading or storing the full repository codebase on the local machine.
+- **On-Demand Content Streaming:** Full skill markdown instructions and recipes are fetched and cached on demand only when accessed.
 
 ```bash
 # List registered sources and skill counts
 argus sources list
 
-# Connect a new external GitHub repository
+# Connect a new external GitHub repository (zero-clone discovery)
 argus sources add --id my-team-skills --name "Team Skills Repo" --type git_repo --location "https://github.com/org/team-skills" --branch main
 
 # Connect a local custom folder
@@ -111,7 +114,7 @@ argus sources add --id custom-vault --name "Local R&D Vault" --type local_dir --
 # Remove a source
 argus sources remove my-team-skills
 
-# Synchronize / git-pull all enabled repositories
+# Synchronize & refresh index for all enabled repositories
 argus sync
 ```
 
