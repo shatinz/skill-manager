@@ -176,7 +176,7 @@ def main():
     fetch_parser.add_argument("skill_id", help="Skill identifier (e.g. 'threejs-scene-craft')")
 
     # sources
-    sources_parser = subparsers.add_parser("sources", help="Manage external skill repositories and vaults")
+    sources_parser = subparsers.add_parser("sources", aliases=["source"], help="Manage external skill repositories and vaults")
     src_sub = sources_parser.add_subparsers(dest="sources_subcommand")
     
     src_sub.add_parser("list", help="List configured sources")
@@ -221,7 +221,7 @@ def main():
         handle_search(proxy, args)
     elif args.command == "fetch":
         handle_fetch(proxy, args)
-    elif args.command == "sources":
+    elif args.command in ("sources", "source"):
         handle_sources(proxy, args)
     elif args.command == "sync":
         res = proxy.sync_all()
