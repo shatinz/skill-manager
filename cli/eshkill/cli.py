@@ -93,6 +93,13 @@ def run_test_router_suite(router: AutoRouter, verbose: bool = True):
 
 
 def main():
+    if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument("--json", action="store_true", help="Output machine-readable JSON for AI agent integration")
     parent_parser.add_argument("--source", type=str, help="Custom local directory or remote URL for skill vault")

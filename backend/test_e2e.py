@@ -10,6 +10,13 @@ End-to-end integration test verifying Stages A through G:
 """
 
 import sys
+if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 from fastapi.testclient import TestClient
 from app.main import app
 from app.database import engine, SessionLocal

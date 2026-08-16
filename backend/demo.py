@@ -15,6 +15,13 @@ import sys
 import os
 from datetime import datetime, timedelta
 
+if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 # Ensure backend root is on PYTHONPATH
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 

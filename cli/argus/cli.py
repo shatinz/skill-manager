@@ -151,6 +151,13 @@ def handle_doctor(proxy: ArgusProxy, args: argparse.Namespace):
 
 
 def main():
+    if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
     parser = argparse.ArgumentParser(
         prog="argus",
         description="Argus — Multi-Repository Skill Proxy & Goal-Aware Search Engine for AI Agents"
