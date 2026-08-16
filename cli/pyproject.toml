@@ -20,3 +20,4 @@ classifiers = [
 [project.scripts]
 eshkill = "eshkill.cli:main"
 askill = "eshkill.cli:main"
+argus = "argus.cli:main"

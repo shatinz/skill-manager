@@ -10,6 +10,7 @@ setup(
         "console_scripts": [
             "eshkill=eshkill.cli:main",
             "askill=eshkill.cli:main",
+            "argus=argus.cli:main",
         ],
     },
     python_requires=">=3.8",

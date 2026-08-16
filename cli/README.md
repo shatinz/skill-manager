@@ -29,14 +29,43 @@ Connecting autonomous AI agents to living, community-driven skill capabilities w
 - 🌐 **Zero-Dependency REST Server (`eshkill serve`):**
   - Lightweight HTTP JSON daemon running on standard Python library `http.server`.
   - Endpoints: `/v1/health`, `/v1/search`, `/v1/auto-route`, `/v1/match`, `/v1/skills`, `/v1/install`, `/v1/proposals`.
+- 👁️ **Argus Multi-Repository Proxy & Goal-Aware Search Engine (`argus`):**
+  - Connects AI agents to distributed skill repositories (Git repos, local vaults, Antigravity skills, Cursor rules).
+  - Deconstructs user prompt intent (e.g. *"make a 3d website"*) and matches skills based on the holistic goal.
+  - Multi-tier ranking: Goal Relevancy (45%), Capability Fit (25%), Ecosystem Compatibility (20%), Source Trust (10%).
+  - Dedicated MCP Server (`argus mcp`) and REST API daemon (`argus serve`).
 - 🔄 **100% Backwards Compatibility:**
-  - Both `eshkill` and `askill` CLI commands and Python packages are fully supported.
+  - `eshkill`, `askill`, and `argus` CLI commands and Python packages are fully supported.
 
 ---
 
 ## 🛠️ CLI Quickstart
 
-### 1. Autonomous Vibe-Coding Router (`auto-select`)
+### 1. Argus Multi-Repository Goal Matcher (`argus match`)
+```bash
+# Goal-aware match and stack synthesis across all connected repos
+argus match "make a 3d website"
+
+# Print compiled agent prompt payload
+argus match "build a fastapi rest api with postgresql" --agent
+
+# Machine-readable JSON output
+argus match "create fullstack dashboard with supabase" --json
+```
+
+### 2. Argus Repository Source Management (`argus sources`)
+```bash
+# List registered repositories and vaults
+argus sources list
+
+# Add external GitHub repository or local vault
+argus sources add --id custom-repo --name "My Skills" --type git_repo --location "https://github.com/user/my-skills"
+
+# Sync all external sources
+argus sync
+```
+
+### 3. Autonomous Vibe-Coding Router (`eshkill auto-select`)
 ```bash
 # Get unified agent prompt payload for a complete tech stack
 eshkill auto-select "build a real-time chat with supabase and nextjs 15 and tailwind styling"
