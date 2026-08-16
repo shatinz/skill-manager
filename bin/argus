@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+import sys
+import os
+
+# Add cli directory to sys.path
+cli_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "cli"))
+if cli_dir not in sys.path:
+    sys.path.insert(0, cli_dir)
+
+from argus.cli import main
+
+if __name__ == "__main__":
+    main()

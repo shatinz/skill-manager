@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300f0ff' stroke-width='2'><circle cx='12' cy='12' r='10'/><path d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'/><path d='M2 12h20'/></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="Shipien Orbital Matrix - Next-Gen Quantum Obfuscated VPN Network with Low-Earth and Geostationary Orbit Relays" />
+    <title>SHIPIEN // Orbital Matrix - Next-Gen Quantum VPN Network</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- 3D Three.js WebGL Canvas Canvas Mount -->
+      <div id="webgl-canvas-container"></div>
+
+      <!-- HUD Top & Bottom Overlay Layer -->
+      <div class="hud-layer">
+        
+        <!-- Top Navigation Bar -->
+        <header class="hud-topbar">
+          <div class="brand-wrapper">
+            <div class="brand-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="9" stroke="#00f0ff" />
+                <ellipse cx="12" cy="12" rx="11" ry="4" transform="rotate(-30 12 12)" stroke="#a855f7" />
+                <circle cx="17" cy="8" r="1.5" fill="#00f0ff" />
+              </svg>
+            </div>
+            <div class="brand-title">SHIPIEN</div>
+            <span class="brand-badge">ARGUS ORBITAL SHIELD</span>
+          </div>
+
+          <!-- Live Network Stats Monitor -->
+          <div class="hud-stats-group">
+            <div class="stat-chip">
+              <span class="pulse-dot"></span>
+              <span data-i18n-en="ORBITAL NODES:" data-i18n-fa="نودهای ماهواره‌ای:">ORBITAL NODES:</span>
+              <span class="stat-value">48/48 ONLINE</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-chip">
+              <span data-i18n-en="GLOBAL LATENCY:" data-i18n-fa="پینگ جهانی:">GLOBAL LATENCY:</span>
+              <span class="stat-value" data-live-ping="14">14ms</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-chip">
+              <span data-i18n-en="ENCRYPTION:" data-i18n-fa="رمزنگاری:">ENCRYPTION:</span>
+              <span class="stat-value">KYBER-1024</span>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="hud-actions">
+            <button id="sound-toggle-btn" class="hud-btn" title="Toggle Procedural Audio FX">
+              <span class="btn-icon">🔊</span>
+              <span class="btn-label" data-i18n-en="Audio FX" data-i18n-fa="صوت فضایی">Audio FX</span>
+            </button>
+            <button id="lang-toggle-btn" class="hud-btn" title="Toggle Language (EN / فارسی)">
+              <span class="btn-icon">🌐</span>
+              <span class="btn-label">EN</span>
+            </button>
+            <button class="hud-btn primary" data-action="open-plan" data-plan-id="meo-shield">
+              <span data-i18n-en="⚡ View Featured Plan" data-i18n-fa="⚡ مشاهده پلن ویژه">⚡ View Featured Plan</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Bottom Controls & Orbit Selection Dock -->
+        <footer class="hud-bottom">
+          
+          <!-- Left: Live Telemetry Terminal -->
+          <div class="telemetry-container">
+            <div class="telemetry-header">
+              <div class="telemetry-title">
+                <span class="pulse-dot"></span>
+                <span>ARGUS LIVE TELEMETRY</span>
+              </div>
+              <span style="font-family: var(--font-mono); font-size: 0.65rem; color: #10b981;">SECURE</span>
+            </div>
+            <div id="telemetry-feed" class="telemetry-feed">
+              <div class="telemetry-item"><span class="log-time">[LIVE]</span> Planetary mesh link synchronized across 12 zones</div>
+            </div>
+          </div>
+
+          <!-- Center: 4 Orbital Tier Selector Dock -->
+          <div class="orbit-dock">
+            <button class="orbit-dock-item" data-tier="1" title="LEO Alpha Mesh">
+              <span class="dock-badge" style="background: rgba(0, 240, 255, 0.15); color: #00f0ff;">LEO</span>
+              <div class="dock-info">
+                <span class="dock-name" data-i18n-en="Orbital Scout" data-i18n-fa="مدار پایینی LEO">Orbital Scout</span>
+                <span class="dock-price">$3.49/mo</span>
+              </div>
+            </button>
+
+            <button class="orbit-dock-item active" data-tier="2" title="MEO Argus Shield (Recommended)">
+              <span class="dock-badge" style="background: rgba(168, 85, 247, 0.2); color: #a855f7;">MEO</span>
+              <div class="dock-info">
+                <span class="dock-name" data-i18n-en="Argus Stealth Pro" data-i18n-fa="سپر آرگوس MEO">Argus Stealth Pro</span>
+                <span class="dock-price">$6.99/mo</span>
+              </div>
+            </button>
+
+            <button class="orbit-dock-item" data-tier="3" title="GEO Sovereign Titan">
+              <span class="dock-badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">GEO</span>
+              <div class="dock-info">
+                <span class="dock-name" data-i18n-en="Cosmic Sovereign" data-i18n-fa="مدار ژئو GEO">Cosmic Sovereign</span>
+                <span class="dock-price">$12.99/mo</span>
+              </div>
+            </button>
+
+            <button class="orbit-dock-item" data-tier="4" title="Polar Deep Infiltration">
+              <span class="dock-badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">POLAR</span>
+              <div class="dock-info">
+                <span class="dock-name" data-i18n-en="Cipher Aurora" data-i18n-fa="مدار قطبی Polar">Cipher Aurora</span>
+                <span class="dock-price">$8.99/mo</span>
+              </div>
+            </button>
+          </div>
+
+          <!-- Right: Viewport Controls -->
+          <div class="viewport-tools">
+            <button id="btn-toggle-rotate" class="tool-btn active" title="Toggle Auto-Rotation">
+              <span>🔄</span>
+            </button>
+            <button id="btn-reset-cam" class="tool-btn" title="Reset Orbital Camera">
+              <span>🎯</span>
+            </button>
+          </div>
+
+        </footer>
+
+      </div>
+
+      <!-- 3D Raycaster Hover Tooltip -->
+      <div id="hover-tooltip" class="hover-tooltip"></div>
+
+      <!-- Backdrop for Liquid Glass Modal -->
+      <div id="modal-backdrop" class="modal-backdrop"></div>
+
+      <!-- Interactive Liquid Glass Modal Menu -->
+      <div id="liquidglass-modal" class="liquidglass-modal">
+        <button id="modal-close-btn" class="modal-close-btn" aria-label="Close modal">✕</button>
+        <div id="modal-dynamic-content"></div>
+      </div>
+
+    </div>
+
+    <!-- Application Entry -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

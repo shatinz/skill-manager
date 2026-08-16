@@ -5,10 +5,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![MCP Standard](https://img.shields.io/badge/MCP-2024--11--05-purple.svg)](https://modelcontextprotocol.io/)
-[![Security: Audited](https://img.shields.io/badge/Security%20Gate-Verified%200%20Vulns-success)](security_audit_report.md)
+[![Argus Proxy](https://img.shields.io/badge/Argus-Multi--Repo%20Skill%20Proxy-orange.svg)](ARGUS.md)
 [![Ecosystem](https://img.shields.io/badge/Vault-60%20Curated%20Skills-cyan)](#-the-living-skill-vault-60-skills)
 
-**[English](README.md)** • **[فارسی (Persian)](README.fa.md)** • **[Русский (Russian)](README.ru.md)** • **[中文 (Chinese)](README.zh.md)**
+**[English](README.md)** • **[👁️ Argus Guide](ARGUS.md)** • **[فارسی (Persian)](README.fa.md)** • **[Русский (Russian)](README.ru.md)** • **[中文 (Chinese)](README.zh.md)**
 
 </div>
 
