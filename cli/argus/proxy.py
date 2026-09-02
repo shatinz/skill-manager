@@ -163,3 +163,10 @@ class ArgusProxy:
                 }
         self.refresh_catalog()
         return results
+
+    def update_best_repositories(self, auto_discover: bool = True, sync_now: bool = False) -> Dict[str, Any]:
+        """Update and register the highest quality GitHub skill repositories."""
+        result = self.source_manager.update_best_repositories(auto_discover=auto_discover)
+        if sync_now or result.get("added"):
+            self.refresh_catalog()
+        return result

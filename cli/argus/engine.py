@@ -84,6 +84,25 @@ GOAL_ONTOLOGY = {
         "domains": ["security-sast-hardening"],
         "inferred_needs": ["threat_analysis", "input_sanitization", "auth_verification"],
         "recommended_capabilities": ["security_hardening"]
+    },
+    "debugging_investigation_testing": {
+        "triggers": [
+            r"\bdebug\b", r"\bdebugging\b", r"\broot cause\b", r"\brace condition\b",
+            r"\btrace\b", r"\btroubleshoot\b", r"\btest driven\b", r"\btdd\b",
+            r"\bunit test(ing)?\b", r"\be2e test(ing)?\b", r"\bflaky\b"
+        ],
+        "domains": ["engineering-discipline", "testing-qa", "debugging-logging"],
+        "inferred_needs": ["root_cause_analysis", "test_isolation", "reproduction_test", "defensive_verification"],
+        "recommended_capabilities": ["debugging_logging", "unit_testing"]
+    },
+    "ui_ux_taste_design": {
+        "triggers": [
+            r"\btaste\b", r"\banti-slop\b", r"\bdesign system\b", r"\bminimalist\b",
+            r"\btypography\b", r"\bbrutalist\b", r"\bui/ux\b", r"\baesthetics?\b"
+        ],
+        "domains": ["ui-design", "ui-design-antislop", "styling-css"],
+        "inferred_needs": ["anti_slop_guidelines", "typography_tokens", "layout_composition", "design_tokens"],
+        "recommended_capabilities": ["frontend_ui", "styling_css"]
     }
 }
 

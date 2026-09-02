@@ -58,6 +58,94 @@ DEFAULT_SOURCES = [
         priority=80,
         trust_score=0.90,
         metadata={"description": "Workspace cursorrules and MDC rules"}
+    ),
+    SkillSource(
+        id="obra-superpowers",
+        name="Agentic Superpowers & Workflows",
+        source_type=SourceType.GIT_REPO,
+        location="https://github.com/obra/superpowers",
+        enabled=True,
+        priority=94,
+        trust_score=0.97,
+        branch="main",
+        metadata={"description": "Battle-tested agentic skills for SDD, TDD, debugging, and review"}
+    ),
+    SkillSource(
+        id="anthropics-skills",
+        name="Anthropic Claude Agent Skills",
+        source_type=SourceType.GIT_REPO,
+        location="https://github.com/anthropics/skills",
+        enabled=True,
+        priority=93,
+        trust_score=0.96,
+        branch="main",
+        metadata={"description": "Official Anthropic repository of modular agent skills and tool integrations"}
+    ),
+    SkillSource(
+        id="leonxlnx-taste-skill",
+        name="Frontend Taste & Anti-Slop Skills",
+        source_type=SourceType.GIT_REPO,
+        location="https://github.com/Leonxlnx/taste-skill",
+        enabled=True,
+        priority=88,
+        trust_score=0.93,
+        branch="main",
+        metadata={"description": "Curated skills for high-taste UI/UX design, brutalism, and anti-AI slop"}
+    ),
+    SkillSource(
+        id="patrickjs-awesome-cursorrules",
+        name="Awesome Cursor Rules & Framework MDCs",
+        source_type=SourceType.GIT_REPO,
+        location="https://github.com/PatrickJS/awesome-cursorrules",
+        enabled=True,
+        priority=89,
+        trust_score=0.94,
+        branch="main",
+        metadata={"description": "Universal collection of .cursorrules and MDCs across 200+ technology stacks"}
+    ),
+    SkillSource(
+        id="wshobson-agents",
+        name="Coding Agent Conventions & Tooling",
+        source_type=SourceType.GIT_REPO,
+        location="https://github.com/wshobson/agents",
+        enabled=True,
+        priority=86,
+        trust_score=0.91,
+        branch="main",
+        metadata={"description": "Coding agent conventions, Python tooling, and agent skill authoring"}
+    ),
+    SkillSource(
+        id="dietrich-gebert-ponytail",
+        name="Ponytail Autonomous Audit & Architecture",
+        source_type=SourceType.GIT_REPO,
+        location="https://github.com/DietrichGebert/ponytail",
+        enabled=True,
+        priority=87,
+        trust_score=0.92,
+        branch="main",
+        metadata={"description": "Autonomous codebase audit, debt elimination, and architectural skills"}
+    ),
+    SkillSource(
+        id="modelcontextprotocol-servers",
+        name="MCP Reference Servers & Tools",
+        source_type=SourceType.GIT_REPO,
+        location="https://github.com/modelcontextprotocol/servers",
+        enabled=True,
+        priority=91,
+        trust_score=0.95,
+        branch="main",
+        metadata={"description": "Official reference implementations for Model Context Protocol servers"}
+    ),
+    SkillSource(
+        id="rmyndharis-antigravity-skills",
+        name="rmyndharis Antigravity Skills",
+        source_type=SourceType.GIT_REPO,
+        location="https://github.com/rmyndharis/antigravity-skills",
+        enabled=True,
+        priority=85,
+        trust_score=0.90,
+        branch="main",
+        metadata={"description": "Community Antigravity agent skills collection"}
     )
 ]
 
@@ -114,6 +202,14 @@ class SourceManager:
                     for item in data.get("sources", []):
                         src = SkillSource.from_dict(item)
                         self.sources[src.id] = src
+                # Merge missing DEFAULT_SOURCES without overwriting user custom sources
+                changed = False
+                for def_src in DEFAULT_SOURCES:
+                    if def_src.id not in self.sources:
+                        self.sources[def_src.id] = def_src
+                        changed = True
+                if changed:
+                    self.save_sources()
             except Exception:
                 self._init_default_sources()
         else:
@@ -124,6 +220,95 @@ class SourceManager:
         for src in DEFAULT_SOURCES:
             self.sources[src.id] = src
         self.save_sources()
+
+    def update_best_repositories(self, auto_discover: bool = True) -> Dict[str, Any]:
+        """
+        Synchronize with the best GitHub skill repositories and optionally
+        discover new trending high-starred skill repositories via GitHub Search API.
+        """
+        added: List[str] = []
+        updated: List[str] = []
+
+        # 1. Sync curated DEFAULT_SOURCES
+        for src in DEFAULT_SOURCES:
+            if src.id not in self.sources:
+                self.sources[src.id] = src
+                added.append(src.id)
+            else:
+                existing = self.sources[src.id]
+                if (existing.location != src.location or
+                        existing.trust_score != src.trust_score or
+                        existing.priority != src.priority):
+                    existing.location = src.location
+                    existing.trust_score = src.trust_score
+                    existing.priority = src.priority
+                    existing.branch = src.branch
+                    updated.append(src.id)
+
+        # 2. Dynamic discovery of top trending repositories on GitHub
+        discovered_count = 0
+        if auto_discover:
+            search_topics = ["topic:agent-skills", "topic:cursor-rules", "topic:cursorrules", "claude-skills"]
+            headers = {
+                "User-Agent": "Argus-Skill-Discovery/1.0",
+                "Accept": "application/vnd.github.v3+json"
+            }
+            token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+            if token:
+                headers["Authorization"] = f"Bearer {token}"
+
+            existing_locations = {s.location.strip().rstrip("/").lower() for s in self.sources.values()}
+
+            for topic in search_topics:
+                api_url = f"https://api.github.com/search/repositories?q={topic}&sort=stars&order=desc"
+                req = urllib.request.Request(api_url, headers=headers)
+                try:
+                    with urllib.request.urlopen(req, timeout=5) as resp:
+                        if resp.status == 200:
+                            data = json.loads(resp.read().decode("utf-8"))
+                            for item in data.get("items", [])[:5]:
+                                stars = item.get("stargazers_count", 0)
+                                if stars < 500:
+                                    continue
+                                html_url = item.get("html_url", "").strip().rstrip("/")
+                                if not html_url or html_url.lower() in existing_locations:
+                                    continue
+                                
+                                owner = item.get("owner", {}).get("login", "community")
+                                repo = item.get("name", "skills")
+                                sid = f"gh-{owner.lower()}-{repo.lower()}"
+                                if sid in self.sources:
+                                    continue
+
+                                branch = item.get("default_branch", "main")
+                                desc = (item.get("description") or "Auto-discovered high-star skill repository")[:120]
+                                trust = min(0.95, round(0.85 + (stars / 200000) * 0.1, 2))
+
+                                new_src = SkillSource(
+                                    id=sid,
+                                    name=f"{repo} ({owner})",
+                                    source_type=SourceType.GIT_REPO,
+                                    location=html_url,
+                                    enabled=True,
+                                    priority=85,
+                                    trust_score=trust,
+                                    branch=branch,
+                                    metadata={"description": desc, "stars": stars, "auto_discovered": True}
+                                )
+                                self.sources[sid] = new_src
+                                existing_locations.add(html_url.lower())
+                                added.append(sid)
+                                discovered_count += 1
+                except Exception:
+                    pass
+
+        self.save_sources()
+        return {
+            "added": added,
+            "updated": updated,
+            "auto_discovered_count": discovered_count,
+            "total_sources": len(self.sources)
+        }
 
     def save_sources(self):
         data = {

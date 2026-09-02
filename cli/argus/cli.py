@@ -135,6 +135,24 @@ def handle_sources(proxy: ArgusProxy, args: argparse.Namespace):
             status_icon = "✓" if details["success"] else "✗"
             print(f"[{status_icon}] {sid}: {details['message']}")
 
+    elif subcmd == "update-best":
+        auto_discover = not getattr(args, "no_discover", False)
+        do_sync = getattr(args, "sync", False)
+        print("Updating Argus to include the best GitHub skill repositories...")
+        result = proxy.update_best_repositories(auto_discover=auto_discover, sync_now=do_sync)
+        if args.json:
+            print(json.dumps(result, indent=2))
+            return
+        print(f"Update complete! Total sources: {result['total_sources']}")
+        if result.get("added"):
+            print(f"Added {len(result['added'])} sources: {', '.join(result['added'])}")
+        if result.get("updated"):
+            print(f"Updated {len(result['updated'])} sources: {', '.join(result['updated'])}")
+        if result.get("auto_discovered_count", 0) > 0:
+            print(f"Auto-discovered {result['auto_discovered_count']} trending GitHub repositories.")
+        if do_sync:
+            print("Successfully synchronized catalog.")
+
 
 def handle_doctor(proxy: ArgusProxy, args: argparse.Namespace):
     print_banner()
@@ -199,7 +217,19 @@ def main():
     rem_src.add_argument("id", help="Source ID to remove")
 
     src_sub.add_parser("sync", help="Sync/pull all remote sources")
+
+    update_best_src = src_sub.add_parser("update-best", help="Update sources to the best GitHub skill repositories and discover trending repos")
+    update_best_src.add_argument("--no-discover", action="store_true", help="Do not query GitHub API for newly trending repos")
+    update_best_src.add_argument("--sync", action="store_true", help="Also immediately sync and re-index the catalog")
+    update_best_src.add_argument("--json", action="store_true", help="Output JSON result")
+
     sources_parser.add_argument("--json", action="store_true", help="Output JSON")
+
+    # update-repos top-level alias
+    update_repos_parser = subparsers.add_parser("update-repos", help="Update sources to the best GitHub skill repositories and discover trending repos")
+    update_repos_parser.add_argument("--no-discover", action="store_true", help="Do not query GitHub API for newly trending repos")
+    update_repos_parser.add_argument("--sync", action="store_true", help="Also immediately sync and re-index the catalog")
+    update_repos_parser.add_argument("--json", action="store_true", help="Output JSON result")
 
     # sync
     subparsers.add_parser("sync", help="Synchronize all remote and local sources")
@@ -229,6 +259,9 @@ def main():
     elif args.command == "fetch":
         handle_fetch(proxy, args)
     elif args.command in ("sources", "source"):
+        handle_sources(proxy, args)
+    elif args.command == "update-repos":
+        args.sources_subcommand = "update-best"
         handle_sources(proxy, args)
     elif args.command == "sync":
         res = proxy.sync_all()

@@ -111,6 +111,17 @@ class ArgusMCPServer:
                     "type": "object",
                     "properties": {}
                 }
+            },
+            {
+                "name": "argus_update_best_sources",
+                "description": "Update configured sources with premier high-starred GitHub skill repositories and discover trending ones.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "auto_discover": {"type": "boolean", "description": "Whether to query GitHub API for trending repositories (default true)."},
+                        "sync_now": {"type": "boolean", "description": "Whether to immediately sync and index (default false)."}
+                    }
+                }
             }
         ]
 
@@ -286,6 +297,18 @@ class ArgusMCPServer:
                     "id": req_id,
                     "result": {
                         "content": [{"type": "text", "text": json.dumps(sync_res, indent=2)}]
+                    }
+                }
+
+            elif tool_name == "argus_update_best_sources":
+                auto_discover = args.get("auto_discover", True)
+                sync_now = args.get("sync_now", False)
+                up_res = self.proxy.update_best_repositories(auto_discover=auto_discover, sync_now=sync_now)
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": json.dumps(up_res, indent=2)}]
                     }
                 }
 

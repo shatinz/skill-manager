@@ -118,7 +118,7 @@ Execute WebGL canvas shaders with procedural 3D meshes.
             id="remote-github-test",
             name="Remote Test Vault",
             source_type=SourceType.GIT_REPO,
-            location="https://github.com/shatinz/skills-and-rules",
+            location="https://github.com/mock-org/mock-skills-repo",
             branch="main"
         )
 
@@ -137,7 +137,7 @@ Execute WebGL canvas shaders with procedural 3D meshes.
         self.assertEqual(pkg.name, "remote-super-skill")
         self.assertIn("3d_rendering", pkg.capabilities)
         self.assertIn("threejs", pkg.compatible_frameworks)
-        self.assertTrue(pkg.remote_url.startswith("https://raw.githubusercontent.com/shatinz/skills-and-rules/main/"))
+        self.assertTrue(pkg.remote_url.startswith("https://raw.githubusercontent.com/mock-org/mock-skills-repo/main/"))
 
         # Verify metadata was cached on disk without storing repo files
         cache_file = os.path.join(self.scanner.meta_cache_dir, "remote-github-test.json")
@@ -179,7 +179,7 @@ Execute WebGL canvas shaders with procedural 3D meshes.
             id="stream-tar-test",
             name="Stream Tar Vault",
             source_type=SourceType.GIT_REPO,
-            location="https://github.com/shatinz/skills-and-rules",
+            location="https://github.com/mock-org/mock-tar-repo",
             branch="main"
         )
 

@@ -14,8 +14,9 @@ class TestCLIEndToEnd(unittest.TestCase):
     def run_cmd(self, bin_path: str, args: list) -> subprocess.CompletedProcess:
         cmd = [PYTHON_BIN, bin_path] + args
         env = os.environ.copy()
-        env["PYTHONPATH"] = f"{os.path.join(BASE_DIR, 'cli')}:{os.path.join(BASE_DIR, 'backend')}"
-        return subprocess.run(cmd, capture_output=True, text=True, check=False, env=env)
+        env["PYTHONPATH"] = f"{os.path.join(BASE_DIR, 'cli')}{os.pathsep}{os.path.join(BASE_DIR, 'backend')}"
+        env["PYTHONIOENCODING"] = "utf-8"
+        return subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", check=False, env=env)
 
     def test_eshkill_version(self):
         res = self.run_cmd(ESH_BIN, ["--version"])

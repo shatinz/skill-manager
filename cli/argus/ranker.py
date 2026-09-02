@@ -112,6 +112,16 @@ class GoalAwareRanker:
         elif goal.deliverable_type == "ai_agent_system":
             if "ai_agents" in pkg.capabilities or "rag" in pkg.tags or "mcp" in pkg.tags:
                 score += 0.40
+        elif goal.deliverable_type == "debugging_investigation_testing":
+            if "debugging_logging" in pkg.capabilities or "unit_testing" in pkg.capabilities or "debugging" in pkg.tags:
+                score += 0.40
+            elif "testing" in pkg.tags or "investigation" in pkg.tags:
+                score += 0.25
+        elif goal.deliverable_type == "ui_ux_taste_design":
+            if "anti-slop" in pkg.tags or "minimalist" in pkg.tags or "ui-design" in pkg.category:
+                score += 0.40
+            elif "frontend_ui" in pkg.capabilities or "styling_css" in pkg.capabilities:
+                score += 0.25
 
         return min(1.0, max(0.0, score))
 

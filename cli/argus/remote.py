@@ -27,14 +27,23 @@ SKILL_FILE_PATTERNS = [
     r"(^|/)SKILL\.md$",
     r"\.mdc$",
     r"(^|/)\.cursorrules$",
+    r"(^|/)\.clinerules$",
+    r"(^|/)\.clinerules/.*\.md$",
+    r"(^|/)\.cursor/rules/.*\.md$",
+    r"(^|/)\.cursor/rules/.*\.mdc$",
+    r"(^|/)\.agents/rules/.*\.md$",
     r"(^|/)copilot-instructions\.md$",
-    r"^(skills|rules|prompts|vault)/.*\.md$",
-    r"^skills-vault/.*\.md$",
+    r"^(skills|rules|prompts|vault|skills-vault)/.*\.md$",
+    r"(^|/)rules/.*\.mdc$",
+    r"(^|/)AGENTS\.md$",
+    r"(^|/)CLAUDE\.md$",
+    r"(^|/)GEMINI\.md$",
 ]
 
 IGNORE_NAMES = {
     "readme.md", "changelog.md", "license.md", "contributing.md",
-    "code_of_conduct.md", "security.md", "todo.md"
+    "code_of_conduct.md", "security.md", "todo.md", "release-notes.md",
+    "funding.yml", "pull_request_template.md"
 }
 
 
@@ -286,7 +295,7 @@ class RemoteRepoScanner:
         req = urllib.request.Request(api_url, headers=self._get_auth_headers())
         
         try:
-            with urllib.request.urlopen(req, timeout=2) as response:
+            with urllib.request.urlopen(req, timeout=5) as response:
                 if response.status != 200:
                     return None
                 data = json.loads(response.read().decode("utf-8"))
@@ -318,7 +327,7 @@ class RemoteRepoScanner:
         req = urllib.request.Request(tar_url, headers=self._get_auth_headers())
         
         try:
-            with urllib.request.urlopen(req, timeout=3) as response:
+            with urllib.request.urlopen(req, timeout=8) as response:
                 if response.status != 200:
                     return None
                 
@@ -393,7 +402,7 @@ class RemoteRepoScanner:
         """Fetch raw content of a single remote skill file."""
         req = urllib.request.Request(url, headers=self._get_auth_headers())
         try:
-            with urllib.request.urlopen(req, timeout=3) as response:
+            with urllib.request.urlopen(req, timeout=5) as response:
                 if response.status == 200:
                     return response.read().decode("utf-8", errors="replace")
         except Exception:
