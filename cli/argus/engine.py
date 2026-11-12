@@ -67,6 +67,16 @@ GOAL_ONTOLOGY = {
         "inferred_needs": ["query_profiling", "schema_indexing", "connection_pooling"],
         "recommended_capabilities": ["database_sql"]
     },
+    "retrieval_ranking": {
+        "triggers": [
+            r"\bskill search\b", r"\bsearch\b", r"\brank(?:ing|er)?\b",
+            r"\bretriev(?:al|e)\b", r"\brelevanc(?:e|y)\b", r"\bbm25\b",
+            r"\brecommender\b"
+        ],
+        "domains": ["search-ranking-retrieval"],
+        "inferred_needs": ["retrieval_index", "ranking_evaluation"],
+        "recommended_capabilities": ["ai_agents"]
+    },
     "devops_container_ci": {
         "triggers": [
             r"\bdocker\b", r"\bcontainer\b", r"\bci/cd\b", r"\bkubernetes\b",
@@ -79,7 +89,9 @@ GOAL_ONTOLOGY = {
     "security_hardening_audit": {
         "triggers": [
             r"\bsecurity\b", r"\bsast\b", r"\bvulnerability\b", r"\bowasp\b",
-            r"\bjwt\b", r"\bxss\b", r"\bauth\b", r"\bsanitize\b"
+            r"\bjwt\b", r"\bxss\b", r"\bauth\b", r"\bsanitize\b",
+            r"\bsecure(?:ly)?\b", r"\bpath traversal\b", r"\bsymlink\b",
+            r"\binput validation\b", r"\bsafe paths?\b"
         ],
         "domains": ["security-sast-hardening"],
         "inferred_needs": ["threat_analysis", "input_sanitization", "auth_verification"],
@@ -118,7 +130,8 @@ FRAMEWORK_PATTERNS = {
     "postgres": [r"\bpostgres(ql)?\b", r"\bsql\b"],
     "docker": [r"\bdocker\b", r"\bcontainer\b"],
     "playwright": [r"\bplaywright\b", r"\be2e\b"],
-    "pytest": [r"\bpytest\b", r"\bunit test\b"]
+    "pytest": [r"\bpytest\b", r"\bunit test\b"],
+    "python": [r"\bpython(?:\s*3(?:\.\d+)?)?\b"]
 }
 
 
@@ -219,6 +232,7 @@ class ArgusSearchIndex:
         self.doc_count = len(packages)
         self.avg_doc_len = 1.0
         self.doc_tokens: Dict[str, List[str]] = {}
+        self.doc_term_freq: Dict[str, Dict[str, int]] = {}
         self.doc_freq: Dict[str, int] = {}
         self._build_index()
 
@@ -228,6 +242,10 @@ class ArgusSearchIndex:
             text = f"{pkg.name} {pkg.description} {pkg.category} {' '.join(pkg.tags)} {' '.join(pkg.capabilities)} {' '.join(pkg.compatible_frameworks)}"
             tokens = tokenize(text)
             self.doc_tokens[pkg.qualified_id] = tokens
+            frequencies: Dict[str, int] = {}
+            for token in tokens:
+                frequencies[token] = frequencies.get(token, 0) + 1
+            self.doc_term_freq[pkg.qualified_id] = frequencies
             total_len += len(tokens)
             
             seen = set(tokens)
@@ -243,12 +261,10 @@ class ArgusSearchIndex:
         if doc_len == 0:
             return 0.0
 
-        # Term frequency in document
-        tf_dict: Dict[str, int] = {}
-        for t in tokens:
-            tf_dict[t] = tf_dict.get(t, 0) + 1
+        # Reuse the term frequencies computed when the index was built.
+        tf_dict = self.doc_term_freq.get(pkg.qualified_id, {})
 
-        for q in query_tokens:
+        for q in set(query_tokens):
             tf = tf_dict.get(q, 0)
             if tf == 0:
                 continue

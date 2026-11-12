@@ -4,6 +4,7 @@ Ranks skills based on how well they fulfill the user prompt's end-to-end goal,
 capability actionability, framework compatibility, and source trust.
 """
 
+import re
 from typing import List, Dict, Set, Tuple, Optional, Any
 from .models import GoalAnalysis, SkillPackage, SkillGoalMatch, SkillSource, ArgusBundle
 from .engine import ArgusSearchIndex, tokenize
@@ -36,6 +37,8 @@ class GoalAwareRanker:
         top_k: int = 5
     ) -> List[SkillGoalMatch]:
         query_tokens = tokenize(goal.raw_prompt)
+        if not query_tokens or top_k <= 0:
+            return []
         matches: List[SkillGoalMatch] = []
 
         for pkg in candidates:
@@ -84,9 +87,21 @@ class GoalAwareRanker:
                 confidence=confidence
             ))
 
-        # Sort by composite rank descending
+        # Select a diverse top-K. Multiple remote repositories often publish
+        # copies of the same named skill; they must not occupy separate slots.
         matches.sort(key=lambda m: m.composite_rank_score, reverse=True)
-        return matches[:top_k]
+        selected: List[SkillGoalMatch] = []
+        seen_names: Set[str] = set()
+        for match in matches:
+            canonical_name = re.sub(r"[\W_]+", "", match.skill.name.casefold())
+            key = canonical_name or match.skill.qualified_id
+            if key in seen_names:
+                continue
+            seen_names.add(key)
+            selected.append(match)
+            if len(selected) >= top_k:
+                break
+        return selected
 
     def _compute_goal_relevancy(self, goal: GoalAnalysis, pkg: SkillPackage, bm25: float) -> float:
         score = bm25 * 0.4
@@ -112,6 +127,27 @@ class GoalAwareRanker:
         elif goal.deliverable_type == "ai_agent_system":
             if "ai_agents" in pkg.capabilities or "rag" in pkg.tags or "mcp" in pkg.tags:
                 score += 0.40
+        elif goal.deliverable_type == "security_hardening_audit":
+            skill_text = f"{pkg.name} {pkg.description} {pkg.category} {' '.join(pkg.tags)}".casefold()
+            if any(term in skill_text for term in (
+                "sanitiz", "traversal", "safe path", "secure coding", "input validation"
+            )):
+                score += 0.40
+            elif "security_hardening" in pkg.capabilities:
+                score += 0.25
+        elif goal.deliverable_type == "retrieval_ranking":
+            # Ranking and search tasks need relevance/evaluation skills rather
+            # than generic tools that merely mention "optimize" or "test".
+            skill_terms = set(tokenize(
+                f"{pkg.name} {pkg.description} {pkg.category} {' '.join(pkg.tags)}"
+            ))
+            if skill_terms.intersection({
+                "search", "ranking", "retrieval", "relevance", "recommender",
+                "recommendation", "bm25", "ranker"
+            }):
+                score += 0.40
+            elif "testing_qa" in pkg.capabilities:
+                score += 0.08
         elif goal.deliverable_type == "debugging_investigation_testing":
             if "debugging_logging" in pkg.capabilities or "unit_testing" in pkg.capabilities or "debugging" in pkg.tags:
                 score += 0.40
